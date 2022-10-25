@@ -160,7 +160,7 @@ def emulate(program: str,  verbose):
         uc.emu_start(ADDRESS + EP, ADDRESS + EP + bootSize)
     except UcError as e:
         print(f"[ERROR]: {e}")
-        BobLog.info("DEBUGING")
+        BobLog.debug("DEBUGING")
 
     end = datetime.now()
     print(f"[{end}] Emulation done...")

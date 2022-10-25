@@ -2,7 +2,7 @@ class globar_var:
     a_queue=[]
     queue_size = 10
 
-class DLL_Setting:
+class DLL_SETTING:
     DLL_FUNCTIONS = {} # {function name: address}
     LOADED_DLL = {} # {dll: address}
 

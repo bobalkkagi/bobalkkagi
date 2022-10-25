@@ -1,7 +1,7 @@
 from unicorn import *
 from unicorn.x86_const import *
 from loader import EndOfString
-from config import DLL_Setting
+from config import DLL_SETTING
 
 import struct
 
@@ -17,11 +17,10 @@ def hook_LoadLibraryA(ip, rsp, uc):
     tmp = uc.mem_read(rsp,8)
     tmp=struct.unpack('<Q',tmp)[0]
 
-    
     dllName = EndOfString(bytes(uc.mem_read(rcx, 0x20))) #byte string
     
-    if dllName in DLL_Setting.LOADED_DLL:
-        d_address = DLL_Setting.LOADED_DLL[dllName]
+    if dllName in DLL_SETTING.LOADED_DLL:
+        d_address = DLL_SETTING.LOADED_DLL[dllName]
     else:
         print(f"{dllName} is not Loaded!")
     
@@ -51,7 +50,7 @@ def hook_GetProcAddress(ip, rsp, uc):
 
     functionName=EndOfString(bytes(uc.mem_read(rdx, 0x20)))
 
-    f_address = DLL_Setting.DLL_FUNCTIONS[EndOfString(bytes(uc.mem_read(rdx, 0x20)))]
+    f_address = DLL_SETTING.DLL_FUNCTIONS[EndOfString(bytes(uc.mem_read(rdx, 0x20)))]
 
     print(f"{functionName}: {hex(f_address)}")
 
@@ -79,8 +78,8 @@ def hook_GetModuleHandleA(ip, rsp, uc):
     
     print(f"RCX : {handle}")
 
-    if handle in DLL_Setting.LOADED_DLL:
-        d_address = DLL_Setting.LOADED_DLL[handle]
+    if handle in DLL_SETTING.LOADED_DLL:
+        d_address = DLL_SETTING.LOADED_DLL[handle]
 
     if d_address:
         uc.reg_write(UC_X86_REG_RAX, d_address)
