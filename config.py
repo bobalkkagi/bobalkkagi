@@ -3,7 +3,8 @@ class globar_var:
     queue_size = 10
 
 class DLL_SETTING:
-    DLL_FUNCTIONS = {} # {function name: address}
+    INV_DLL_FUNCTIONS = {}
+    DLL_FUNCTIONS = {v: k for k, v in INV_DLL_FUNCTIONS.items()}
     LOADED_DLL = {} # {dll: address}
 
 def i_queue(data):

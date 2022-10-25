@@ -29,10 +29,11 @@ def ReturnDLLAddr(addr):
 
 def DLL_Loader(uc, dllName, base) -> int: #return next dll load base 
 
-    path = GetDLLPath(dllName)
+    lowerDllName = dllName.lower()
+    path = GetDLLPath(lowerDllName)
     try :
         dll = pefile.PE(path, fast_load=True)
-        DLL_SETTING.LOADED_DLL[dllName] = base
+        DLL_SETTING.LOADED_DLL[lowerDllName] = base
         uc.mem_write(base, dll.header)
 
         for section in dll.sections:
@@ -45,12 +46,18 @@ def DLL_Loader(uc, dllName, base) -> int: #return next dll load base
         Next_DLL_ADDRESS = ReturnDLLAddr(base + len(data))
 
         for entry in dll.DIRECTORY_ENTRY_EXPORT.symbols:
+
+            if entry.name:
+                dllFunction = entry.name.decode('utf-8')
             try:
-                DLL_SETTING.DLL_FUNCTIONS[entry.name.decode('utf-8')] = base+entry.address
+                if dllFunction not in DLL_SETTING.DLL_FUNCTIONS:
+                    DLL_SETTING.DLL_FUNCTIONS[lowerDllName+"_"+dllFunction] = base+entry.address
+                else:
+                    print(f"ERROR! {dllFunction} is in DLL_FUNCTIONS")
             except:
                 pass
 
-        print(f'[Load] {dllName}: {hex(base)}')
+        print(f'[Load] {lowerDllName}: {hex(base)}')
         return Next_DLL_ADDRESS
 
     except FileNotFoundError:
@@ -73,7 +80,7 @@ def Insert_IAT(uc, pe, base, DLL_ADDRESS):
         
         dll = pe.get_string_at_rva(import_desc.Name, pefile.MAX_DLL_LENGTH).decode('utf-8') # dll Name 가져오기
 
-        if dll not in DLL_SETTING.LOADED_DLL:
+        if dll.lower() not in DLL_SETTING.LOADED_DLL:
             DLL_ADDRESS = DLL_Loader(uc, dll, DLL_ADDRESS)
                 
         peDataLen = len(pe.__data__) - file_offset
@@ -97,17 +104,21 @@ def Insert_IAT(uc, pe, base, DLL_ADDRESS):
         for funcs in importData: # Unicorn으로 할당한 IAT공간에 함수들의 정보를 저장
             
             try:
-                func_addr = DLL_SETTING.DLL_FUNCTIONS[(funcs.name).decode('utf-8')]
+                func_addr = DLL_SETTING.DLL_FUNCTIONS[dll+'_'+(funcs.name).decode('utf-8')]
             except:
-                print(func_addr)
+                print(funcs.name)
+                print("DLL FUNCTIONS\n")
+                print(DLL_SETTING.DLL_FUNCTIONS)
                 input()
                 continue
 
             uc.mem_write(base+funcs.address-imageBase,struct.pack('<Q', func_addr))
             
         rva += import_desc.sizeof()
-
-
+        print(DLL_SETTING.LOADED_DLL)
+        input('>>>>>')
+        print("DLL FUNCTIONS\n")
+        print(DLL_SETTING.DLL_FUNCTIONS)
 
 
 

@@ -57,7 +57,7 @@ def hook_block(uc, address, size, user_data):
     code = uc.mem_read(address, size)
    
     if rip in InvDllFunctions:
-        globals()['hook_'+InvDllFunctions[rip]](rip,rsp,uc)
+        globals()['hook_'+InvDllFunctions[rip].split('.dll_')[1]](rip,rsp,uc)
     print("")
     
 
@@ -84,7 +84,8 @@ def hook_code(uc, address, size, user_data):
     config.i_queue(tmp)
 
     if rip in InvDllFunctions:
-        globals()['hook_'+InvDllFunctions[rip]](rip,rsp,uc)
+        print(InvDllFunctions[rip])
+        globals()['hook_'+InvDllFunctions[rip].split('.dll_')[1]](rip,rsp,uc)
 
 
 def setup_teb(uc):
@@ -131,8 +132,7 @@ def emulate(program: str,  verbose):
         "kernel32.dll", "ntdll.dll", 
         "user32.dll", "ucrtbase.dll",
         "vcruntime140d.dll", "win32u.dll",
-        "win32u.dll", "gdi32.dll",
-        "msvcp_win.dll", "msvcp_win.dll",
+        "gdi32.dll", "msvcp_win.dll",
         "advapi32.dll", "shell32.dll", "shlwapi.dll"
         ]
     
