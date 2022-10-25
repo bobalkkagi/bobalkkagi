@@ -5,7 +5,7 @@ from loader import DLL_Loader, Insert_IAT
 from logger import *
 from datetime import datetime
 from api_hook import *
-from config import DLL_Setting
+from config import DLL_SETTING
 
 import logging
 import config
@@ -28,11 +28,6 @@ MB = 2**20 #Mega Byte
 BobLog = logging.getLogger("Bobalkkagi")
 
 
-
-def disas(code,address):
-    md=Cs(CS_ARCH_X86,CS_MODE_64)
-    assem=md.disasm(code,address)
-    return assem
 
 def hook_fetch(uc, access, address, size, value, user_data):
     
@@ -108,7 +103,8 @@ def setup_teb(uc):
 
 def emulate(program: str,  verbose):
 
-    print("Emulating Binary!")
+    start = datetime.now()
+    print(f"[{start}]Emulating Binary!")
     global InvDllFunctions
 
     DLL_ADDRESS = 0x800000
@@ -142,13 +138,13 @@ def emulate(program: str,  verbose):
     
     #Load dll
     for dll in dllList:
-        DLL_ADDRESS = DLL_Loader(uc, dll, DLL_ADDRESS, DLL_Setting.LOADED_DLL, DLL_Setting.DLL_FUNCTIONS)
+        DLL_ADDRESS = DLL_Loader(uc, dll, DLL_ADDRESS)
 
     setup_teb(uc)
 
-    Insert_IAT(uc, pe, ADDRESS, DLL_Setting.LOADED_DLL, DLL_Setting.DLL_FUNCTIONS, DLL_ADDRESS)
+    Insert_IAT(uc, pe, ADDRESS, DLL_ADDRESS)
     
-    InvDllFunctions = {v: k for k, v in DLL_Setting.DLL_FUNCTIONS.items()}
+    InvDllFunctions = {v: k for k, v in DLL_SETTING.DLL_FUNCTIONS.items()}
     
     uc.reg_write(UC_X86_REG_RSP, STACK_BASE - 0x1000) #0x200000
     uc.reg_write(UC_X86_REG_RBP, 0x0) #0x200600a
@@ -166,5 +162,7 @@ def emulate(program: str,  verbose):
         print(f"[ERROR]: {e}")
         BobLog.info("DEBUGING")
 
-    print(f"[{datetime.now()}] Emulation done...") 
+    end = datetime.now()
+    print(f"[{end}] Emulation done...")
+    print(f"Runtime: [{end-start}]")
     
