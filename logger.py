@@ -1,3 +1,6 @@
+from atexit import register
+from distutils.sysconfig import customize_compiler
+from click import argument
 from unicorn import *
 from unicorn.x86_const import *
 import logging
@@ -6,40 +9,18 @@ import struct
 from capstone import *
 import lief  # type: ignore
 
-regis = {
-    "RAX": UC_X86_REG_RAX,
-    "RBX": UC_X86_REG_RBX,
-    "RCX": UC_X86_REG_RCX,
-    "RDX": UC_X86_REG_RDX,
-    "RDI": UC_X86_REG_RDI,
-    "RSI": UC_X86_REG_RSI,
-    "R8": UC_X86_REG_R8, 
-    "R9": UC_X86_REG_R9,
-    "R10": UC_X86_REG_R10,
-    "R11": UC_X86_REG_R11,
-    "R12": UC_X86_REG_R12,
-    "R13": UC_X86_REG_R13,
-    "R14": UC_X86_REG_R14,
-    "R15": UC_X86_REG_R15,
-    "RBP": UC_X86_REG_RBP,
-    "RSP": UC_X86_REG_RSP,
-    "RIP": UC_X86_REG_RIP
-    }
+regis = {"RAX": UC_X86_REG_RAX ,"RBX": UC_X86_REG_RBX,"RCX": UC_X86_REG_RCX,"RDX": UC_X86_REG_RDX,"RDI": UC_X86_REG_RDI,"RSI": UC_X86_REG_RSI,"R8": UC_X86_REG_R8,
+"R9": UC_X86_REG_R9,"R10": UC_X86_REG_R10,"R11": UC_X86_REG_R11,"R12": UC_X86_REG_R12,"R13": UC_X86_REG_R13,"R14": UC_X86_REG_R14,"R15": UC_X86_REG_R15,"RBP": UC_X86_REG_RBP,"RSP": UC_X86_REG_RSP,"RIP": UC_X86_REG_RIP}
 
 def disas(code,address):
     md=Cs(CS_ARCH_X86,CS_MODE_64)
     assem=md.disasm(code,address)
     return assem
 
-def setup_logger(uc,logger: logging.Logger, verbose:bool) -> None:
+def setup_logger(uc,logger: logging.Logger) -> None:
     
-    lief.logging.disable()
-    if verbose:
-        logLevel = logging.DEBUG
-    else:
-        logLevel = logging.INFO
-        
-    logger.setLevel(logLevel)
+
+    logger.setLevel(logging.DEBUG)
 
     # Create a console handler with a higher log level
     stream_handler = logging.StreamHandler()
@@ -67,9 +48,6 @@ class CustomFormatter(logging.Formatter):
     
     
     def format(self, record: logging.LogRecord) -> str:
-        global a_queue
-        print(record.levelname)
-        print(record.levelno)
         for key in regis:
             tmp = self.uc.reg_read(regis[key])
             self.reg[key]=tmp
@@ -96,12 +74,12 @@ class CustomFormatter(logging.Formatter):
 
         
         stack =struct.unpack('<Q',self.uc.mem_read(self.reg["RSP"],0x8))[0]
-        for i in range(0,11):
+        for i in range(-5,11):
             d_format += self.yellow+"0x%x" % (self.reg["RSP"]+8*i) + self.green+"\t<==" + self.reset+ "\t0x%x\n" % (struct.unpack('<Q',self.uc.mem_read(self.reg["RSP"]+8*i,0x8))[0])
         self.FORMATS = {
-            logging.DEBUG: self.grey + "%(levelname)s - %(message)s" + self.reset,
-            #logging.INFO: green + "%(levelname)s" + reset + " - %(message)s",
-            logging.INFO: self.green + "%(levelname)s\n"+d_format +self.reset,
+            #logging.DEBUG: self.grey + "%(levelname)s - %(message)s" + self.reset,
+            logging.DEBUG: self.green + "%(levelname)s - %(message)s\n"+d_format +self.reset,
+            logging.INFO: self.green + "%(levelname)s" + self.bold_red + " - %(message)s",
             logging.WARNING: self.yellow + self.format_problem_str + self.reset,
             logging.ERROR: self.red + self.format_problem_str + self.reset,
             logging.CRITICAL: self.bold_red + self.format_problem_str + self.reset
