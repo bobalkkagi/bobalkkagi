@@ -33,7 +33,8 @@ def DLL_Loader(uc, dllName, base) -> int: #return next dll load base
     try :
         dll = pefile.PE(path, fast_load=True)
         DLL_SETTING.LOADED_DLL[dllName] = base
-        
+        uc.mem_write(base, dll.header)
+
         for section in dll.sections:
             code = section.get_data()
             uc.mem_write(base + section.VirtualAddress, code)
