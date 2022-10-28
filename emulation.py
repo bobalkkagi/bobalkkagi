@@ -59,8 +59,8 @@ def hook_block(uc, address, size, user_data):
         config.p_queue()
     config.i_queue(tmp)
    
-    if rip in InvDllFunctions:
-        globals()['hook_'+InvDllFunctions[rip].split('.dll_')[1]](rip,rsp,uc)
+    if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
+        globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc)
     
 
 def hook_code(uc, address, size, user_data):
@@ -85,9 +85,9 @@ def hook_code(uc, address, size, user_data):
         config.p_queue()
     config.i_queue(tmp)
 
-    if rip in InvDllFunctions:
-        print(InvDllFunctions[rip])
-        globals()['hook_'+InvDllFunctions[rip].split('.dll_')[1]](rip,rsp,uc)
+    if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
+        print(DLL_SETTING.INV_DLL_FUNCTIONS[rip])
+        globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc)
 
 
 def setup_teb(uc):
@@ -109,8 +109,6 @@ def emulate(program: str,  verbose):
 
     start = datetime.now()
     print(f"[{start}]Emulating Binary!")
-    global InvDllFunctions
-
     DLL_ADDRESS = 0x800000
 
     pe = pefile.PE(program)
@@ -149,7 +147,7 @@ def emulate(program: str,  verbose):
         SetListEntry(uc,dllList[i],i)
     Insert_IAT(uc, pe, ADDRESS, DLL_ADDRESS)
 
-    InvDllFunctions = {v: k for k, v in DLL_SETTING.DLL_FUNCTIONS.items()}
+    config.InvDllDict()
     
     uc.reg_write(UC_X86_REG_RSP, STACK_BASE - 0x1000) #0x200000
     uc.reg_write(UC_X86_REG_RBP, 0x0) #0x200600a
