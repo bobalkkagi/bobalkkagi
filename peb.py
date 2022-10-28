@@ -168,7 +168,6 @@ def SetListEntry(uc, dllName,number):
     listEntry.BaseAddress = DLL_SETTING.LOADED_DLL[dllName]
     listEntry.EntryPoint = 0
     uc.mem_write((Ldr+0x60) + (number)*0x40,bytes(listEntry))
-    print(bytes(listEntry))
     #print("BaseAddress : ",hex(listEntry.BaseAddress))
 
 def SetLdr(uc):
@@ -186,5 +185,4 @@ def SetLdr(uc):
     ldr.ShutdownInProgress = 0x0
     ldr.ShutdownThreadId = 0x0
     uc.mem_write(Ldr ,bytes(ldr))
-    print(bytes(ldr))
     #print("BaseAddress : ",hex(listEntry.BaseAddress))
