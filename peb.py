@@ -1,3 +1,6 @@
+from pickle import LIST
+from re import A
+from zipapp import ZipAppError
 from unicorn import *
 from unicorn.x86_const import *
 from ctypes import *
@@ -147,33 +150,39 @@ peb.Mutant=-1
 peb.ImageBaseAddress=0x140000000
 peb.Ldr= 0x2
 
-ldr = PEB_LDR_DATA()
 
-ldr.Length = 3
-peb.Ldr=id(ldr)
-
-print(hex(peb.Ldr))
-
-
-
-peb_ldr_data=PEB_LDR_DATA()
-
-peb_ldr_data.Length = 0x58
-peb_ldr_data.Initialized = 0x1
-peb_ldr_data.SsHandle = 0x0
 
 def SetListEntry(uc, dllName,number):
     listEntry = LIST_ENTRY()
-    listEntry.InLoadOrderModuleList_Flink = Ldr + (number+1)*0x40 
-    listEntry.InLoadOrderModuleList_Blink = Ldr + (number-1)*0x40
-    listEntry.InMemoryOrderModuleList_Flink = Ldr + (number+1)*0x40 +0x10 
-    listEntry.InMemoryOrderModuleList_Blink = Ldr + (number-1)*0x40 +0x10
-    listEntry.InInitializationOrderModuleList_Flink = Ldr + (number+1)*0x40 +0x20 
-    listEntry.InInitializationOrderModuleList_Blink = Ldr + (number-1)*0x40 +0x20
+    listEntry.InLoadOrderModuleList_Flink = (Ldr + 0x60) + (number+1)*0x40 
+    listEntry.InMemoryOrderModuleList_Flink = (Ldr + 0x60) + (number+1)*0x40 +0x10 
+    listEntry.InInitializationOrderModuleList_Flink = (Ldr + 0x60) + (number+1)*0x40 +0x20 
+    if number == 0:
+        listEntry.InLoadOrderModuleList_Blink = (Ldr + 0x10) 
+        listEntry.InMemoryOrderModuleList_Blink = (Ldr + 0x20) 
+        listEntry.InInitializationOrderModuleList_Blink = (Ldr + 0x30)
+    else:
+        listEntry.InLoadOrderModuleList_Blink = (Ldr + 0x60) + (number-1)*0x40
+        listEntry.InMemoryOrderModuleList_Blink = (Ldr + 0x60) + (number-1)*0x40 +0x10
+        listEntry.InInitializationOrderModuleList_Blink = (Ldr + 0x60) + (number-1)*0x40 +0x20
     listEntry.BaseAddress = DLL_SETTING.LOADED_DLL[dllName]
     listEntry.EntryPoint = 0
-    uc.mem_write(Ldr + (number)*0x40,bytes(listEntry))
+    uc.mem_write((Ldr+0x60) + (number)*0x40,bytes(listEntry))
     #print("BaseAddress : ",hex(listEntry.BaseAddress))
 
 def SetLdr(uc):
     ldr = PEB_LDR_DATA()
+    ldr.Length = 0x58
+    ldr.Initialized = 0x1
+    ldr.SsHandle = 0x0
+    ldr.InLoadOrderModuleList_Flink = Ldr + 0x60
+    ldr.InLoadOrderModuleList_Blink = 0x0
+    ldr.InMemoryOrderModuleList_Flink = Ldr + 0x70 
+    ldr.InMemoryOrderModuleList_Blink = 0x0
+    ldr.InInitializationOrderModuleList_Flink = Ldr+0x80 
+    ldr.InInitializationOrderModuleList_Blink = 0x0
+    ldr.EntryInProgress = 0x0
+    ldr.ShutdownInProgress = 0x0
+    ldr.ShutdownThreadId = 0x0
+    uc.mem_write(Ldr ,bytes(ldr))
+    #print("BaseAddress : ",hex(listEntry.BaseAddress))

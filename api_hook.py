@@ -4,7 +4,6 @@ from loader import EndOfString
 from config import DLL_SETTING
 
 import struct
-
 def hook_LoadLibraryA(ip, rsp, uc):
     print("========LoadLibraryA========")
     
@@ -36,6 +35,8 @@ def hook_LoadLibraryA(ip, rsp, uc):
 def hook_GetProcAddress(ip, rsp, uc):
     print("========GetProcAddress========")
     
+    INV_LOADED_DLL = {v: k for k, v in DLL_SETTING.LOADED_DLL.items()}
+
     rax = uc.reg_read(UC_X86_REG_RAX)
     rcx = uc.reg_read(UC_X86_REG_RCX)
     rdx = uc.reg_read(UC_X86_REG_RDX)
@@ -49,8 +50,9 @@ def hook_GetProcAddress(ip, rsp, uc):
     
     
     functionName=EndOfString(bytes(uc.mem_read(rdx, 0x20)))
-    print(hex(rcx),functionName)
-    f_address = DLL_SETTING.DLL_FUNCTIONS[EndOfString(bytes(uc.mem_read(rdx, 0x20)))]
+    print(INV_LOADED_DLL[rcx],functionName)
+    functionName = INV_LOADED_DLL[rcx]+"_" + functionName
+    f_address = DLL_SETTING.DLL_FUNCTIONS[functionName]
 
     print(f"{functionName}: {hex(f_address)}")
 
