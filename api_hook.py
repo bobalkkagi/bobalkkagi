@@ -35,7 +35,6 @@ def hook_LoadLibraryA(ip, rsp, uc):
 def hook_GetProcAddress(ip, rsp, uc):
     print("========GetProcAddress========")
     
-    INV_LOADED_DLL = {v: k for k, v in DLL_SETTING.LOADED_DLL.items()}
 
     rax = uc.reg_read(UC_X86_REG_RAX)
     rcx = uc.reg_read(UC_X86_REG_RCX)
@@ -50,8 +49,8 @@ def hook_GetProcAddress(ip, rsp, uc):
     
     
     functionName=EndOfString(bytes(uc.mem_read(rdx, 0x20)))
-    print(INV_LOADED_DLL[rcx],functionName)
-    functionName = INV_LOADED_DLL[rcx]+"_" + functionName
+    print(DLL_SETTING.INV_LOADED_DLL[rcx],functionName)
+    functionName = DLL_SETTING.INV_LOADED_DLL[rcx]+"_" + functionName
     f_address = DLL_SETTING.DLL_FUNCTIONS[functionName]
 
     print(f"{functionName}: {hex(f_address)}")
