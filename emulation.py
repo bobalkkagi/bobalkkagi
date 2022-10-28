@@ -6,6 +6,7 @@ from logger import *
 from datetime import datetime
 from api_hook import *
 from config import DLL_SETTING
+from peb import SetLdr, SetListEntry
 
 import logging
 import config
@@ -17,6 +18,7 @@ GS = 0xff10000000000000
 ADDRESS = 0x140000000
 DLL_BASE = 0x800000
 
+Ldr = 0x000001B54C810000
 STACK_BASE=0x201000
 STACK_LIMIT= 0x100000
 HEAP_BASE=0x18476850000
@@ -37,28 +39,28 @@ def hook_fetch(uc, access, address, size, value, user_data):
 
 
 def hook_block(uc, address, size, user_data):
-    rbp=uc.reg_read(UC_X86_REG_RBP)
+    #rbp=uc.reg_read(UC_X86_REG_RBP)
     rsp=uc.reg_read(UC_X86_REG_RSP)
     rip=uc.reg_read(UC_X86_REG_RIP)
-    rax=uc.reg_read(UC_X86_REG_RAX)
-    rbx=uc.reg_read(UC_X86_REG_RBX)
-    rcx=uc.reg_read(UC_X86_REG_RCX)
-    rdx=uc.reg_read(UC_X86_REG_RDX)
-    rdi=uc.reg_read(UC_X86_REG_RDI)
-    rsi=uc.reg_read(UC_X86_REG_RSI)
+    #rax=uc.reg_read(UC_X86_REG_RAX)
+    #rbx=uc.reg_read(UC_X86_REG_RBX)
+    #rcx=uc.reg_read(UC_X86_REG_RCX)
+    #rdx=uc.reg_read(UC_X86_REG_RDX)
+    #rdi=uc.reg_read(UC_X86_REG_RDI)
+    #rsi=uc.reg_read(UC_X86_REG_RSI)
     
-    gs = uc.reg_read(UC_X86_REG_GS)
-    gs_base = uc.reg_read(UC_X86_REG_GS_BASE)
-    gdtr = uc.reg_read(UC_X86_REG_GDTR)
+    #gs = uc.reg_read(UC_X86_REG_GS)
+    #gs_base = uc.reg_read(UC_X86_REG_GS_BASE)
+    #gdtr = uc.reg_read(UC_X86_REG_GDTR)
 
-    reg_rsp = uc.mem_read(rsp,0x8)
+    tmp = {hex(address):size}
     
-    # read this instruction code from memory
-    code = uc.mem_read(address, size)
+    if config.get_len() >=config.get_size():
+        config.p_queue()
+    config.i_queue(tmp)
    
     if rip in InvDllFunctions:
         globals()['hook_'+InvDllFunctions[rip].split('.dll_')[1]](rip,rsp,uc)
-    print("")
     
 
 def hook_code(uc, address, size, user_data):
@@ -95,6 +97,7 @@ def setup_teb(uc):
     
     uc.mem_map(teb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
     uc.mem_map(peb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
+    uc.mem_map(Ldr, 1 * MB, UC_PROT_ALL)
     uc.mem_write(teb_addr + 0x30, struct.pack('<Q', teb_addr))
     uc.mem_write(teb_addr + 0x60, struct.pack('<Q', peb_addr))
     uc.mem_write(peb_addr+ 0x30, struct.pack('<Q', HEAP_BASE))
@@ -141,16 +144,19 @@ def emulate(program: str,  verbose):
         DLL_ADDRESS = DLL_Loader(uc, dll, DLL_ADDRESS)
 
     setup_teb(uc)
-
+    SetLdr(uc) # Ldr set     load된 dll마다 추가해줘야 함
+    for i in range(0,5):  # ListEntry set 
+        SetListEntry(uc,dllList[i],i)
     Insert_IAT(uc, pe, ADDRESS, DLL_ADDRESS)
-    
+
     InvDllFunctions = {v: k for k, v in DLL_SETTING.DLL_FUNCTIONS.items()}
     
     uc.reg_write(UC_X86_REG_RSP, STACK_BASE - 0x1000) #0x200000
     uc.reg_write(UC_X86_REG_RBP, 0x0) #0x200600a
     
     print("hook start!")
-    uc.hook_add(UC_HOOK_CODE, hook_code)
+    #uc.hook_add(UC_HOOK_CODE, hook_code)
+    uc.hook_add(UC_HOOK_BLOCK, hook_block)
    
     uc.reg_write(UC_X86_REG_RAX, ADDRESS+EP)
     uc.reg_write(UC_X86_REG_RDX, ADDRESS+EP)
