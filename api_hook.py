@@ -47,9 +47,9 @@ def hook_GetProcAddress(ip, rsp, uc):
     
     #func_nameByte = bytes(uc.mem_read(rdx, 0x20))
     
-
+    
     functionName=EndOfString(bytes(uc.mem_read(rdx, 0x20)))
-
+    print(hex(rcx),functionName)
     f_address = DLL_SETTING.DLL_FUNCTIONS[EndOfString(bytes(uc.mem_read(rdx, 0x20)))]
 
     print(f"{functionName}: {hex(f_address)}")

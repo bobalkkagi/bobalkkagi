@@ -129,7 +129,7 @@ def emulate(program: str,  verbose):
             bootSize = section.VirtualAddress + section.Misc_VirtualSize
 
     dllList = [
-        "kernel32.dll", "ntdll.dll", 
+        "kernel32.dll", "kernelbase.dll", "ntdll.dll", 
         "user32.dll", "ucrtbase.dll",
         "vcruntime140d.dll", "win32u.dll",
         "gdi32.dll", "msvcp_win.dll",
