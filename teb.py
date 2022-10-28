@@ -32,12 +32,12 @@ class TEB(Structure):
     ("PlaceholderReserved", c_char*10),                      #+0x282 [10] Char
     ("ProxiedProcessId",  c_uint32),                         #+0x28c
     ("ActiveFrame", c_void_p),                               #+0x290 _ActivationStack  : _ACTIVATION_CONTEXT_STACK
-    ("FrameListCache_Flink", c_void_p)                       #       rameListCache     : Ptr64 _LIST_ENTRY
-    ("FrameListCache_Blink", c_void_p)                       #       Ptr64 _LIST_ENTRY
-    ("Flags", c_uint32)
-    ("NextCookieSequenceNumber", c_uint32)
-    ("StackId", c_uint32)
-    ("NoData", c_uint32)                                     #실제로는 값이 없음 
+    ("FrameListCache_Flink", c_void_p),                      #       rameListCache     : Ptr64 _LIST_ENTRY
+    ("FrameListCache_Blink", c_void_p),                      #       Ptr64 _LIST_ENTRY
+    ("Flags", c_uint32),
+    ("NextCookieSequenceNumber", c_uint32),
+    ("StackId", c_uint32),
+    ("NoData", c_uint32),                                    #실제로는 값이 없음 
     ("WorkingOnBehalfTicket", c_ubyte*8),                    #+0x2b8 [8] UChar
     ("ExceptionCode", c_int32),                              #+0x2c0
     ("Padding0", c_ubyte*4),                                 #+0x2c4 [4] UChar
@@ -78,7 +78,7 @@ class TEB(Structure):
     ("DeallocationStack", c_void_p),                         #+0x1478
     ("TlsSlots", c_void_p*64),                               #+0x1480 [64] Ptr64 Void
     ("TlsLinks_Flink", c_void_p),                            #+0x1680 _LIST_ENTRY
-    ("TlsLinks_Blink", c_void_p)
+    ("TlsLinks_Blink", c_void_p),
     ("Vdm", c_void_p),                                       #+0x1690
     ("ReservedForNtRpc", c_void_p),                          #+0x1698
     ("DbgSsReserved", c_void_p*2),                           #+0x16a0 [2] Ptr64 Void
@@ -168,3 +168,22 @@ class _LIST_ENTRY(Structure):
         ("Flink", c_uint64),
         ("Blink", c_uint64)
     ]
+
+
+
+#STACK_BASE=0x201000
+#STACK_LIMIT= 0x100000
+#MB = 2**20 #Mega Byte
+def SetTeb():
+    teb = TEB(
+        -1, 
+        0x201000, 
+        0x100000, 
+        0, 
+        0, 
+        0,
+    )
+    return teb
+
+teb = SetTeb()
+print(teb.StackBase)
