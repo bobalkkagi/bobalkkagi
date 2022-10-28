@@ -3,14 +3,11 @@ class globar_var:
     queue_size = 10
 
 class DLL_SETTING:
-
+    
     DLL_FUNCTIONS = {} # {function : address}
     LOADED_DLL = {} # {dll : address}
-    
-    
-    #def InvDict(self):
-    #    self.INV_DLL_FUNCTIONS = {v: k for k, v in DLL_FUNCTIONS.items()}
-    #    self.INV_LOADED_DLL = {v: k for k, v in LOADED_DLL.items()}
+    INV_DLL_FUNCTIONS ={}
+    INV_LOADED_DLL = {}
 
 def i_queue(data):
     globar_var.a_queue.insert(0,data)
@@ -22,3 +19,7 @@ def get_len():
     return len(globar_var.a_queue)
 def get_size():
     return globar_var.queue_size
+
+def InvDllDict():
+    DLL_SETTING.INV_DLL_FUNCTIONS = {v: k for k, v in DLL_SETTING.DLL_FUNCTIONS.items()}
+    DLL_SETTING.INV_LOADED_DLL = {v: k for k, v in DLL_SETTING.LOADED_DLL.items()}
