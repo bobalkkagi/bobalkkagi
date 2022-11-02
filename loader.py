@@ -109,11 +109,8 @@ def Insert_IAT(uc, pe, base, DLL_ADDRESS):
             try:
                 func_addr = DLL_SETTING.DLL_FUNCTIONS[dll+'_'+(funcs.name).decode('utf-8')]
             except:
-                #print(funcs.name)
-                #print("DLL FUNCTIONS\n")
-                #print(DLL_SETTING.DLL_FUNCTIONS)
-                #input()
-                continue
+                print(f"[DLL Setting Error] {funcs} not in DLL_FUNCTIONS")
+                break
 
             uc.mem_write(base+funcs.address-imageBase,struct.pack('<Q', func_addr))
             
