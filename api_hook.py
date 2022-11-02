@@ -46,7 +46,7 @@ def hook_GetProcAddress(ip, rsp, uc):
     tmp=struct.unpack('<Q',tmp)[0]
     
     #func_nameByte = bytes(uc.mem_read(rdx, 0x20))
-    
+
     
     functionName=EndOfString(bytes(uc.mem_read(rdx, 0x20)))
     print(DLL_SETTING.INV_LOADED_DLL[rcx],functionName)
