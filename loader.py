@@ -17,8 +17,6 @@ def GetDLLPath(dll:str, path=None)->str:
         root = path
     else:
         root = "C:\\Windows\\System32\\"
-    print(root)
-    input()
     global dllPath
     for path, dirs, files in os.walk(root):
         if dll in files:
