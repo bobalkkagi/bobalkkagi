@@ -99,7 +99,7 @@ class CustomFormatter(logging.Formatter):
         self.FORMATS = {
             #logging.DEBUG: self.grey + "%(levelname)s - %(message)s" + self.reset,
             logging.DEBUG: self.green + "%(levelname)s - %(message)s\n"+d_format +self.reset,
-            logging.INFO: self.green + "%(levelname)s" + self.bold_red + " - %(message)s",
+            logging.INFO: self.green + "%(levelname)s" + self.bold_red + " - %(message)s"+self.reset,
             logging.WARNING: self.yellow + self.format_problem_str + self.reset,
             logging.ERROR: self.red + self.format_problem_str + self.reset,
             logging.CRITICAL: self.bold_red + self.format_problem_str + self.reset
