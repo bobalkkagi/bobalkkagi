@@ -49,10 +49,12 @@ class TEB(Structure):
     ("InstrumentationCallbackDisabled", c_ubyte),            #+0x2ec
     ("UnalignedLoadStoreExceptions", c_ubyte),               #+0x2ed
     ("Padding1", c_ubyte*2),                                 #+0x2ee [2] UChar
-    ("Offset", c_uint32, 31),                                #+0x2f0  _GDI_TEB_BATCH
-    ("HasRenderingCommand", c_uint32, 1),
-    ("HDC", c_uint64),
-    ("Buffer", c_int32*310),                                 #        [310] Uint4B
+    #_GDI_TEB_BATCH
+    ("GTB_Offset", c_uint32,31),                                #+0x2f0  
+    ("GTB_HasRenderingCommand", c_uint32,1),
+    ("GTB_HDC", c_uint64),
+    ("GTB_Buffer", c_uint*310),                                 #        [310] Uint4B
+    #--------------
     ("RealClientId_UniqueProcess", c_void_p),                #+0x7d8  RealClientId
     ("RealClientId_UniqueThread", c_void_p),
     ("GdiCachedProcessHandle", c_void_p),                    #+0x7e8
@@ -174,16 +176,180 @@ class _LIST_ENTRY(Structure):
 #STACK_BASE=0x201000
 #STACK_LIMIT= 0x100000
 #MB = 2**20 #Mega Byte
-def SetTeb():
+def InitTeb():
+    TEB_BASE = 0xff10000000000000
     teb = TEB(
-        -1, 
-        0x201000, 
-        0x100000, 
-        0, 
-        0, 
+        -1,                 #Exceptionlist         
+        0x201000,           #StackBase
+        0x100000,           #STackLimit
+        0,                  #SubSystemTib
+        0,                  #FiberData
+        0,                  #ArbitaryUserPointer
+        0xff10000000000000, #AddrOfTeb -> important
+        0,                  #EnvironmentPointer
+        0xdeadbeef,         #ClientId_UniqueProcess
+        0xdeadbeef,         #ClientId_UniqueThread
+        0,                  #ActiveRpcHandle
+        0,                  #ThreadLocalStoragePointer
+        0xff20000000000000, #PEB -> important
+        2,                  #LastErrorValue
+        0,                  #CountOfOwnedCriticalSections
+        0,                  #CsrClientThread
+        0,                  #Win32ThreadInfo
+        (0,),               #User32Reserved
+        (0,),               #UserReserved
+        0,                  #WOW32Reserved
+        0x412,              #CurrentLocale
+        0,                  #FpSoftwareStatusRegister
+        (0,),               #ReservedForDebuggerInstrumentation
+        (0,),               #SystemReserved1
+        0,                  #PlaceholderCompatibilityMode
+        0,                  #PlaceholderHydrationAlwaysExplicit
+        b'',                #PlaceholderReserved
+        0,                  #ProxiedProcessId
+        #_ActivationStack
+        0,                  #ActiveFrame
+        0,                  #FrameListCache_Flink
+        0,                  #FrameListCache_Blink
+        0x2,                #Flags
+        0x1,                #NextCookieSequenceNumber
+        0,                  #StackId
+        0,                  #실제로 없는 값
+        #-----------------
+        (0,),               #
+        0,                  #
+        (0,),               #
+        TEB_BASE+0x290,     #ActivationContextStackPointer
+        0,                  #InstrumentationCallbackSp
+        0,                  #InstrumentationCallbackPreviousPc
+        0,                  #InstrumentationCallbackPreviousSp
+        0xfffe,             #TxFsContext
+        0,                  #InstrumentationCallbackDisabled
+        0,                  #UnalignedLoadStoreExceptions
+        (0,),               #Padding1
+        #_GDI_TEB_BATCH
+        0x0,                
+        0x0,
+        0x1,
+        (0,),
+        #----------------
+        0xdeadbeef,         #RealClientId_UniqueProcess
+        0xdeadbeef,         #RealClientId_UniqueThread
         0,
+        0,                  #GdiClientPID
+        0,                  #GdiClientTID
+        0,
+        (0,),               #Win32ClientInfo[62]
+        (0,),               #glDispatchTable[233]
+        (0,),               #glReserved1
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        (0,),
+        #_UNICODE_STRING
+        0x0,
+        0x20a,
+        TEB_BASE+0x1268,
+        #--------------
+        u'ntdll.dll',
+        (0,),
+        0,
+        (0,),               #TLS Slot
+        0,                  #TlsLinks_Flink
+        0,                  #TlsLinks_Blink
+        0,                  #Vdm
+        0,                  #ReservedForNtRpc
+        (0,),
+        0,
+        (0,),
+        (0,),               #Instrumentation
+        #GUID
+        0,                  
+        0,
+        0,
+        (0,),
+        #------------
+        0,
+        0,
+        0,
+        0,
+        0,
+        #_PROCESSOR_NUMBER
+        0,
+        0x2,
+        0x2,
+        #--------------
+        0x2020000,
+        0,
+        0,
+        0x2,
+        0x2,
+        0,
+        (0,),
+        0,
+        0,
+        0,
+        (0,),
+        0,                  #   +0x1768
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,                   #HeapData
+        (0,),
+        0,                   #CurrentTransactionHandle
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,                  #CrossTebFlags
+        # "SameTebFlags" #+0x17ee 
+        0,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        1,
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        #EffectiveContainerId
+        0,
+        0,
+        0,
+        (0,),
+        #--------------------
+        0,
+        0,
+        (0,),
+        0
     )
+    #teb.StaticUnicodeBuffer[261] = b"ntdll.dll"
     return teb
-
-teb = SetTeb()
-print(teb.StackBase)
+   
