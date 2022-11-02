@@ -6,22 +6,22 @@ from logger import *
 from datetime import datetime
 from api_hook import *
 from config import DLL_SETTING
-from peb import SetLdr, SetListEntry
+from peb import SetLdr, SetListEntry, SetProcessHeap
 
 import logging
 import config
 import struct
 import pefile
-
+import os
 
 GS = 0xff10000000000000
 ADDRESS = 0x140000000
 DLL_BASE = 0x800000
-
+COUNT=0
 Ldr = 0x000001B54C810000
+PROC_HEAP_ADDRESS=0x000001E9E3850000
 STACK_BASE=0x201000
 STACK_LIMIT= 0x100000
-HEAP_BASE=0x18476850000
 MB = 2**20 #Mega Byte
 
 #DLL_FUNCTIONS={} # {function name: address}
@@ -39,55 +39,53 @@ def hook_fetch(uc, access, address, size, value, user_data):
 
 
 def hook_block(uc, address, size, user_data):
-    #rbp=uc.reg_read(UC_X86_REG_RBP)
+    
     rsp=uc.reg_read(UC_X86_REG_RSP)
     rip=uc.reg_read(UC_X86_REG_RIP)
-    #rax=uc.reg_read(UC_X86_REG_RAX)
-    #rbx=uc.reg_read(UC_X86_REG_RBX)
-    #rcx=uc.reg_read(UC_X86_REG_RCX)
-    #rdx=uc.reg_read(UC_X86_REG_RDX)
-    #rdi=uc.reg_read(UC_X86_REG_RDI)
-    #rsi=uc.reg_read(UC_X86_REG_RSI)
     
-    #gs = uc.reg_read(UC_X86_REG_GS)
-    #gs_base = uc.reg_read(UC_X86_REG_GS_BASE)
-    #gdtr = uc.reg_read(UC_X86_REG_GDTR)
-
+    #BobLog.debug("DEBUGING")
+    
     tmp = {hex(address):size}
     
     if config.get_len() >=config.get_size():
         config.p_queue()
     config.i_queue(tmp)
    
-    if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
-        globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc)
-    
+    try :
+        if rip in InvDllFunctions:
+            print(InvDllFunctions[rip])
+            globals()['hook_'+InvDllFunctions[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
+    except KeyError as e:
+        BobLog.info("Not Found : "+str(e))
 
 def hook_code(uc, address, size, user_data):
     
-    #rbp=uc.reg_read(UC_X86_REG_RBP)
     rsp=uc.reg_read(UC_X86_REG_RSP)
     rip=uc.reg_read(UC_X86_REG_RIP)
-    #rax=uc.reg_read(UC_X86_REG_RAX)
-    #rbx=uc.reg_read(UC_X86_REG_RBX)
-    #rcx=uc.reg_read(UC_X86_REG_RCX)
-    #rdx=uc.reg_read(UC_X86_REG_RDX)
-    #rdi=uc.reg_read(UC_X86_REG_RDI)
-    #rsi=uc.reg_read(UC_X86_REG_RSI)
     
-    #gs = uc.reg_read(UC_X86_REG_GS)
-    #gs_base = uc.reg_read(UC_X86_REG_GS_BASE)
-    #gdtr = uc.reg_read(UC_X86_REG_GDTR)
-
+    global COUNT
+    global ADDRESS
+    
+    '''
     tmp = {hex(address):size}
     
     if config.get_len() >=config.get_size():
         config.p_queue()
     config.i_queue(tmp)
 
-    if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
-        print(DLL_SETTING.INV_DLL_FUNCTIONS[rip])
-        globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc)
+    try :
+        if rip in InvDllFunctions:
+            print(InvDllFunctions[rip])
+            globals()['hook_'+InvDllFunctions[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
+    except KeyError as e:
+        BobLog.info("Not Found : "+str(e))
+    '''
+    if rip == ADDRESS+0x2889be:
+        COUNT+=1
+        if COUNT <=100:
+            tmp=uc.mem_read(ADDRESS+0x85608,0x20)
+            print(tmp)
+
 
 
 def setup_teb(uc):
@@ -98,17 +96,22 @@ def setup_teb(uc):
     uc.mem_map(teb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
     uc.mem_map(peb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
     uc.mem_map(Ldr, 1 * MB, UC_PROT_ALL)
+    uc.mem_map(PROC_HEAP_ADDRESS, 10 * MB, UC_PROT_ALL)
     uc.mem_write(teb_addr + 0x30, struct.pack('<Q', teb_addr))
     uc.mem_write(teb_addr + 0x60, struct.pack('<Q', peb_addr))
-    uc.mem_write(peb_addr+ 0x30, struct.pack('<Q', HEAP_BASE))
+    uc.mem_write(peb_addr+ 0x30, struct.pack('<Q', PROC_HEAP_ADDRESS))
+    uc.mem_write(PROC_HEAP_ADDRESS+0x1db0,struct.pack('<Q',0x5A0058))
+    uc.mem_write(PROC_HEAP_ADDRESS+0x1db8,struct.pack('<Q',PROC_HEAP_ADDRESS+0x2398))
+
 
     uc.reg_write(UC_X86_REG_GS_BASE, teb_addr)
     uc.reg_write(UC_X86_REG_CS, 0x400000)
 
 def emulate(program: str,  verbose):
-
     start = datetime.now()
     print(f"[{start}]Emulating Binary!")
+    global InvDllFunctions
+
     DLL_ADDRESS = 0x800000
 
     pe = pefile.PE(program)
@@ -130,7 +133,7 @@ def emulate(program: str,  verbose):
             bootSize = section.VirtualAddress + section.Misc_VirtualSize
 
     dllList = [
-        "kernel32.dll", "kernelbase.dll", "ntdll.dll", 
+        #"kernel32.dll", "kernelbase.dll", #"ntdll.dll", 
         "user32.dll", "ucrtbase.dll",
         "vcruntime140d.dll", "win32u.dll",
         "gdi32.dll", "msvcp_win.dll",
@@ -138,16 +141,24 @@ def emulate(program: str,  verbose):
         ]
     
     #Load dll
+    DLL_ADDRESS = DLL_Loader(uc, "ntdll.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
+    DLL_ADDRESS = DLL_Loader(uc, "kernel32.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
+    DLL_ADDRESS = DLL_Loader(uc, "KernelBase.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
     for dll in dllList:
         DLL_ADDRESS = DLL_Loader(uc, dll, DLL_ADDRESS)
 
     setup_teb(uc)
+    '''
     SetLdr(uc) # Ldr set     load된 dll마다 추가해줘야 함
-    for i in range(0,5):  # ListEntry set 
+    for i in range(0,4):  # ListEntry set 
         SetListEntry(uc,dllList[i],i)
+    '''
+    uc.mem_write(PROC_HEAP_ADDRESS+0x2398,os.path.abspath(program).encode("utf-8"))
+    SetProcessHeap(uc)
     Insert_IAT(uc, pe, ADDRESS, DLL_ADDRESS)
 
-    config.InvDllDict()
+
+    InvDllFunctions = {v: k for k, v in DLL_SETTING.DLL_FUNCTIONS.items()}
     
     uc.reg_write(UC_X86_REG_RSP, STACK_BASE - 0x1000) #0x200000
     uc.reg_write(UC_X86_REG_RBP, 0x0) #0x200600a
@@ -159,7 +170,7 @@ def emulate(program: str,  verbose):
     uc.reg_write(UC_X86_REG_RAX, ADDRESS+EP)
     uc.reg_write(UC_X86_REG_RDX, ADDRESS+EP)
     uc.reg_write(UC_X86_REG_R9, ADDRESS+EP)
-
+    
     try:
         uc.emu_start(ADDRESS + EP, ADDRESS + EP + bootSize)
     except UcError as e:

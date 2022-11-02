@@ -7,6 +7,7 @@ from ctypes import *
 from config import DLL_SETTING
 
 Ldr = 0x000001B54C810000
+PROC_HEAP_ADDRESS=0x000001E9E3850000
 #Ldr = 0x000001B54C810040
 #Ldr = 0x000001B54C810080
 
@@ -40,7 +41,55 @@ class PEB_LDR_DATA(Structure):
         ("ShutdownThreadId", c_void_p),
     ]
 
-
+class PROCESS_HEAP(Structure):
+    _fields_=[
+        ("Segment",c_uint64),
+        ("Entry",c_uint64),
+        ("SegmentSignature",c_uint32),
+        ("SegmentFlags",c_uint32),
+        ("SegmentListEntry",c_void_p * 2),
+        ("Heap",c_void_p),
+        ("BaseAddress",c_void_p),
+        ("NumberOfPages",c_uint32),
+        ("Padding0",c_uint32),
+        ("FirstEntry",c_void_p),
+        ("LastValidEntry",c_void_p),
+        ("NumberOfUnCommittedPages",c_uint32),
+        ("NumberOfUnCommittedRanges",c_uint32),
+        ("SegmentAllocatorBackTraceIndex",c_uint16),
+        ("Reserved",c_uint16),
+        ("Padding1",c_uint8 * 4),
+        ("UCRSegmentList",c_void_p*2),
+        ("Flags",c_uint32),
+        ("ForceFlags",c_uint32),
+        ("CompatibilityFlags",c_uint32),
+        ("EncodeFlagMask",c_uint32),
+        ("Encoding",c_void_p * 2),
+        ("Interceptor",c_uint32),
+        ("VirtualMemoryThreshold",c_uint32),
+        ("Signature",c_uint32),
+        ("SegmentReserve",c_uint64),
+        ("SegmentCommit",c_uint64),
+        ("DeCommitFreeBlockThreshold",c_uint64),
+        ("DeCommitTotalFreeThreshold",c_uint64),
+        ("TotalFreeSize",c_uint64),
+        ("MaximumAllocationSize",c_uint64),
+        ("ProcessHeapsListIndex",c_uint16),
+        ("HeaderValidateLength",c_uint16),
+        ("HeaderValidateCopy",c_void_p),
+        ("NextAvailableTagIndex",c_uint16),
+        ("MaximumTagIndex",c_uint16),
+        ("TagEntries",c_void_p),
+        ("UCRList",c_void_p*2),
+        ("AlignRound",c_uint64),
+        ("AlignMask",c_uint64),
+        ("VirtualAllocdBlocks",c_void_p*2),
+        ("SegmentList",c_void_p*2),
+        ("AllocatorBackTraceIndex",c_uint16),
+        ("Padding2",c_uint8*2),
+        ("NonDedicatedListLength",c_uint32),
+        ("BlocksIndex",c_void_p),
+    ]
 
 class PEB(Structure):
     _fields_ = [
@@ -148,7 +197,10 @@ peb.BitField=4
 peb.Padding0=0
 peb.Mutant=-1
 peb.ImageBaseAddress=0x140000000
-peb.Ldr= 0x2
+peb.Ldr= Ldr
+peb.ProcessParameters = 0x0 # 채워줘야함
+peb.SubSystemData = 0x0
+peb.ProcessHeap=0x0
 
 
 
@@ -186,3 +238,13 @@ def SetLdr(uc):
     ldr.ShutdownThreadId = 0x0
     uc.mem_write(Ldr ,bytes(ldr))
     #print("BaseAddress : ",hex(listEntry.BaseAddress))
+
+def SetProcessHeap(uc):
+    procHeap = PROCESS_HEAP()
+    procHeap.Segment = 0x0
+    procHeap.Entry = 0x0 # 특정한 값으로 채워야함
+    procHeap.SegmentSignature = 0xffeeffee
+    procHeap.SegmentFlags = 0x2
+    procHeap.BlocksIndex = PROC_HEAP_ADDRESS+0x2e8
+    uc.mem_write(PROC_HEAP_ADDRESS ,bytes(procHeap))
+

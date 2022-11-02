@@ -17,8 +17,6 @@ def GetDLLPath(dll:str, path=None)->str:
         root = path
     else:
         root = "C:\\Windows\\System32\\"
-    print(root)
-    input()
     global dllPath
     for path, dirs, files in os.walk(root):
         if dll in files:
@@ -111,11 +109,14 @@ def Insert_IAT(uc, pe, base, DLL_ADDRESS):
             try:
                 func_addr = DLL_SETTING.DLL_FUNCTIONS[dll+'_'+(funcs.name).decode('utf-8')]
             except:
+                #print(funcs.name)
+                #print("DLL FUNCTIONS\n")
+                #print(DLL_SETTING.DLL_FUNCTIONS)
+                #input()
                 continue
 
             uc.mem_write(base+funcs.address-imageBase,struct.pack('<Q', func_addr))
             
         rva += import_desc.sizeof()
-
 
 
