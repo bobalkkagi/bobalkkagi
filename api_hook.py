@@ -2,8 +2,6 @@ from unicorn import *
 from unicorn.x86_const import *
 from loader import EndOfString
 from config import DLL_SETTING, HEAP_HANDLE
-
-import logging
 import struct
 import os
 
@@ -34,7 +32,6 @@ def hook_LoadLibraryA(ip, rsp, uc, log):
 
 def hook_GetProcAddress(ip, rsp, uc, log):
     
-    INV_LOADED_DLL = {v: k for k, v in DLL_SETTING.LOADED_DLL.items()}
 
     rcx = uc.reg_read(UC_X86_REG_RCX)
     rdx = uc.reg_read(UC_X86_REG_RDX)
@@ -47,7 +44,7 @@ def hook_GetProcAddress(ip, rsp, uc, log):
 
     
     functionName=EndOfString(bytes(uc.mem_read(rdx, 0x20)))
-    functionName = INV_LOADED_DLL[rcx]+"_" + functionName
+    functionName = DLL_SETTING.INV_LOADED_DLL[rcx]+"_" + functionName
     f_address = DLL_SETTING.DLL_FUNCTIONS[functionName]
 
     

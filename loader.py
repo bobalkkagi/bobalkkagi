@@ -81,7 +81,7 @@ def Insert_IAT(uc, pe, base, DLL_ADDRESS):
         if not import_desc or import_desc.all_zeroes():
             break
         
-        dll = pe.get_string_at_rva(import_desc.Name, pefile.MAX_DLL_LENGTH).decode('utf-8') # dll Name 가져오기
+        dll = pe.get_string_at_rva(import_desc.Name, pefile.MAX_DLL_LENGTH).decode('utf-8').lower() # dll Name 가져오기
 
         if dll.lower() not in DLL_SETTING.LOADED_DLL:
             DLL_ADDRESS = DLL_Loader(uc, dll, DLL_ADDRESS)
@@ -109,7 +109,7 @@ def Insert_IAT(uc, pe, base, DLL_ADDRESS):
             try:
                 func_addr = DLL_SETTING.DLL_FUNCTIONS[dll+'_'+(funcs.name).decode('utf-8')]
             except:
-                print(f"[DLL Setting Error] {funcs} not in DLL_FUNCTIONS")
+                print(f"[DLL Setting Error] {funcs.name} not in DLL_FUNCTIONS")
                 break
 
             uc.mem_write(base+funcs.address-imageBase,struct.pack('<Q', func_addr))

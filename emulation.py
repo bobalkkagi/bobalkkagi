@@ -7,6 +7,7 @@ from datetime import datetime
 from api_hook import *
 from config import DLL_SETTING
 from peb import SetLdr, SetListEntry, SetProcessHeap
+from teb import *
 
 import logging
 import config
@@ -51,9 +52,9 @@ def hook_block(uc, address, size, user_data):
         config.p_queue()
     config.i_queue(tmp)
    
-
     try :
         if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
+            print(DLL_SETTING.INV_DLL_FUNCTIONS[rip])
             globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
     except KeyError as e:
         BobLog.info("Not Found : "+str(e))
@@ -74,9 +75,9 @@ def hook_code(uc, address, size, user_data):
     config.i_queue(tmp)
 
     try :
-        if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
-            print(DLL_SETTING.INV_DLL_FUNCTIONS[rip])
-            globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
+        if rip in InvDllFunctions:
+            print(InvDllFunctions[rip])
+            globals()['hook_'+InvDllFunctions[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
     except KeyError as e:
         BobLog.info("Not Found : "+str(e))
     '''
@@ -92,25 +93,22 @@ def setup_teb(uc):
     global HEAP_BASE
     teb_addr = 0xff10000000000000
     peb_addr = 0xff20000000000000
-    
+    teb = InitTeb()
+    teb_payload = bytes(teb)
     uc.mem_map(teb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
     uc.mem_map(peb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
     uc.mem_map(Ldr, 1 * MB, UC_PROT_ALL)
     uc.mem_map(PROC_HEAP_ADDRESS, 10 * MB, UC_PROT_ALL)
-    uc.mem_write(teb_addr + 0x30, struct.pack('<Q', teb_addr))
-    uc.mem_write(teb_addr + 0x60, struct.pack('<Q', peb_addr))
+    uc.mem_write(teb_addr, teb_payload)
     uc.mem_write(peb_addr+ 0x30, struct.pack('<Q', PROC_HEAP_ADDRESS))
     uc.mem_write(PROC_HEAP_ADDRESS+0x1db0,struct.pack('<Q',0x5A0058))
     uc.mem_write(PROC_HEAP_ADDRESS+0x1db8,struct.pack('<Q',PROC_HEAP_ADDRESS+0x2398))
-
-
     uc.reg_write(UC_X86_REG_GS_BASE, teb_addr)
     uc.reg_write(UC_X86_REG_CS, 0x400000)
 
 def emulate(program: str,  verbose):
     start = datetime.now()
     print(f"[{start}]Emulating Binary!")
-    global InvDllFunctions
 
     DLL_ADDRESS = 0x800000
 
@@ -133,7 +131,7 @@ def emulate(program: str,  verbose):
             bootSize = section.VirtualAddress + section.Misc_VirtualSize
 
     dllList = [
-        #"kernel32.dll", "kernelbase.dll", #"ntdll.dll", 
+        "kernel32.dll", "kernelbase.dll", "ntdll.dll", 
         "user32.dll", "ucrtbase.dll",
         "vcruntime140d.dll", "win32u.dll",
         "gdi32.dll", "msvcp_win.dll",
@@ -141,9 +139,9 @@ def emulate(program: str,  verbose):
         ]
     
     #Load dll
-    DLL_ADDRESS = DLL_Loader(uc, "ntdll.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
-    DLL_ADDRESS = DLL_Loader(uc, "kernel32.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
-    DLL_ADDRESS = DLL_Loader(uc, "KernelBase.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
+    #DLL_ADDRESS = DLL_Loader(uc, "ntdll.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
+    #DLL_ADDRESS = DLL_Loader(uc, "kernel32.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
+    #DLL_ADDRESS = DLL_Loader(uc, "KernelBase.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
     for dll in dllList:
         DLL_ADDRESS = DLL_Loader(uc, dll, DLL_ADDRESS)
 
@@ -157,8 +155,8 @@ def emulate(program: str,  verbose):
     SetProcessHeap(uc)
     Insert_IAT(uc, pe, ADDRESS, DLL_ADDRESS)
 
-
     config.InvDllDict()
+    
     uc.reg_write(UC_X86_REG_RSP, STACK_BASE - 0x1000) #0x200000
     uc.reg_write(UC_X86_REG_RBP, 0x0) #0x200600a
     
