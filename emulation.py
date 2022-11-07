@@ -6,7 +6,7 @@ from logger import *
 from datetime import datetime
 from api_hook import *
 from config import DLL_SETTING
-from peb import SetLdr, SetListEntry, SetProcessHeap
+from peb import SetLdr, SetListEntry, SetProcessHeap, SetPEB
 from teb import *
 
 import logging
@@ -81,11 +81,6 @@ def hook_code(uc, address, size, user_data):
     except KeyError as e:
         BobLog.info("Not Found : "+str(e))
     '''
-    if rip == ADDRESS+0x2889be:
-        COUNT+=1
-        if COUNT <=100:
-            tmp=uc.mem_read(ADDRESS+0x85608,0x20)
-            print(tmp)
 
 
 
@@ -152,6 +147,7 @@ def emulate(program: str,  verbose):
         SetListEntry(uc,dllList[i],i)
     '''
     uc.mem_write(PROC_HEAP_ADDRESS+0x2398,os.path.abspath(program).encode("utf-8"))
+    SetPEB(uc)
     SetProcessHeap(uc)
     Insert_IAT(uc, pe, ADDRESS, DLL_ADDRESS)
 
