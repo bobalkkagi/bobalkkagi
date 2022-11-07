@@ -173,10 +173,7 @@ def emulate(program: str,  verbose):
     except UcError as e:
         print(f"[ERROR]: {e}")
         BobLog.debug("DEBUGING")
-        
-        bytestr = uc.mem_read(0xff10000000000000,0x2000)
-        for i in range(0, len(bytestr)//8):
-            print(bytestr[i*8:(i+1)*8])            
+                  
 
     end = datetime.now()
     print(f"[{end}] Emulation done...")
