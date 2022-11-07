@@ -8,9 +8,7 @@ from config import DLL_SETTING
 
 Ldr = 0x000001B54C810000
 PROC_HEAP_ADDRESS=0x000001E9E3850000
-#Ldr = 0x000001B54C810040
-#Ldr = 0x000001B54C810080
-
+PEB_ADDR = 0xff20000000000000
 
 class LIST_ENTRY(Structure):
     _fields_ =[
@@ -188,19 +186,20 @@ class PEB(Structure):
         # ... too much item
     ]
 
-
-peb = PEB()
-peb .InheritedAddressSpace=0
-peb.ReadImageFileExecOptions=0
-peb.BeingDebugged=0
-peb.BitField=4
-peb.Padding0=0
-peb.Mutant=-1
-peb.ImageBaseAddress=0x140000000
-peb.Ldr= Ldr
-peb.ProcessParameters = 0x0 # 채워줘야함
-peb.SubSystemData = 0x0
-peb.ProcessHeap=0x0
+def SetPEB(uc):
+    peb = PEB()
+    peb.InheritedAddressSpace=0
+    peb.ReadImageFileExecOptions=0
+    peb.BeingDebugged=0
+    peb.BitField=4
+    peb.Padding0=0
+    peb.Mutant=-1
+    peb.ImageBaseAddress=0x140000000
+    peb.Ldr= Ldr
+    peb.ProcessParameters =  PROC_HEAP_ADDRESS+0x1d50# 채워줘야함
+    peb.SubSystemData = 0x0
+    peb.ProcessHeap=PROC_HEAP_ADDRESS
+    uc.mem_write(PEB_ADDR ,bytes(peb))
 
 
 
