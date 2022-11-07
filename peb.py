@@ -1,6 +1,3 @@
-from pickle import LIST
-from re import A
-from zipapp import ZipAppError
 from unicorn import *
 from unicorn.x86_const import *
 from ctypes import *
