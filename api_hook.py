@@ -326,3 +326,61 @@ def hook_GetVersion(ip, rsp, uc, log):
     uc.reg_write(UC_X86_REG_RAX,0x206) 
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_RtlAddVectoredExceptionHandler(ip, rsp, uc, log):
+    
+    
+    rbx = uc.reg_read(UC_X86_REG_RBX)
+    rbp = uc.reg_read(UC_X86_REG_RBP)
+    rsi = uc.reg_read(UC_X86_REG_RSI)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+    
+    #log.debug("DEBUGING")
+  
+    
+    #print(path.encode("utf-8"))
+    #print(hex(len(path)))
+    log.info(f"API Call : RtlAddVectoredExceptionHandler")
+    uc.mem_write(rsp+0x8,struct.pack('<Q',rbx))
+    uc.mem_write(rsp+0x10,struct.pack('<Q',rbp))
+    uc.mem_write(rsp+0x18,struct.pack('<Q',rsi))
+   
+    uc.reg_write(UC_X86_REG_RAX,0x000001E9E3860000) #임시 핸들
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_GetCommandLineA(ip, rsp, uc, log):
+    
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.info(f"API Call : GetCommandLineA")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0x000001E9E3860000+0x3480) #임시포인터
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_GetCurrentProcess(ip, rsp, uc, log):
+    
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.info(f"API Call : GetCurrentProcess")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0xffffffffffffffff)
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
