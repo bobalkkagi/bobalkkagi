@@ -12,12 +12,12 @@ def EndOfString(ByteData: bytes) -> str:
     
     return byteString
 
-def GetDLLPath(dll:str, path=None)->str:
-    if path:
-        root = path
+def GetDLLPath(dll:str)->str:
+    global dllPath
+    if dll in os.listdir("dll"):
+        root = "dll"
     else:
         root = "C:\\Windows\\System32\\"
-    global dllPath
     for path, dirs, files in os.walk(root):
         if dll in files:
             dllPath = os.path.join(path, dll)
@@ -29,10 +29,10 @@ def ReturnDLLAddr(addr):
     loadedAddr = (loadedAddr >> 16) << 16
     return loadedAddr #return loaded DLL address
 
-def DLL_Loader(uc, dllName, base, userpath=None) -> int: #return next dll load base 
+def DLL_Loader(uc, dllName, base) -> int: #return next dll load base 
 
     lowerDllName = dllName.lower()
-    path = GetDLLPath(lowerDllName, userpath) #path 부분 추가해서 사용
+    path = GetDLLPath(lowerDllName) #path 부분 추가해서 사용
 
     try :
         dll = pefile.PE(path, fast_load=True)
