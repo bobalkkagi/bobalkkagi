@@ -5,9 +5,10 @@ from loader import DLL_Loader, Insert_IAT
 from logger import *
 from datetime import datetime
 from api_hook import *
-from config import DLL_SETTING
-from peb import SetLdr, SetListEntry, SetProcessHeap
+from config import DLL_SETTING, GlobalVar
+from peb import SetLdr, SetListEntry, SetProcessHeap, SetPEB
 from teb import *
+from util import getVirtualMemorySize, printHex
 
 import logging
 import config
@@ -55,9 +56,12 @@ def hook_block(uc, address, size, user_data):
     try :
         if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
             print(DLL_SETTING.INV_DLL_FUNCTIONS[rip])
-            globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
+            globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip, rsp, uc, BobLog)
     except KeyError as e:
-        BobLog.info("Not Found : "+str(e))
+        #print("===== Something Error ====")
+        BobLog.debug(f"Error : {e}")
+        #print("===== end =====")
+        #BobLog.info(f"Not Found : {e}")
 
 def hook_code(uc, address, size, user_data):
     
@@ -81,11 +85,6 @@ def hook_code(uc, address, size, user_data):
     except KeyError as e:
         BobLog.info("Not Found : "+str(e))
     '''
-    if rip == ADDRESS+0x2889be:
-        COUNT+=1
-        if COUNT <=100:
-            tmp=uc.mem_read(ADDRESS+0x85608,0x20)
-            print(tmp)
 
 
 
@@ -95,8 +94,8 @@ def setup_teb(uc):
     peb_addr = 0xff20000000000000
     teb = InitTeb()
     teb_payload = bytes(teb)
-    uc.mem_map(teb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
-    uc.mem_map(peb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
+    uc.mem_map(teb_addr, 2 * 1024 * 1024, UC_PROT_ALL)
+    uc.mem_map(peb_addr, 2 * 1024 * 1024, UC_PROT_ALL)
     uc.mem_map(Ldr, 1 * MB, UC_PROT_ALL)
     uc.mem_map(PROC_HEAP_ADDRESS, 10 * MB, UC_PROT_ALL)
     uc.mem_write(teb_addr, teb_payload)
@@ -108,11 +107,18 @@ def setup_teb(uc):
 
 def emulate(program: str,  verbose):
     start = datetime.now()
-    print(f"[{start}]Emulating Binary!")
+    print(f"[{start}] Emulating Binary!")
 
     DLL_ADDRESS = 0x800000
-
     pe = pefile.PE(program)
+    GlobalVar['ProgPath'] = os.path.abspath(program)
+    GlobalVar['BaseAddr'] = ADDRESS + 20*MB
+    GlobalVar['VirtualMemSize'] = getVirtualMemorySize(pe)
+    #printHex(GlobalVar['VirtualMemSize'])
+    GlobalVar['DynamicMemOffset'] = GlobalVar['BaseAddr'] + GlobalVar['VirtualMemSize']
+    GlobalVar['allocated_chunks'] = []
+    GlobalVar['alloc_sizes'] = {}
+
     uc = Uc(UC_ARCH_X86, UC_MODE_64)
 
     setup_logger(uc, BobLog, verbose)
@@ -139,9 +145,6 @@ def emulate(program: str,  verbose):
         ]
     
     #Load dll
-    #DLL_ADDRESS = DLL_Loader(uc, "ntdll.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
-    #DLL_ADDRESS = DLL_Loader(uc, "kernel32.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
-    #DLL_ADDRESS = DLL_Loader(uc, "KernelBase.dll", DLL_ADDRESS,"C:\\Users\\kor15\\Desktop\\practice\\bob\\Bobalkkagi_test")
     for dll in dllList:
         DLL_ADDRESS = DLL_Loader(uc, dll, DLL_ADDRESS)
 
@@ -152,6 +155,7 @@ def emulate(program: str,  verbose):
         SetListEntry(uc,dllList[i],i)
     '''
     uc.mem_write(PROC_HEAP_ADDRESS+0x2398,os.path.abspath(program).encode("utf-8"))
+    SetPEB(uc)
     SetProcessHeap(uc)
     Insert_IAT(uc, pe, ADDRESS, DLL_ADDRESS)
 
@@ -159,8 +163,8 @@ def emulate(program: str,  verbose):
     
     uc.reg_write(UC_X86_REG_RSP, STACK_BASE - 0x1000) #0x200000
     uc.reg_write(UC_X86_REG_RBP, 0x0) #0x200600a
-    
-    print("hook start!")
+
+    print("================== hook start! ==================")
     #uc.hook_add(UC_HOOK_CODE, hook_code)
     uc.hook_add(UC_HOOK_BLOCK, hook_block)
    
@@ -171,14 +175,15 @@ def emulate(program: str,  verbose):
     try:
         uc.emu_start(ADDRESS + EP, ADDRESS + EP + bootSize)
     except UcError as e:
+        print(20*"=" + " End "+20*"=")
         print(f"[ERROR]: {e}")
-        BobLog.debug("DEBUGING")
-        
-        bytestr = uc.mem_read(0xff10000000000000,0x2000)
-        for i in range(0, len(bytestr)//8):
-            print(bytestr[i*8:(i+1)*8])            
+        #BobLog.debug("DEBUGING")
+                  
 
     end = datetime.now()
     print(f"[{end}] Emulation done...")
     print(f"Runtime: [{end-start}]")
     
+
+
+        

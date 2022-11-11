@@ -2,9 +2,7 @@ class globar_var:
     a_queue=[]
     queue_size = 10
 
-
 class DLL_SETTING:
-
     DLL_FUNCTIONS = {}
     LOADED_DLL = {} # {dll: address}
     INV_DLL_FUNCTIONS ={}
@@ -14,6 +12,8 @@ class HEAP_HANDLE:
     heap_handle=[0x000001E9E3850000]
     heap_handle_size=1
 
+GlobalVar = {}
+    
 def i_queue(data):
     globar_var.a_queue.insert(0,data)
 def p_queue():
