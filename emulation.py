@@ -99,8 +99,10 @@ def hook_code(uc, address, size, user_data):
 
     assem = disas(bytes(uc.mem_read(address, size)), address)
 
-    print(reg)
+    '''
+    print(reg) # 레지스터 변화 확인
     time.sleep(1)
+    '''
 
     for asm in assem:
         config.get_num1()
@@ -108,8 +110,8 @@ def hook_code(uc, address, size, user_data):
             if (config.ret_num2() == -2):
                 api_data = reg["RAX"]
                 # 처음 call한 부분에서 asm op_str 변경 (원래 api 값이 들어있는 reg값 참조해서?)
-                print(asm)
-                time.sleep(1)
+                #print(asm)
+                #time.sleep(1)
                 continue
             config.get_num2()
             continue
