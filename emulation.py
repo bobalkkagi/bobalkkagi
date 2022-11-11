@@ -82,7 +82,44 @@ def hook_code(uc, address, size, user_data):
         BobLog.info("Not Found : "+str(e))
     '''
 
+    
+    '''
+    for section in pe.sections:
+        if b'.text' in section.Name:
+            handle이 text영역일때로 변경해야함
+    '''
 
+    from logger import regis
+    import time
+
+    reg = {}
+
+    for key in regis:
+        reg[key] = hex(uc.reg_read(regis[key]))
+
+    assem = disas(bytes(uc.mem_read(address, size)), address)
+
+    print(reg)
+    time.sleep(1)
+
+    for asm in assem:
+        config.get_num1()
+        if ("jmp" == asm.mnemonic):
+            if (config.ret_num2() == -2):
+                api_data = reg["RAX"]
+                # 처음 call한 부분에서 asm op_str 변경 (원래 api 값이 들어있는 reg값 참조해서?)
+                print(asm)
+                time.sleep(1)
+                continue
+            config.get_num2()
+            continue
+        elif ("or" == asm.mnemonic):
+            num1_tmp = config.sub_num1()
+            num2_tmp = config.ret_num2()
+            if(num2_tmp == num1_tmp):
+                config.res_num2()
+                continue
+        config.globar_var.control_num2 = -1
 
 def setup_teb(uc):
     global HEAP_BASE
