@@ -104,6 +104,7 @@ def hook_code(uc, address, size, user_data):
     time.sleep(1)
     '''
 
+    '''
     for asm in assem:
         config.get_num1()
         if ("jmp" == asm.mnemonic):
@@ -122,6 +123,7 @@ def hook_code(uc, address, size, user_data):
                 config.res_num2()
                 continue
         config.globar_var.control_num2 = -1
+    '''
 
 def setup_teb(uc):
     global HEAP_BASE
