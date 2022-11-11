@@ -1,15 +1,20 @@
 from unicorn import *
 from unicorn.x86_const import *
 from loader import EndOfString
+<<<<<<< HEAD
 from config import DLL_SETTING, HEAP_HANDLE, GlobalVar
 from util import *
 
 from logger import PrintFunction
+=======
+from config import DLL_SETTING, HEAP_HANDLE
+
+import logging
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
 import struct
 import os, sys
 
  
-
 
 def hook_LoadLibraryA(ip, rsp, uc, log):
     
@@ -33,6 +38,11 @@ def hook_LoadLibraryA(ip, rsp, uc, log):
 
     uc.mem_write(rsp+0x8,struct.pack('<Q',rbx))
     uc.mem_write(rsp+0x10,struct.pack('<Q',rsi))
+<<<<<<< HEAD
+=======
+    log.info(f"API Call : LoadLibraryA, {dllName}: {hex(d_address)}")
+    #log.debug("DEBUGING")
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
     
@@ -63,6 +73,9 @@ def hook_GetProcAddress(ip, rsp, uc, log):
     uc.mem_write(rsp+0x10,struct.pack('<Q',f_address))
     if f_address:
         uc.reg_write(UC_X86_REG_RAX,f_address)
+    log.info(f"API Call : GetProcAddress, {functionName}: {hex(f_address)}")
+    #log.debug("DEBUGING")
+    
 
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
@@ -78,7 +91,12 @@ def hook_GetModuleHandleA(ip, rsp, uc, log):
     
 
     handle = EndOfString(bytes(uc.mem_read(rcx, 0xd)))
+<<<<<<< HEAD
 
+=======
+    log.info(f"API Call : GetModuleHandleA, RCX : {handle}")    
+    #log.debug("DEBUGING")
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
     if handle in DLL_SETTING.LOADED_DLL:
         d_address = DLL_SETTING.LOADED_DLL[handle]
 
@@ -96,6 +114,11 @@ def hook_RtlInitializeCriticalSection(ip, rsp, uc, log):
     tmp = uc.mem_read(rsp,8)
     tmp=struct.unpack('<Q',tmp)[0]
     uc.mem_write(rsp+0x10,struct.pack('<Q',rbx))
+<<<<<<< HEAD
+=======
+    log.info(f"API Call : RtlInitializeCriticalSection, RCX : {hex(rcx)}")
+    #log.debug("DEBUGING")
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
     uc.reg_write(UC_X86_REG_RAX,0x0)
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
@@ -110,7 +133,13 @@ def hook_GetUserDefaultUILanguage(ip,rsp, uc, log):
     
     
     uc.mem_write(rsp+0x8,struct.pack('<Q',0x409))
+<<<<<<< HEAD
 
+=======
+    log.info(f"API Call : GetUserDefaultUILanguage, RCX : {hex(rcx)}")
+    #log.debug("DEBUGING")
+    
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
     uc.reg_write(UC_X86_REG_RAX,0x409)
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
@@ -125,7 +154,14 @@ def hook_GetProcessHeap(ip, rsp, uc, log):
     
     rax =uc.mem_read(0xff20000000000000+0x30,8)
     rax =struct.unpack('<Q',rax)[0]
+<<<<<<< HEAD
 
+=======
+    
+    log.info(f"API Call : GetProcessHeap, RAX : {hex(rcx)}")
+    #log.debug("DEBUGING")
+    
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
     uc.reg_write(UC_X86_REG_RAX,rax)
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
@@ -148,6 +184,11 @@ def hook_RtlAllocateHeap(ip, rsp, uc, log):
     uc.mem_write(rsp+0x8,struct.pack('<Q',0x3))
     uc.mem_write(rsp+0x10,struct.pack('<Q',rbx))
 
+<<<<<<< HEAD
+=======
+    log.info(f"API Call : RtlAllocateHeap, RAX : {hex(HEAP_HANDLE.heap_handle[HEAP_HANDLE.heap_handle_size-1])}")
+    #log.debug("DEBUGING")
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
     
@@ -197,7 +238,14 @@ def hook_GetCurrentDirectoryW(ip, rsp, uc, log):
     tmp=struct.unpack('<Q',tmp)[0]
 
     cwd = os.getcwd()
+<<<<<<< HEAD
 
+=======
+    cwd_len = len(cwd)
+    #log.debug("DEBUGING")
+    log.info(f"API Call : GetCurrentDirectoryW, path : {cwd}, len : {hex(cwd_len)}")
+    
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
     uc.mem_write(rdx,cwd.encode('utf-8'))
     uc.reg_write(UC_X86_REG_RAX,len(cwd))
     uc.reg_write(UC_X86_REG_RCX,rdx)
@@ -211,8 +259,18 @@ def hook_SetCurrentDirectoryW(ip, rsp, uc, log):
     rcx = uc.reg_read(UC_X86_REG_RCX)
     
     tmp = uc.mem_read(rsp,8)
+<<<<<<< HEAD
     tmp = struct.unpack('<Q',tmp)[0]
 
+=======
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.info(f"API Call : SetCurrentDirectoryW")
+    
+    #log.debug("DEBUGING")
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
     uc.reg_write(UC_X86_REG_RAX,0x1)
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
@@ -237,6 +295,7 @@ def hook_GetModuleFileNameW(ip, rsp, uc, log):
             module_name = "somefakename.dll"
         path = f"C:/Windows/System32/{module_name}"
     
+<<<<<<< HEAD
     uc.reg_write(UC_X86_REG_R11,rdx)
     
     uc.mem_write(rsp+0x8,struct.pack('<Q', rbx))
@@ -246,6 +305,123 @@ def hook_GetModuleFileNameW(ip, rsp, uc, log):
     uc.reg_write(UC_X86_REG_RAX, len(path))
     uc.reg_write(UC_X86_REG_RDX, 0x0)
     uc.reg_write(UC_X86_REG_R8, 0x0)
+=======
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_R11,rdx)
+    
+    #print(path.encode("utf-8"))
+    #print(hex(len(path)))
+    log.info(f"API Call : GetModuleFileNameW, path : {path}")
+    uc.mem_write(rsp+0x8,struct.pack('<Q',rbx))
+    uc.mem_write(rsp+0x10,struct.pack('<Q',rbp))
+    uc.mem_write(rsp+0x18,struct.pack('<Q',rsi))
+    uc.mem_write(rdx,path.encode("utf-16"))
+    uc.reg_write(UC_X86_REG_RAX,len(path))
+    uc.reg_write(UC_X86_REG_RDX,0x0)
+    uc.reg_write(UC_X86_REG_R8,0x0)
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_GetCurrentThreadId(ip, rsp, uc, log):
+    
+    log.info(f"API Call : GetCurrentThreadId")
+    
+   
+
+   
+
+def hook_OpenThread(ip, rsp, uc, log):
+    
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.info(f"API Call : OpenThread")
+    
+    #log.debug("DEBUGING")
+
+    uc.reg_write(UC_X86_REG_RAX,0xcc) # 임시 스레드 핸들
+    uc.mem_write(rsp+0x20,struct.pack('<Q',0xcc))
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_GetVersion(ip, rsp, uc, log):
+    
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.info(f"API Call : GetVersion, Returning 6.2 (Windows 8 or Windows 10)")
+    
+    #log.debug("DEBUGING")
+
+    uc.reg_write(UC_X86_REG_RAX,0x206) 
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_RtlAddVectoredExceptionHandler(ip, rsp, uc, log):
+    
+    
+    rbx = uc.reg_read(UC_X86_REG_RBX)
+    rbp = uc.reg_read(UC_X86_REG_RBP)
+    rsi = uc.reg_read(UC_X86_REG_RSI)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+    
+    #log.debug("DEBUGING")
+  
+    
+    #print(path.encode("utf-8"))
+    #print(hex(len(path)))
+    log.info(f"API Call : RtlAddVectoredExceptionHandler")
+    uc.mem_write(rsp+0x8,struct.pack('<Q',rbx))
+    uc.mem_write(rsp+0x10,struct.pack('<Q',rbp))
+    uc.mem_write(rsp+0x18,struct.pack('<Q',rsi))
+   
+    uc.reg_write(UC_X86_REG_RAX,0x000001E9E3860000) #임시 핸들
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_GetCommandLineA(ip, rsp, uc, log):
+    
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.info(f"API Call : GetCommandLineA")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0x000001E9E3860000+0x3480) #임시포인터
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_GetCurrentProcess(ip, rsp, uc, log):
+    
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.info(f"API Call : GetCurrentProcess")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0xffffffffffffffff)
+>>>>>>> 83b1aec4f56d0b52a4dbeffc2f32c1a652965bc3
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
 

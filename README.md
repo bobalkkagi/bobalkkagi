@@ -1,9 +1,8 @@
 # Bobalkkagi
 Bob project
 
-###=============================================###
+Unpacking & Devirtualization of Themida 3.1.3 packed program(Tiger red64)
 
-We (Hope) develope unpacking and devirtualization of Themida 3.1.3 packing(Tiger red64)
 
 ```
 
