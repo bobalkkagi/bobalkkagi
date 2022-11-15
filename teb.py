@@ -187,15 +187,15 @@ def InitTeb():
         0,                  #ArbitaryUserPointer
         0xff10000000000000, #AddrOfTeb -> important
         0,                  #EnvironmentPointer
-        0xdeadbeef,         #ClientId_UniqueProcess
-        0xdeadbeef,         #ClientId_UniqueThread
+        0x13013,         #ClientId_UniqueProcess
+        0x13018,         #ClientId_UniqueThread
         0,                  #ActiveRpcHandle
         0,                  #ThreadLocalStoragePointer
         0xff20000000000000, #PEB -> important
-        2,                  #LastErrorValue
+        0x3b67,                  #LastErrorValue
         0,                  #CountOfOwnedCriticalSections
         0,                  #CsrClientThread
-        0,                  #Win32ThreadInfo
+        0xd30,                  #Win32ThreadInfo
         (0,),               #User32Reserved
         (0,),               #UserReserved
         0,                  #WOW32Reserved

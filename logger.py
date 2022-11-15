@@ -4,7 +4,6 @@ import logging
 import config
 import struct
 from capstone import *
-import sys
 import lief  # type: ignore
 
 regis = {
@@ -26,12 +25,6 @@ regis = {
     "RSP": UC_X86_REG_RSP,
     "RIP": UC_X86_REG_RIP
     }
-
-def PrintFunction(log, uc=None):
-    if uc:
-        log.info(f"call {sys._getframe(1).f_code.co_name} RAX : {uc.reg_read(UC_X86_REG_RAX)}")
-    else:
-        log.info(f"call {sys._getframe(1).f_code.co_name}")
 
 def disas(code,address):
     md=Cs(CS_ARCH_X86,CS_MODE_64)
@@ -78,10 +71,10 @@ class CustomFormatter(logging.Formatter):
         for key in regis:
             tmp = self.uc.reg_read(regis[key])
             self.reg[key]=tmp
-
+        
         d_format = self.blue+"--------------------------[ REGISTERS]-------------------------\n"+self.reset
         for key in self.reg:
-            d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x{:016x}\n".format(self.reg[key])
+            d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x%x\n" % self.reg[key]
         d_format += self.reset
         d_format += self.blue+"--------------------------[ DISASM ]-------------------------\n"+self.reset
         
@@ -102,12 +95,16 @@ class CustomFormatter(logging.Formatter):
         
         stack =struct.unpack('<Q',self.uc.mem_read(self.reg["RSP"],0x8))[0]
         for i in range(-5,11):
-            d_format += self.yellow+"0x{:016x}".format(self.reg["RSP"]+8*i) + self.green+"\t<==" + self.reset+ "\t0x%x\n" % (struct.unpack('<Q',self.uc.mem_read(self.reg["RSP"]+8*i,0x8))[0])
+            if i == 0:
+                d_format += self.green +"▶"+self.yellow+"0x%x" % (self.reg["RSP"]) + self.green+"\t<==" + self.reset+ "\t0x%x\n" % (struct.unpack('<Q',self.uc.mem_read(self.reg["RSP"],0x8))[0])
+            else:
+                d_format += self.yellow+"0x%x" % (self.reg["RSP"]+8*i) + self.green+"\t<==" + self.reset+ "\t0x%x\n" % (struct.unpack('<Q',self.uc.mem_read(self.reg["RSP"]+8*i,0x8))[0])
         self.FORMATS = {
             #logging.DEBUG: self.grey + "%(levelname)s - %(message)s" + self.reset,
             logging.DEBUG: self.green + "%(levelname)s - %(message)s\n"+d_format +self.reset,
-            logging.INFO: self.green + "%(levelname)s" + self.bold_red + " - %(message)s"+self.reset,
-            logging.WARNING: self.yellow + self.format_problem_str + self.reset,
+            logging.INFO: self.green + "%(levelname)s" + self.yellow + " - %(message)s"+self.reset,
+            #logging.WARNING: self.yellow + self.format_problem_str + self.reset,
+            logging.WARNING: self.green + "HOOKING" + self.bold_red + " - %(message)s"+self.reset,
             logging.ERROR: self.red + self.format_problem_str + self.reset,
             logging.CRITICAL: self.bold_red + self.format_problem_str + self.reset
         }
