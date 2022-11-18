@@ -6,7 +6,7 @@ from logger import *
 from datetime import datetime
 from api_hook import *
 from config import DLL_SETTING
-from peb import SetLdr, SetListEntry, SetProcessHeap, SetPEB
+from peb import SetLdr, SetListEntry, SetProcessHeap, setup_peb
 from teb import *
 
 import logging
@@ -18,7 +18,6 @@ import os
 GS = 0xff10000000000000
 IMAGE_BASE = 0x140000000
 ADDRESS = 0x140000000
-DLL_BASE = 0x800000
 COUNT=0
 Ldr = 0x000001B54C810000
 PROC_HEAP_ADDRESS=0x000001E9E3850000
@@ -26,6 +25,7 @@ ALLOCATE_CHUNK=0x0000020000000000
 STACK_BASE=0x201000
 STACK_LIMIT= 0x100000
 MB = 2**20 #Mega Byte
+KUSER_SHARED_DATA = 0x000000007FFE0000
 
 #DLL_FUNCTIONS={} # {function name: address}
 #LOADED_DLL = {} # {dll: address}
@@ -43,6 +43,7 @@ def hook_fetch(uc, access, address, size, value, user_data):
 
 def hook_block(uc, address, size, user_data):
     
+    exitFlag=0
     rsp=uc.reg_read(UC_X86_REG_RSP)
     rip=uc.reg_read(UC_X86_REG_RIP)
     
@@ -57,6 +58,7 @@ def hook_block(uc, address, size, user_data):
     try :
        if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
             BobLog.info(f"This Function is {DLL_SETTING.INV_DLL_FUNCTIONS[rip]}, RIP : {hex(rip)}")
+            BobLog.debug("DEBUGING")
             exitFlag=globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
             if exitFlag ==1:
                 uc.emu_stop()
@@ -84,6 +86,7 @@ def hook_code(uc, address, size, user_data):
     try :
        if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
             BobLog.info(f"This Function is {DLL_SETTING.INV_DLL_FUNCTIONS[rip]}, RIP : {hex(rip)}")
+            BobLog.debug("DEBUGING")
             exitFlag=globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
             if exitFlag ==1:
                 uc.emu_stop()
@@ -97,7 +100,6 @@ def hook_code(uc, address, size, user_data):
 
 
 def setup_teb(uc):
-    global HEAP_BASE
     teb_addr = 0xff10000000000000
     peb_addr = 0xff20000000000000
     teb = InitTeb()
@@ -109,9 +111,9 @@ def setup_teb(uc):
     uc.mem_map(ALLOCATE_CHUNK, 10 * MB, UC_PROT_ALL)
     uc.mem_write(teb_addr, teb_payload)
     uc.mem_write(peb_addr+ 0x30, struct.pack('<Q', PROC_HEAP_ADDRESS))
-    uc.mem_write(PROC_HEAP_ADDRESS+0x1db0,struct.pack('<Q',0x5A0058))
-    uc.mem_write(PROC_HEAP_ADDRESS+0x1db8,struct.pack('<Q',PROC_HEAP_ADDRESS+0x2398))
-
+    #uc.mem_write(PROC_HEAP_ADDRESS+0x1db0,struct.pack('<Q',0x5A0058))
+    #uc.mem_write(PROC_HEAP_ADDRESS+0x1db8,struct.pack('<Q',PROC_HEAP_ADDRESS+0x2398))
+    uc.mem_map(KUSER_SHARED_DATA, 0x1000, UC_PROT_READ)
 
     uc.reg_write(UC_X86_REG_GS_BASE, teb_addr)
     uc.reg_write(UC_X86_REG_CS, 0x400000)
@@ -136,23 +138,25 @@ def emulate(program: str,  verbose):
 
     
     setup_teb(uc)
+    uc.mem_write(PROC_HEAP_ADDRESS+0x2398,os.path.abspath(program).encode("utf-8"))
+    setup_peb(uc)
+    SetProcessHeap(uc)
+    
     '''
     SetLdr(uc) # Ldr set     load된 dll마다 추가해줘야 함
     for i in range(0,4):  # ListEntry set 
         SetListEntry(uc,dllList[i],i)
     '''
-    uc.mem_write(PROC_HEAP_ADDRESS+0x2398,os.path.abspath(program).encode("utf-8"))
-    SetPEB(uc)
-    SetProcessHeap(uc)
+    
 
     config.InvDllDict()
 
     uc.reg_write(UC_X86_REG_RSP, STACK_BASE - pe.OPTIONAL_HEADER.SectionAlignment) #0x200000
-    uc.reg_write(UC_X86_REG_RBP, 0x0) #0x200600a
+    uc.reg_write(UC_X86_REG_RBP, 0x0) 
     
     print("hook start!")
-    uc.hook_add(UC_HOOK_CODE, hook_code)
-    #uc.hook_add(UC_HOOK_BLOCK, hook_block)
+    #uc.hook_add(UC_HOOK_CODE, hook_code)
+    uc.hook_add(UC_HOOK_BLOCK, hook_block)
    
     uc.reg_write(UC_X86_REG_RAX, ADDRESS+EP)
     uc.reg_write(UC_X86_REG_RDX, ADDRESS+EP)
@@ -161,14 +165,8 @@ def emulate(program: str,  verbose):
     #uc.mem_write(0x100F794,struct.pack('<Q',0x1))
     
     
-    '''
-    for key in DLL_SETTING.DLL_FUNCTIONS:
-        print("key : {0}, value : {1}".format(key,hex(DLL_SETTING.DLL_FUNCTIONS[key])))
-    
-    print("=================================================")
-    for key in DLL_SETTING.LOADED_DLL:
-        print("key : {0}, value : {1}".format(key,hex(DLL_SETTING.LOADED_DLL[key])))
-    '''
+    #P_DLL_Function()
+    #P_LOADED_DLL()
 
     try:
         uc.emu_start(IMAGE_BASE + EP, ADDRESS)
@@ -180,3 +178,12 @@ def emulate(program: str,  verbose):
     print(f"[{end}] Emulation done...")
     print(f"Runtime: [{end-start}]")
     
+
+
+def P_DLL_Function():
+    for key in DLL_SETTING.DLL_FUNCTIONS:
+        print("key : {0}, value : {1}".format(key,hex(DLL_SETTING.DLL_FUNCTIONS[key])))
+    
+def P_LOADED_DLL():
+    for key in DLL_SETTING.LOADED_DLL:
+        print("key : {0}, value : {1}".format(key,hex(DLL_SETTING.LOADED_DLL[key])))
