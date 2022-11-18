@@ -11,6 +11,8 @@ regis = {
     "RBX": UC_X86_REG_RBX,
     "RCX": UC_X86_REG_RCX,
     "RDX": UC_X86_REG_RDX,
+    "RBP": UC_X86_REG_RBP,
+    "RSP": UC_X86_REG_RSP,
     "RDI": UC_X86_REG_RDI,
     "RSI": UC_X86_REG_RSI,
     "R8": UC_X86_REG_R8, 
@@ -21,9 +23,8 @@ regis = {
     "R13": UC_X86_REG_R13,
     "R14": UC_X86_REG_R14,
     "R15": UC_X86_REG_R15,
-    "RBP": UC_X86_REG_RBP,
-    "RSP": UC_X86_REG_RSP,
-    "RIP": UC_X86_REG_RIP
+    "RIP": UC_X86_REG_RIP,
+    "RFLAG": UC_X86_REG_EFLAGS
     }
 
 def disas(code,address):
@@ -73,8 +74,26 @@ class CustomFormatter(logging.Formatter):
             self.reg[key]=tmp
         
         d_format = self.blue+"--------------------------[ REGISTERS]-------------------------\n"+self.reset
-        for key in self.reg:
-            d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x%x\n" % self.reg[key]
+        for idx, key in enumerate(self.reg):
+            try:
+                d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x%x\t" % self.reg[key] + str(self.uc.mem_read(self.reg[key],0x50).split(b'\x00')[0],'utf-8').replace('\n','') + '\n'
+            except:
+                d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x%x\n" % self.reg[key]
+            if key == "RFLAG":
+                OF = (self.reg[key] & 0b100000000000)>>11    #11 
+                DF = (self.reg[key] & 0b10000000000 )>>10    #10 
+                IF = (self.reg[key] & 0b1000000000  )>>9     #9 
+                TF = (self.reg[key] & 0b100000000   )>>8     #8 
+                SF = (self.reg[key] & 0b10000000    )>>7     #7 
+                ZF = (self.reg[key] & 0b1000000     )>>6     #6 
+                AF = (self.reg[key] & 0b10000       )>>4     #4 
+                PF = (self.reg[key] & 0b100         )>>2     #2
+                CF = (self.reg[key] & 0b1           )        #0
+                d_format += f" ZF {ZF} PF {PF} AF {AF}\n OF {OF} SF {SF} DF {DF}\n CF {CF} TF {TF} IF {IF}\n"
+            if idx in [7, 15, 16]:
+                d_format += '\n'
+
+
         d_format += self.reset
         d_format += self.blue+"--------------------------[ DISASM ]-------------------------\n"+self.reset
         
