@@ -1,7 +1,7 @@
 from unicorn import *
 from unicorn.x86_const import *
 from loader import EndOfString, PE_Loader
-from config import DLL_SETTING, HEAP_HANDLE, GLOBALVAR
+from config import DLL_SETTING, HEAP_HANDLE, GLOBALVAR, InvDllDict
 
 import logging
 import struct
@@ -110,7 +110,7 @@ def hook__initterm(ip, rsp, uc, log):
     uc.reg_write(UC_X86_REG_RAX, 0)
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
-
+'''
 def hook_ZwQueryVirtualMemory(ip, rsp, uc, log):
     
     rcx = uc.reg_read(UC_X86_REG_RCX)
@@ -125,7 +125,7 @@ def hook_ZwQueryVirtualMemory(ip, rsp, uc, log):
     uc.mem_write(rsp+0x38,bytes(uc.mem_read(rsp+0x28,0x8)))
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
-
+'''
 def hook_GetModuleFileNameW(ip, rsp, uc, log):
     
     rcx = uc.reg_read(UC_X86_REG_RCX)
@@ -226,6 +226,25 @@ def hook___stdio_common_vfprintf(ip, rsp, uc, log):
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
 
+def hook_MessageBoxExW(ip, rsp, uc, log):
+    
+    
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    rdx = uc.reg_read(UC_X86_REG_RDX)
+    r8 = uc.reg_read(UC_X86_REG_R8)
+  
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+    text = bytes(uc.mem_read(rdx, 0x100)).decode('utf-16')
+    title = bytes(uc.mem_read(r8, 0x10)).decode('utf-16')
+    
+    
+    log.warning(f"HOOK_API_CALL : MessageBoxExW, hadnle : {hex(rcx)}, TEXT : {text}, TITLE : {title}")
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0x1)
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
 def hook_MessageBoxW(ip, rsp, uc, log):
     
     
@@ -291,6 +310,7 @@ def hook_LoadLibraryA(ip, rsp, uc, log):
     
     if dllName not in DLL_SETTING.LOADED_DLL:
         PE_Loader(uc, dllName, GLOBALVAR['NEXT_DLL_BASE'])
+        InvDllDict()
 
     d_address = DLL_SETTING.LOADED_DLL[dllName]
     if d_address:
@@ -631,7 +651,175 @@ def hook_FreeSid(ip, rsp, uc, log):
     uc.reg_write(UC_X86_REG_RAX,0x0)
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_VirtualProtect(ip, rsp, uc, log):
+    
+    privilege = {
+        0x2: UC_PROT_READ, 
+        0x4: UC_PROT_READ | UC_PROT_WRITE,
+        0x10:UC_PROT_EXEC,
+        0x20:UC_PROT_EXEC | UC_PROT_READ, 
+        0x40:UC_PROT_ALL
+    }
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    rdx = uc.reg_read(UC_X86_REG_RDX)
+    r8 = uc.reg_read(UC_X86_REG_R8)
+    r9 = uc.reg_read(UC_X86_REG_R9)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+    #log.debug("DEBUGING")
+    log.warning(f"HOOK_API_CALL : VirtualProtect, Address : {hex(rcx)}, Size : {hex(rdx)}, Privilege : {hex(r8)}")
+    uc.mem_protect(align(rcx-0x1000), rdx+0x1000, privilege[r8])
+    #uc.mem_protect(0x7ff00018b000, 0x2000, UC_PROT_ALL)
+
+    #log.debug("DEBUGING")
+    uc.mem_write(r9, struct.pack('<Q',0x20))
+    uc.reg_write(UC_X86_REG_RAX,0x1)
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_GetForegroundWindow(ip, rsp, uc, log):
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.warning(f"HOOK_API_CALL : GetForegroundWindow")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0x0)
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_GetWindowTextA(ip, rsp, uc, log):
+    
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    rbx = uc.reg_read(UC_X86_REG_RBX)
+    rsi = uc.reg_read(UC_X86_REG_RSI)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.warning(f"HOOK_API_CALL : GetWindowTextA")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0x0)
+    uc.mem_write(rsp+0x8,struct.pack('<Q',rbx))
+    uc.mem_write(rsp+0x10,struct.pack('<Q',rsi))
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_RaiseException(ip, rsp, uc, log):
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.warning(f"HOOK_API_CALL : RaiseException")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0x0)
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_RtlRemoveVectoredExceptionHandler(ip, rsp, uc, log):
+    
+    
+    rbx = uc.reg_read(UC_X86_REG_RBX)
+    rbp = uc.reg_read(UC_X86_REG_RBP)
+    rsi = uc.reg_read(UC_X86_REG_RSI)
+    rdi = uc.reg_read(UC_X86_REG_RDI)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+    
+    
+  
+    
+    #print(path.encode("utf-8"))
+    #print(hex(len(path)))
+    log.warning(f"HOOK_API_CALL : RtlRemoveVectoredExceptionHandler")
+    #log.debug("DEBUGING")
+    uc.mem_write(rsp+0x8,struct.pack('<Q',rbx))
+    uc.mem_write(rsp+0x10,struct.pack('<Q',rbp))
+    uc.mem_write(rsp+0x18,struct.pack('<Q',rsi))
+    uc.mem_write(rsp+0x20,struct.pack('<Q',rdi))
+   
+    uc.reg_write(UC_X86_REG_RAX,0x1) #임시 핸들
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_GetSystemFirmwareTable(ip, rsp, uc, log):
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.warning(f"HOOK_API_CALL : GetSystemFirmwareTable")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0x2666)
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_RtlFreeHeap(ip, rsp, uc, log):
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.warning(f"HOOK_API_CALL : RtlFreeHeap")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0x1)
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
+def hook_ZwQueryInformationProcess(ip, rsp, uc, log):
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    rdx = uc.reg_read(UC_X86_REG_RDX)
+    r8 = uc.reg_read(UC_X86_REG_R8)
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+    #log.debug("DEBUGING")
+    log.warning(f"HOOK_API_CALL : ZwQueryInformationProcess")
+    #log.debug("DEBUGING")
+    
+    if rdx == 0x7:
+        uc.mem_write(r8,struct.pack('<Q',0x0))
+
+    uc.reg_write(UC_X86_REG_RAX, 0x0)
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
 '''
+def hook_IsBadWritePtr(ip, rsp, uc, log):
+    
+    rcx = uc.reg_read(UC_X86_REG_RCX)
+    rdx = uc.reg_read(UC_X86_REG_RDX)
+    
+    tmp = uc.mem_read(rsp,8)
+    tmp=struct.unpack('<Q',tmp)[0]
+
+
+    #log.debug("DEBUGING")
+    log.warning(f"HOOK_API_CALL : IsBadWritePtr, RCX : {hex(rcx)}, RDX : {hex(rdx)}")
+    
+    #log.debug("DEBUGING")
+    uc.reg_write(UC_X86_REG_RAX,0x0)
+    uc.reg_write(UC_X86_REG_RIP,tmp)
+    uc.reg_write(UC_X86_REG_RSP,rsp+8)
+
 def hook_RtlAddVectoredExceptionHandler(ip, rsp, uc, log):
     
     
@@ -764,34 +952,7 @@ def hook_GetVersion(ip, rsp, uc, log):
 
 
 
-def hook_RtlRemoveVectoredExceptionHandler(ip, rsp, uc, log):
-    
-    
-    rbx = uc.reg_read(UC_X86_REG_RBX)
-    rbp = uc.reg_read(UC_X86_REG_RBP)
-    rsi = uc.reg_read(UC_X86_REG_RSI)
-    rdi = uc.reg_read(UC_X86_REG_RDI)
-    
-    tmp = uc.mem_read(rsp,8)
-    tmp=struct.unpack('<Q',tmp)[0]
 
-    
-    
-  
-    
-    #print(path.encode("utf-8"))
-    #print(hex(len(path)))
-    log.warning(f"HOOK_API_CALL : RtlRemoveVectoredExceptionHandler")
-    #log.debug("DEBUGING")
-    uc.mem_write(rsp+0x8,struct.pack('<Q',rbx))
-    uc.mem_write(rsp+0x10,struct.pack('<Q',rbp))
-    uc.mem_write(rsp+0x18,struct.pack('<Q',rsi))
-    uc.mem_write(rsp+0x20,struct.pack('<Q',rdi))
-   
-    uc.reg_write(UC_X86_REG_RAX,0x1) #임시 핸들
-    #log.debug("DEBUGING")
-    uc.reg_write(UC_X86_REG_RIP,tmp)
-    uc.reg_write(UC_X86_REG_RSP,rsp+8)
 
 
 
@@ -852,73 +1013,13 @@ def hook_VirtualProtect(ip, rsp, uc, log):
     uc.reg_write(UC_X86_REG_RIP,tmp)
     uc.reg_write(UC_X86_REG_RSP,rsp+8)
 
-def hook_IsBadWritePtr(ip, rsp, uc, log):
-    
-    rcx = uc.reg_read(UC_X86_REG_RCX)
-    rdx = uc.reg_read(UC_X86_REG_RDX)
-    r8 = uc.reg_read(UC_X86_REG_R8)
-    r9 = uc.reg_read(UC_X86_REG_R9)
-    rbx = uc.reg_read(UC_X86_REG_RBX)
-    
-    tmp = uc.mem_read(rsp,8)
-    tmp=struct.unpack('<Q',tmp)[0]
 
 
-    #log.debug("DEBUGING")
-    log.warning(f"HOOK_API_CALL : IsBadWritePtr, RCX : {hex(rcx)}, RDX : {hex(rdx)}")
-    
-    #log.debug("DEBUGING")
-    uc.reg_write(UC_X86_REG_RAX,0x0)
-    uc.reg_write(UC_X86_REG_RIP,tmp)
-    uc.reg_write(UC_X86_REG_RSP,rsp+8)
-
-def hook_GetForegroundWindow(ip, rsp, uc, log):
-    
-    tmp = uc.mem_read(rsp,8)
-    tmp=struct.unpack('<Q',tmp)[0]
 
 
-    #log.debug("DEBUGING")
-    log.warning(f"HOOK_API_CALL : GetForegroundWindow")
-    
-    #log.debug("DEBUGING")
-    uc.reg_write(UC_X86_REG_RAX,0x0)
-    uc.reg_write(UC_X86_REG_RIP,tmp)
-    uc.reg_write(UC_X86_REG_RSP,rsp+8)
-
-def hook_GetWindowTextA(ip, rsp, uc, log):
-    
-    rcx = uc.reg_read(UC_X86_REG_RCX)
-    rbx = uc.reg_read(UC_X86_REG_RBX)
-    rsi = uc.reg_read(UC_X86_REG_RSI)
-    
-    tmp = uc.mem_read(rsp,8)
-    tmp=struct.unpack('<Q',tmp)[0]
 
 
-    #log.debug("DEBUGING")
-    log.warning(f"HOOK_API_CALL : GetWindowTextA")
-    
-    #log.debug("DEBUGING")
-    uc.reg_write(UC_X86_REG_RAX,0x0)
-    uc.mem_write(rsp+0x8,struct.pack('<Q',rbx))
-    uc.mem_write(rsp+0x10,struct.pack('<Q',rsi))
-    uc.reg_write(UC_X86_REG_RIP,tmp)
-    uc.reg_write(UC_X86_REG_RSP,rsp+8)
 
-def hook_RaiseException(ip, rsp, uc, log):
-    
-    tmp = uc.mem_read(rsp,8)
-    tmp=struct.unpack('<Q',tmp)[0]
-
-
-    #log.debug("DEBUGING")
-    log.warning(f"HOOK_API_CALL : RaiseException")
-    
-    #log.debug("DEBUGING")
-    uc.reg_write(UC_X86_REG_RAX,0x0)
-    uc.reg_write(UC_X86_REG_RIP,tmp)
-    uc.reg_write(UC_X86_REG_RSP,rsp+8)
 
 def hook_GetCurrentThread(ip, rsp, uc, log):
 
