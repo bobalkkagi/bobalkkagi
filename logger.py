@@ -4,6 +4,7 @@ import logging
 import config
 import struct
 from capstone import *
+from util import IsReadable
 import lief  # type: ignore
 
 regis = {
@@ -76,7 +77,12 @@ class CustomFormatter(logging.Formatter):
         d_format = self.blue+"--------------------------[ REGISTERS]-------------------------\n"+self.reset
         for idx, key in enumerate(self.reg):
             try:
-                d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x%x\t" % self.reg[key] + str(self.uc.mem_read(self.reg[key],0x50).split(b'\x00')[0],'utf-8').replace('\n','') + '\n'
+                string = str(self.uc.mem_read(self.reg[key],0x50).split(b'\x00')[0],'utf-8').replace('\n','')
+                d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x%x\t" % self.reg[key]
+                if IsReadable(string):
+                    d_format += string + '\n'
+                else:
+                    d_format += '\n'
             except:
                 d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x%x\n" % self.reg[key]
             if key == "RFLAG":
@@ -89,7 +95,7 @@ class CustomFormatter(logging.Formatter):
                 AF = (self.reg[key] & 0b10000       )>>4     #4 
                 PF = (self.reg[key] & 0b100         )>>2     #2
                 CF = (self.reg[key] & 0b1           )        #0
-                d_format += f" ZF {ZF} PF {PF} AF {AF}\n OF {OF} SF {SF} DF {DF}\n CF {CF} TF {TF} IF {IF}\n"
+                d_format += f"\n    ZF {ZF} PF {PF} AF {AF}\n    OF {OF} SF {SF} DF {DF}\n    CF {CF} TF {TF} IF {IF}\n"
             if idx in [7, 15, 16]:
                 d_format += '\n'
 
