@@ -93,7 +93,7 @@ def alloc(uc, size, log, offset = None):
 
 def IsReadable(string):
     for ch in string:
-        if 32 < ord(ch) < 127:
+        if 31 < ord(ch) < 127:
             pass
         else:
             return False
