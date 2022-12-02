@@ -3,20 +3,20 @@ from ctypes import *
 class TEB(Structure):
     _fields_ = [
     # NT_TIB < 0x38
-    ("ExceptionList" , c_void_p),                            #0x8 Ptr64 _EXCEPTION_REGISTRATION_RECORD
-    ("StackBase", c_void_p),
-    ("StackLimit", c_void_p),
-    ("SubSystemTib", c_void_p),
-    ("FiberData", c_void_p),                                 # datatype union with version(Uint4B) 
-    ("ArbitaryUserPointer", c_void_p),
-    ("AddrOfTeb", c_void_p), 
-    ("EnvironmentPointer", c_void_p),                        #+0x38  
-    ("ClientId_UniqueProcess", c_void_p),                    #       ClientId
-    ("ClientId_UniqueThread", c_void_p),
-    ("ActiveRpcHandle", c_void_p),
-    ("ThreadLocalStoragePointer", c_void_p),
-    ("ProcessEnvironmentBlock", c_void_p),                   #       Ptr64 _PEB
-    ("LastErrorValue", c_uint32),                            #       Uint4B
+    ("ExceptionList" , c_void_p),                            #+0x000 Ptr64 _EXCEPTION_REGISTRATION_RECORD
+    ("StackBase", c_void_p),                                 #+0x008
+    ("StackLimit", c_void_p),                                #+0x010
+    ("SubSystemTib", c_void_p),                              #+0x018
+    ("FiberData", c_void_p),                                 #+0x020 datatype union with version(Uint4B) 
+    ("ArbitaryUserPointer", c_void_p),                       #+0x028
+    ("AddrOfTeb", c_void_p),                                 #+0x030
+    ("EnvironmentPointer", c_void_p),                        #+0x038  
+    ("ClientId_UniqueProcess", c_void_p),                    #+0x040       ClientId
+    ("ClientId_UniqueThread", c_void_p),                     #+0x048
+    ("ActiveRpcHandle", c_void_p),                           #+0x050
+    ("ThreadLocalStoragePointer", c_void_p),                 #+0x058
+    ("ProcessEnvironmentBlock", c_void_p),                   #+0x060       Ptr64 _PEB
+    ("LastErrorValue", c_uint32),                            #+0x068       Uint4B
     ("countOfOwnedCriticalSections", c_uint32),              #+0x06c
     ("CsrClientThread", c_void_p),                           #+0x070
     ("Win32ThreadInfo", c_void_p),                           #+0x078
@@ -24,7 +24,7 @@ class TEB(Structure):
     ("UserReserved", c_uint32*5),                            #+0x0e8 [5] Uint4B
     ("WOW32Reserved", c_void_p),                             #+0x100
     ("CurrentLocale", c_uint32),                             #+0x108
-    ("FpSoftwareStatusRegister", c_uint64),                  #+0x10c
+    ("FpSoftwareStatusRegister", c_uint32),                  #+0x10c
     ("ReservedForDebuggerInstrumentation", c_void_p*16),     #+0x110 [16] Ptr64 Void
     ("SystemReserved1", c_void_p*30),                        #+0x190 [30] Ptr64 Void
     ("PlaceholderCompatibilityMode", c_char),                #+0x280
@@ -37,7 +37,6 @@ class TEB(Structure):
     ("Flags", c_uint32),
     ("NextCookieSequenceNumber", c_uint32),
     ("StackId", c_uint32),
-    ("NoData", c_uint32),                                    #실제로는 값이 없음 
     ("WorkingOnBehalfTicket", c_ubyte*8),                    #+0x2b8 [8] UChar
     ("ExceptionCode", c_int32),                              #+0x2c0
     ("Padding0", c_ubyte*4),                                 #+0x2c4 [4] UChar
@@ -51,7 +50,7 @@ class TEB(Structure):
     ("Padding1", c_ubyte*2),                                 #+0x2ee [2] UChar
     #_GDI_TEB_BATCH
     ("GTB_Offset", c_uint32,31),                                #+0x2f0  
-    ("GTB_HasRenderingCommand", c_uint32,1),
+    ("GTB_HasRenderingCommand", c_uint32,1),                    
     ("GTB_HDC", c_uint64),
     ("GTB_Buffer", c_uint*310),                                 #        [310] Uint4B
     #--------------
@@ -187,15 +186,15 @@ def InitTeb():
         0,                  #ArbitaryUserPointer
         0xff10000000000000, #AddrOfTeb -> important
         0,                  #EnvironmentPointer
-        0x13013,         #ClientId_UniqueProcess
-        0x13018,         #ClientId_UniqueThread
+        0x13013,            #ClientId_UniqueProcess
+        0x13018,            #ClientId_UniqueThread
         0,                  #ActiveRpcHandle
         0,                  #ThreadLocalStoragePointer
         0xff20000000000000, #PEB -> important
-        0x3b67,                  #LastErrorValue
+        0x3b67,             #LastErrorValue
         0,                  #CountOfOwnedCriticalSections
         0,                  #CsrClientThread
-        0xd30,                  #Win32ThreadInfo
+        0xd30,              #Win32ThreadInfo
         (0,),               #User32Reserved
         (0,),               #UserReserved
         0,                  #WOW32Reserved
@@ -209,12 +208,11 @@ def InitTeb():
         0,                  #ProxiedProcessId
         #_ActivationStack
         0,                  #ActiveFrame
-        0,                  #FrameListCache_Flink
-        0,                  #FrameListCache_Blink
+        TEB_BASE+0x298,     #FrameListCache_Flink
+        TEB_BASE+0x298,     #FrameListCache_Blink
         0x2,                #Flags
         0x1,                #NextCookieSequenceNumber
-        0,                  #StackId
-        0,                  #실제로 없는 값
+        0x2147dee,          #StackId
         #-----------------
         (0,),               #
         0,                  #
@@ -229,8 +227,8 @@ def InitTeb():
         (0,),               #Padding1
         #_GDI_TEB_BATCH
         0x0,                
-        0x0,
-        0x1,
+        0x0,           
+        0x160000,           #0TEB+0x2F8 값비교
         (0,),
         #----------------
         0xdeadbeef,         #RealClientId_UniqueProcess
@@ -350,6 +348,6 @@ def InitTeb():
         (0,),
         0
     )
-    #teb.StaticUnicodeBuffer[261] = b"ntdll.dll"
+    teb.ActivationContextStackPointer = 0x400000
     return teb
    
