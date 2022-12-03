@@ -1,12 +1,9 @@
-from pickle import LIST
-from re import A
-from zipapp import ZipAppError
 from unicorn import *
 from unicorn.x86_const import *
 from ctypes import *
 from config import DLL_SETTING
 
-Ldr = 0x000001B54C810000
+Ldr = DLL_SETTING.LOADED_DLL['ntdll.dll'] + 0x17A120
 PROC_HEAP_ADDRESS=0x000001E9E3850000
 PEB_ADDR = 0xff20000000000000
 
@@ -37,6 +34,66 @@ class PEB_LDR_DATA(Structure):
         ("EntryInProgress", c_void_p),
         ("ShutdownInProgress", c_void_p),
         ("ShutdownThreadId", c_void_p),
+    ]
+
+class UNICODE_STRING(Structure):
+    _fields_ = [
+        ("Length", c_uint16),
+        ("MaximumLength", c_uint16),
+        ("Buffer", c_wchar_p)
+    ]
+
+class _LIST_ENTRY(Structure):
+    _fields_ = [
+        ("Flink", c_void_p),
+        ("Blink", c_void_p)
+    ]
+
+class _RTL_BALANCED_NODE(Structure):
+    _fields_=[
+        ("Left", c_void_p),
+        ("Right", c_void_p),
+        ("ParentValue", c_uint64)
+    ]
+
+class _LARGE_INTEGER(Structure):
+    _fields_=[
+        ("LowPart", c_uint32),
+        ("HighPart", c_int32),
+    ]
+class LDR_DATA_TABLE_ENTRY(Structure):
+    _fields_ = [
+        ("InLoadOrderLinks", _LIST_ENTRY),
+        ("InMemoryOrderLinks", _LIST_ENTRY),
+        ("InInitializationOrderLinks", _LIST_ENTRY),
+        ("DllBase", c_void_p),
+        ("EntryPoint", c_void_p),
+        ("SizeOfImage", c_uint32),
+        ("FullDllName", UNICODE_STRING), # _UNICODE_STRING
+        ("BaseDllName", UNICODE_STRING), # _UNICODE_STRING
+        ("FlagGroup", c_ubyte*4),
+        ("Flags", c_uint32),
+        ("ObsoleteLoadCount", c_uint16),
+        ("TlsIndex", c_uint16),
+        ("HashLinks", _LIST_ENTRY),
+        ("TimeDateStamp", c_uint32),
+        ("EntryPointActivationContext", c_void_p), # Ptr64 _ACTIVATION_CONTEXT
+        ("Lock", c_void_p),
+        ("DdagNode", c_void_p), #_LDR_DDAG_NODE
+        ("NodeModuleLink", _LIST_ENTRY),
+        ("LoadContext", c_void_p), # _LDRP_LOAD_CONTEXT
+        ("ParentDllBase", c_void_p),
+        ("SwitchBackContext", c_void_p),
+        ("BaseAddressIndexNode", _RTL_BALANCED_NODE),
+        ("MappingInfoIndexNode", _RTL_BALANCED_NODE),
+        ("OriginalBase", c_uint32),
+        ("LoadTime", _LARGE_INTEGER),
+        ("BaseNameHashValue", c_uint32),
+        ("LoadReason", c_uint32), # _LDR_DLL_LOAD_REASON
+        ("ImplicitPathOptions", c_uint32),
+        ("ReferenceCount", c_uint32),
+        ("DependentLoadFlags", c_uint32),
+        ("SigningLevel", c_ubyte)
     ]
 
 class PROCESS_HEAP(Structure):
@@ -182,8 +239,6 @@ class PEB(Structure):
         ("LeapSecondData", c_void_p),
         ("LeapSecondFlags", c_uint32),
         ("NtGlobalFlag2", c_uint32),
-        
-        # ... too much item
     ]
 
 def SetPEB(uc):
@@ -199,29 +254,25 @@ def SetPEB(uc):
     peb.ProcessParameters =  PROC_HEAP_ADDRESS+0x1d50# 채워줘야함
     peb.SubSystemData = 0x0
     peb.ProcessHeap=PROC_HEAP_ADDRESS
+    peb.ActivationContextData = 0x400000 # 언팩시 필요 일단 스택 사이즈를 줘봄
     uc.mem_write(PEB_ADDR ,bytes(peb))
 
 
 
-def SetListEntry(uc, dllName,number):
+def SetListEntry(uc, baseaddress, number):
     listEntry = LIST_ENTRY()
     listEntry.InLoadOrderModuleList_Flink = (Ldr + 0x60) + (number+1)*0x40 
     listEntry.InMemoryOrderModuleList_Flink = (Ldr + 0x60) + (number+1)*0x40 +0x10 
     listEntry.InInitializationOrderModuleList_Flink = (Ldr + 0x60) + (number+1)*0x40 +0x20 
-    if number == 0:
-        listEntry.InLoadOrderModuleList_Blink = (Ldr + 0x10) 
-        listEntry.InMemoryOrderModuleList_Blink = (Ldr + 0x20) 
-        listEntry.InInitializationOrderModuleList_Blink = (Ldr + 0x30)
-    else:
-        listEntry.InLoadOrderModuleList_Blink = (Ldr + 0x60) + (number-1)*0x40
-        listEntry.InMemoryOrderModuleList_Blink = (Ldr + 0x60) + (number-1)*0x40 +0x10
-        listEntry.InInitializationOrderModuleList_Blink = (Ldr + 0x60) + (number-1)*0x40 +0x20
-    listEntry.BaseAddress = DLL_SETTING.LOADED_DLL[dllName]
+    listEntry.InLoadOrderModuleList_Blink = (Ldr + 0x60) + (number-1)*0x40
+    listEntry.InMemoryOrderModuleList_Blink = (Ldr + 0x60) + (number-1)*0x40 +0x10
+    listEntry.InInitializationOrderModuleList_Blink = (Ldr + 0x60) + (number-1)*0x40 +0x20
+    listEntry.BaseAddress = baseaddress
     listEntry.EntryPoint = 0
     uc.mem_write((Ldr+0x60) + (number)*0x40,bytes(listEntry))
     #print("BaseAddress : ",hex(listEntry.BaseAddress))
 
-def SetLdr(uc):
+def InitLdr(uc):
     ldr = PEB_LDR_DATA()
     ldr.Length = 0x58
     ldr.Initialized = 0x1
@@ -236,7 +287,7 @@ def SetLdr(uc):
     ldr.ShutdownInProgress = 0x0
     ldr.ShutdownThreadId = 0x0
     uc.mem_write(Ldr ,bytes(ldr))
-    #print("BaseAddress : ",hex(listEntry.BaseAddress))
+    
 
 def SetProcessHeap(uc):
     procHeap = PROCESS_HEAP()
@@ -246,4 +297,3 @@ def SetProcessHeap(uc):
     procHeap.SegmentFlags = 0x2
     procHeap.BlocksIndex = PROC_HEAP_ADDRESS+0x2e8
     uc.mem_write(PROC_HEAP_ADDRESS ,bytes(procHeap))
-
