@@ -3,7 +3,7 @@ from unicorn.x86_const import *
 import struct
 import pefile
 import os
-from config import DLL_SETTING
+from config import DLL_SETTING, GLOBALVAR, globar_var
 
 PRIVILEGE = {
         0x0:UC_PROT_NONE,
@@ -18,29 +18,80 @@ PRIVILEGE = {
 
 REFLECTOR = {
         "api-ms-win-core-sysinfo-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-sysinfo-l1-2-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-sysinfo-l1-2-1.dll" : "kernelbase.dll",
         "api-ms-win-core-libraryloader-l1-2-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-libraryloader-l1-2-1.dll" : "kernelbase.dll",
         "api-ms-win-core-errorhandling-l1-1-0.dll" : "kernelbase.dll",
         "api-ms-win-core-libraryloader-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-threadpool-legacy-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-threadpool-private-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-timezone-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-crt-math-l1-1-0.dll" : "ucrtbase.dll",
+        "api-ms-win-crt-time-l1-1-0.dll" : "ucrtbase.dll",
         "api-ms-win-crt-runtime-l1-1-0.dll" : "ucrtbase.dll",
         "api-ms-win-crt-heap-l1-1-0.dll" : "ucrtbase.dll",
+        "api-ms-win-crt-heap-l1-1-0.dll" : "ucrtbase.dll",
+        "api-ms-win-crt-utility-l1-1-0.dll": "ucrtbase.dll",
         "api-ms-win-crt-stdio-l1-1-0.dll" : "ucrtbase.dll",
         "api-ms-win-crt-locale-l1-1-0.dll" : "ucrtbase.dll",
         "api-ms-win-core-synch-l1-1-0.dll" : "ntdll.dll",
-        "api-ms-win-core-heap-l1-1-0.dll" : "ntdll.dll",
+        "api-ms-win-core-heap-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-processthreads-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-processthreads-l1-1-1.dll" : "kernelbase.dll",
+        "api-ms-win-core-processthreads-l1-1-2.dll" : "kernelbase.dll",
+        "api-ms-win-core-xstate-l2-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-wow64-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-realtime-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-io-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-io-l1-1-1.dll" : "kernelbase.dll",
+        "api-ms-win-core-memory-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-memory-l1-1-1.dll" : "kernelbase.dll",
+        "api-ms-win-core-memory-l1-1-2.dll" : "kernelbase.dll",
+        "api-ms-win-core-file-l1-1-0.dll" : "kernel32.dll",
+        "api-ms-win-core-file-l1-2-0.dll" : "kernel32.dll",
+        "api-ms-win-core-file-l1-2-1.dll" : "kernel32.dll",
+        "api-ms-win-core-file-l2-1-0.dll" : "kernel32.dll",
+        "api-ms-win-core-file-l2-1-1.dll" : "kernel32.dll",
+        "api-ms-win-core-rtlsupport-l1-1-0.dll" : "kernel32.dll",
+        "api-ms-win-core-console-l1-1-0.dll" : "kernel32.dll",
+        "api-ms-win-eventing-provider-l1-1-0.dll" : "advapi32.dll",
+        "api-ms-win-core-console-l1-1-0.dll" : "kernel32.dll",
+        "api-ms-win-core-datetime-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-datetime-l1-1-1.dll" : "kernelbase.dll",
+        "api-ms-win-core-datetime-l1-1-2.dll" : "kernelbase.dll",
+        "api-ms-win-core-debug-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-debug-l1-1-1.dll" : "kernelbase.dll",
+        "api-ms-win-core-fibers-l1-1-0.dll" : "kernel32.dll",
+        "api-ms-win-core-handle-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-localization-l1-2-0.dll" : "kernel32.dll",
+        "api-ms-win-core-namedpipe-l1-1-0.dll" : "kernel32.dll",
+        "api-ms-win-core-processenvironment-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-processenvironment-l1-2-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-profile-l1-1-0.dll" : "kernel32.dll",
+        "api-ms-win-core-string-l1-1-0.dll" : "kernel32.dll",
+        "api-ms-win-core-synch-l1-2-0.dll" : "kernel32.dll",
+        "api-ms-win-core-util-l1-1-0.dll" : "kernel32.dll",
+        "api-ms-win-security-base-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-security-base-l1-2-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-registry-l1-1-0.dll" : "kernelbase.dll",
+        "api-ms-win-core-registry-l1-1-1.dll" : "kernelbase.dll",
+        "api-ms-win-core-registry-l1-1-2.dll" : "kernelbase.dll",
         
-        
-
 
     }
 RTL = {
     "InitializeSListHead" : "RtlInitializeSListHead",
-    "EnterCriticalSection" : "RtlEnterCriticalSection",
-    "HeapAlloc" : "RtlAllocateHeap"
-
+    #"EnterCriticalSection" : "RtlEnterCriticalSection",
+    #"HeapAlloc" : "RtlAllocateHeap",
+    "QueryUnbiasedInterruptTime" : "RtlQueryUnbiasedInterruptTime",
+    "QueryPerformanceCounter" : "RtlQueryPerformanceCounter",
 }
-IMAGE_BASE = 0x140000000
-ADDRESS = 0x140000000
-DLL_BASE = 0x7FF000000000
+
+
+IMAGE_BASE_START = 0x140000000
+IMAGE_BASE_END = 0x140000000
+#DLL_BASE = 0x7FF000000000
 
 def EndOfString(ByteData: bytes) -> str:
     byteString = ""
@@ -52,9 +103,9 @@ def EndOfString(ByteData: bytes) -> str:
     return byteString
 
 
-def PE_Loader(uc, fileName, base, privilege=None) -> None: #
-    global ADDRESS
-    global DLL_BASE
+def PE_Loader(uc, fileName, base, privilege=None, path=None) -> None: #
+    global IMAGE_BASE_END
+    #global DLL_BASE
     
     originBase = base
     dllFlag = False
@@ -64,13 +115,10 @@ def PE_Loader(uc, fileName, base, privilege=None) -> None: #
 
     if ".dll" in fileName:
         dllFlag = True
-    
+        path = GetDLLPath(fileName, path)
+    else :
+        path = fileName
 
-
-    if dllFlag == True:
-        path = GetDLLPath(fileName)
-    else:
-        path = fileName   #실행파일 경로
 
     try :
         pe = pefile.PE(path, fast_load=True)
@@ -88,12 +136,12 @@ def PE_Loader(uc, fileName, base, privilege=None) -> None: #
         sectionSize, sectionInfo = Section(uc, pe, originBase)
         base += sectionSize
         
-        DataFix(uc, sectionInfo, originBase, imageBase, base-originBase) #imagebase 기준으로 저장된 정보를 load한 base주소 기준으로 변경
+        DataFix(uc, sectionInfo, originBase, imageBase, base-originBase) #imagebase 기준으로 저장된 정보를 load한 base주소 기준으로 변경, 예외처리가 필요할 수 있다.
 
         if dllFlag == True:
-            DLL_BASE = base
+            GLOBALVAR['NEXT_DLL_BASE'] = base
         else :
-            ADDRESS = base
+            IMAGE_BASE_END = base
         pe.parse_data_directories()
         if dllFlag == True:
             for entry in pe.DIRECTORY_ENTRY_EXPORT.symbols:
@@ -107,7 +155,7 @@ def PE_Loader(uc, fileName, base, privilege=None) -> None: #
                 except:
                     pass
         
-        Insert_IAT(uc, pe, originBase)
+        Insert_IAT(uc, pe, originBase) #
         print(f'[Load] {fileName}: {hex(originBase)}')
     except FileNotFoundError:
         #print(" isn't exist in ")
@@ -115,7 +163,7 @@ def PE_Loader(uc, fileName, base, privilege=None) -> None: #
 
 
 def Insert_IAT(uc, pe, base):
-    global DLL_BASE
+    #global DLL_BASE
     rva =pe.OPTIONAL_HEADER.DATA_DIRECTORY[1].VirtualAddress # DIRECTORY_ENTRY_IMPORT -> RVA
     imageBase = pe.OPTIONAL_HEADER.ImageBase 
     while True:
@@ -134,7 +182,7 @@ def Insert_IAT(uc, pe, base):
 
     
         if dll.lower() not in DLL_SETTING.LOADED_DLL:
-            PE_Loader(uc, dll, DLL_BASE)
+            PE_Loader(uc, dll, GLOBALVAR['NEXT_DLL_BASE'], None, os.path.abspath("vm_dll"))
             #print(dll)     
         peDataLen = len(pe.__data__) - file_offset
         dllnames_only=False 
@@ -198,6 +246,10 @@ def GetDLLPath(dll:str, path=None)->str:
                     
     return dllPath
 
+def PrivChange(privilege):
+    changeDic={0x2:0x10, 0x4:0x2, 0x6:0x20, 0xc:0x4, 0xe:0x40}
+    return changeDic[privilege]
+
 def Section(uc, pe, base):
     totalSize = 0
     info=[]
@@ -208,6 +260,7 @@ def Section(uc, pe, base):
         uc.mem_map(base+section.VirtualAddress, align(section.Misc_VirtualSize) , PRIVILEGE[section.Characteristics >>28])
         uc.mem_write(base+section.VirtualAddress, code)
         totalSize += align(section.Misc_VirtualSize)
+        globar_var.SECTIONINFO.append([base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(section.Characteristics >>28)])
     return totalSize, info
 
 def DataFix(uc,sectionInfo,originbase,imagebase,offset):
@@ -223,3 +276,12 @@ def DataFix(uc,sectionInfo,originbase,imagebase,offset):
                     uc.mem_write(section[1]+count,struct.pack('<Q',data-imagebase+originbase))
                 count += 0x8
             uc.mem_protect(section[1],section[2],TPrivileage)
+            
+def Remove_EXEC(sectionName:str, Characteristics, cnt:int):
+    if len(sectionName) > 0 and sectionName != '.text':
+        return Characteristics >> 28
+    elif (Characteristics >> 28)&0x2:
+        print(f"[Removed] No name {cnt}st section EXEC privilege!")
+        return (Characteristics >> 28)^0x2 
+    else:
+        return Characteristics >> 28
