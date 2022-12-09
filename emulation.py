@@ -44,6 +44,17 @@ def hook_fetch(uc, access, address, size, value, user_data):
 def hook_mem_read_unmapped(uc, access, address, size, value, user_dat):
     print("unmapped")
     print(hex(access), hex(address), hex(size), hex(value))
+    code = uc.mem_read(address, size)
+    asm=disas(bytes(code),address)
+    print(code)
+    print(asm)
+    print("hi")
+    
+    for a in asm:
+        print("hi")
+        #print("  0x%x: " % a.address +"\t%s" % a.mnemonic +"\t%s\n" % a.op_str)
+        #print("  0x%x: " % a.address +"\t%s" % a.mnemonic +"\t%s\n" % a.op_str)
+        
 
 def hook_api(uc, address, size, user_data):
     global HOOKREGION
@@ -221,8 +232,8 @@ def InsPatch(uc, address, size, user_data):
     rsp=uc.reg_read(UC_X86_REG_RSP)
     if size ==0xf1f1f1f1 :
         size = 0x3
+
     code = uc.mem_read(address, size)
-    
     asm=disas(bytes(code),address)
     for a in asm:
         if a.mnemonic == "xrstor":
@@ -302,12 +313,14 @@ def emulate(program: str,  verbose):
     InvHookFuncDict()
     
     print("hook start!")
-    uc.hook_add(UC_HOOK_MEM_READ_UNMAPPED, hook_mem_read_unmapped)
+    #uc.hook_add(UC_HOOK_MEM_READ_UNMAPPED, hook_mem_read_unmapped)
+    uc.hook_add(UC_HOOK_MEM_WRITE_PROT, hook_mem_read_unmapped)
     #uc.hook_add(UC_HOOK_CODE, hook_code)
     #uc.hook_add(UC_HOOK_BLOCK, hook_block) 
-    #uc.hook_add(UC_HOOK_BLOCK, hook_block, None,  0x7ff000000000,  0x7ff001000000)
+    
     print(hex(DLL_SETTING.LOADED_DLL["ntdll.dll"]), hex(DLL_SETTING.LOADED_DLL["kernel32.dll"]))
     uc.hook_add(UC_HOOK_CODE, InsPatch, None,  DLL_SETTING.LOADED_DLL["ntdll.dll"], DLL_SETTING.LOADED_DLL["kernelbase.dll"])
+    #uc.hook_add(UC_HOOK_BLOCK, hook_block, None,  0x7ff000000000,  0x800000000000)
     uc.hook_add(UC_HOOK_BLOCK, hook_api, None, HOOKREGION, HOOKREGION+0x1000) 
     
     uc.reg_write(UC_X86_REG_RAX, ADDRESS+EP)
@@ -328,17 +341,19 @@ def emulate(program: str,  verbose):
 
     #P_DLL_Function()
     #P_LOADED_DLL()
-        
-    
-   
-    uc.mem_protect(0x140001000,0x1000,UC_PROT_READ)
-    globar_var.SECTIONINFO[0][2]=0x2
+    '''
+    for key in globar_var.SECTIONINFO:
+        print("address : {0}, size : {1}, priv : {2}".format(hex(key[0]),hex(key[1]),hex(key[2])))
+    '''
+    uc.mem_protect(0x140001000,0xE6000,UC_PROT_READ)
+    globar_var.SECTIONINFO[1][2]=0x2
     print("PID : ",os.getpid())
     try:
         uc.emu_start(IMAGE_BASE + EP, ADDRESS)
     except UcError as e:
         print(f"[ERROR]: {e}")
         BobLog.info("Find OEP : %s" % hex(uc.reg_read(UC_X86_REG_RIP)))
+        print(hex(uc.reg_read(UC_X86_REG_R14)))
         #print(hex(uc.reg_read(UC_X86_REG_RIP)))
         #BobLog.debug("DEBUGING")
   

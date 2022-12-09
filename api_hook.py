@@ -690,8 +690,11 @@ def hook_VirtualProtect(ip, rsp, uc, log):
 
     #log.debug("DEBUGING")
     log.warning(f"HOOK_API_CALL : VirtualProtect, Address : {hex(rcx)}, Size : {hex(rdx)}, Privilege : {hex(r8)}")
+    
+    
     if align(rcx) > rcx:	
-        uc.mem_protect(align(rcx)-0x1000, align(rdx), privilege[r8])	
+        offset =  rcx - (align(rcx)- 0x1000)
+        uc.mem_protect(align(rcx)-0x1000, align(rdx+offset), privilege[r8])	
     else:	
         uc.mem_protect(align(rcx), align(rdx), privilege[r8])
     
