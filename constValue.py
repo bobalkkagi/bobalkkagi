@@ -1,0 +1,12 @@
+
+GS = 0xff10000000000000
+TebAddress = 0xff10000000000000
+PebAddress = 0xff20000000000000
+Ldr = 0x000001B54C810000
+ProcHeapAddress=0x000001E9E3850000
+MB = 2**20 #Mega Byte
+StackBase=0x201000
+StackLimit= 0x100000
+KuserSharedData = 0x000000007FFE0000
+PshimData = 0x600000
+ActivationContext = 0x400000
