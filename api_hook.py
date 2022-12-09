@@ -937,21 +937,6 @@ def hook_RegCloseKey(ip, rsp, uc, log):
     log.warning(f"HOOK_API_CALL :RegCloseKey")
     #log.debug("DEBUGING")
 
-    dr0 = uc.reg_read(UC_X86_REG_DR0)
-    dr1 = uc.reg_read(UC_X86_REG_DR1)
-    dr2 = uc.reg_read(UC_X86_REG_DR2)
-    dr3 = uc.reg_read(UC_X86_REG_DR3)
-    dr4 = uc.reg_read(UC_X86_REG_DR4)
-    dr5 = uc.reg_read(UC_X86_REG_DR5)
-    dr6 = uc.reg_read(UC_X86_REG_DR6)
-    dr7 = uc.reg_read(UC_X86_REG_DR7)
-    dr8 = uc.reg_read(UC_X86_REG_DR8)
-    dr9 = uc.reg_read(UC_X86_REG_DR9)
-    dr10 = uc.reg_read(UC_X86_REG_DR10)
-    dr11 = uc.reg_read(UC_X86_REG_DR11)
-    
-    uc.reg_write(UC_X86_REG_DR6, 0x0)
-    uc.reg_write(UC_X86_REG_DR7, 0x0)
     
     uc.reg_write(UC_X86_REG_RAX, 0x0)
     uc.reg_write(UC_X86_REG_RIP,tmp)
