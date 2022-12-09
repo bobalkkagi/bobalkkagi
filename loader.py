@@ -9,10 +9,43 @@ from util import align
 import struct
 import pefile
 import os
+<<<<<<< HEAD
 
 
 def PE_Loader(uc, fileName, base, oep: bool = False, path = None) -> None: #
   
+=======
+from globalValue import DLL_SETTING, GLOBAL_VAR
+from util import EndOfString
+from reflector import REFLECTOR
+
+PRIVILEGE = {
+        0x0:UC_PROT_NONE,
+        0x2:UC_PROT_EXEC, 
+        0x4:UC_PROT_READ, 
+        0x8:UC_PROT_WRITE, 
+        0x6:UC_PROT_EXEC | UC_PROT_READ, 
+        0xa:UC_PROT_EXEC | UC_PROT_WRITE, 
+        0xc:UC_PROT_READ | UC_PROT_WRITE, 
+        0xe:UC_PROT_ALL
+    }
+
+
+RTL = {
+    "InitializeSListHead" : "RtlInitializeSListHead",
+    "QueryUnbiasedInterruptTime" : "RtlQueryUnbiasedInterruptTime",
+    "QueryPerformanceCounter" : "RtlQueryPerformanceCounter",
+}
+
+
+#DLL_BASE = 0x7FF000000000
+
+
+
+def PE_Loader(uc, fileName, base, privilege=None, path=None) -> None: #
+    #global DLL_BASE
+    
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
     originBase = base
     dllFlag = False
     sectionInfo=[]
@@ -23,15 +56,27 @@ def PE_Loader(uc, fileName, base, oep: bool = False, path = None) -> None: #
             fileName = REFLECTOR[fileName]
         dllFlag = True
         path = GetDLLPath(fileName, path)
+<<<<<<< HEAD
+=======
+    else :
+        path = fileName
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
 
     else :
         path = Path(fileName)
 
+<<<<<<< HEAD
 
     try :
         pe = pefile.PE(path, fast_load=True)
         imageBase = pe.OPTIONAL_HEADER.ImageBase
         if dllFlag:
+=======
+    try :
+        pe = pefile.PE(path, fast_load=True)
+        imageBase = pe.OPTIONAL_HEADER.ImageBase
+        if dllFlag == True:
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
             if fileName.lower() not in DLL_SETTING.LoadedDll:
                 DLL_SETTING.LoadedDll[fileName.lower()] = originBase
             else:
@@ -49,6 +94,13 @@ def PE_Loader(uc, fileName, base, oep: bool = False, path = None) -> None: #
         
         DataFix(uc, sectionInfo, originBase, imageBase, base-originBase) #imagebase 기준으로 저장된 정보를 load한 base주소 기준으로 변경, 예외처리가 필요할 수 있다.
 
+<<<<<<< HEAD
+=======
+        if dllFlag == True:
+            GLOBAL_VAR.DllEnd = base
+        else :
+            GLOBAL_VAR.ImageBaseEnd = base
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
         pe.parse_data_directories()
         if dllFlag:
             GLOBAL_VAR.DllEnd = base
@@ -62,15 +114,23 @@ def PE_Loader(uc, fileName, base, oep: bool = False, path = None) -> None: #
                         print(f"ERROR! {dllFunction} is in DllFuncs")
                 except:
                     pass
+<<<<<<< HEAD
         else:
             GLOBAL_VAR.ImageBaseEnd = base
 
+=======
+        
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
         Insert_IAT(uc, pe, originBase) #
 
         if fileName == "ntdll.dll":
             NtdllPatch(uc, originBase)
 
+<<<<<<< HEAD
         #print(f'[Load] {fileName:<80}: {originBase:016x}')
+=======
+        print(f'[Load] {fileName}: {hex(originBase)}')
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
     except FileNotFoundError:
         pass
 
@@ -96,7 +156,11 @@ def Insert_IAT(uc, pe, base):
     
         if dll.lower() not in DLL_SETTING.LoadedDll:
             PE_Loader(uc, dll, GLOBAL_VAR.DllEnd, None, os.path.abspath("vm_dll"))
+<<<<<<< HEAD
     
+=======
+            #print(dll)     
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
         peDataLen = len(pe.__data__) - file_offset
         dllnames_only=False 
         importData = [] # IAT에 저장되있는 함수들의 정보를 가져옴
@@ -153,7 +217,11 @@ def PrivChange(privilege):
     changeDic={0x2:0x10, 0x4:0x2, 0x6:0x20, 0xc:0x4, 0xe:0x40}
     return changeDic[privilege]
 
+<<<<<<< HEAD
 def Section(uc, pe, base, oep):
+=======
+def Section(uc, pe, base):
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
     totalSize = 0
     info=[]
 
@@ -177,7 +245,11 @@ def Section(uc, pe, base, oep):
 
         uc.mem_write(base+section.VirtualAddress, code)
         totalSize += align(section.Misc_VirtualSize)
+<<<<<<< HEAD
         
+=======
+        GLOBAL_VAR.SectionInfo.append([base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(section.Characteristics >>28)])
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
     return totalSize, info
 
 def DataFix(uc, sectionInfo, originbase, imagebase, offset):
@@ -212,11 +284,20 @@ def NtdllPatch(uc,base):
     uc.mem_write(base + 0x17A3F0+0x70,struct.pack('<Q',base + 0x17277c))
     uc.mem_write(base + 0x17A370+0x8,struct.pack('<Q',0x2000000000000000))
    
+<<<<<<< HEAD
 def RemoveEXEC(sectionName:str, Characteristics):
     if len(sectionName) > 0 and sectionName != '.text':
         return Characteristics >> 28
     elif (Characteristics >> 28)&0x2:
         #print(f"[Removed] No name {cnt} st section EXEC privilege!")
         return (Characteristics >> 28)^0x2, '.text'
+=======
+def Remove_EXEC(sectionName:str, Characteristics, cnt:int):
+    if len(sectionName) > 0 and sectionName != '.text':
+        return Characteristics >> 28
+    elif (Characteristics >> 28)&0x2:
+        print(f"[Removed] No name {cnt}st section EXEC privilege!")
+        return (Characteristics >> 28)^0x2 
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
     else:
         return Characteristics >> 28

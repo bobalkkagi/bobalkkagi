@@ -6,7 +6,13 @@ from util import IsReadable
 
 import logging
 import struct
+<<<<<<< HEAD
 
+=======
+from capstone import *
+from util import IsReadable
+import lief  # type: ignore
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
 
 regis = {
     "RAX": UC_X86_REG_RAX,
@@ -72,11 +78,19 @@ class CustomFormatter(logging.Formatter):
             tmp = self.uc.reg_read(regis[key])
             self.reg[key]=tmp
         
+<<<<<<< HEAD
         d_format = self.blue+  "{0:=^80}\n".format("[ REGISTERS ]") + self.reset
         for idx, key in enumerate(self.reg):
             try:
                 string = str(self.uc.mem_read(self.reg[key], 0x50).split(b'\x00')[0],'utf-8').replace('\n','')
                 d_format += self.green+"%-10s" % (key+":")+self.reset+ "{:<016x}\t".format(self.reg[key])
+=======
+        d_format = self.blue+"--------------------------[ REGISTERS]-------------------------\n"+self.reset
+        for idx, key in enumerate(self.reg):
+            try:
+                string = str(self.uc.mem_read(self.reg[key],0x50).split(b'\x00')[0],'utf-8').replace('\n','')
+                d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x%x\t" % self.reg[key]
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
                 if IsReadable(string):
                     d_format += string + '\n'
                 else:
@@ -84,6 +98,7 @@ class CustomFormatter(logging.Formatter):
             except:
                 d_format += self.green+"%-10s" % (key+":")+self.reset+ "0x%x\n" % self.reg[key]
             if key == "RFLAG":
+<<<<<<< HEAD
                 OF = (self.reg[key] & 0b100000000000) >> 11    #11 
                 DF = (self.reg[key] & 0b10000000000 ) >> 10    #10 
                 IF = (self.reg[key] & 0b1000000000  ) >> 9     #9 
@@ -93,6 +108,17 @@ class CustomFormatter(logging.Formatter):
                 AF = (self.reg[key] & 0b10000       ) >> 4     #4 
                 PF = (self.reg[key] & 0b100         ) >> 2     #2
                 CF = (self.reg[key] & 0b1           )          #0
+=======
+                OF = (self.reg[key] & 0b100000000000)>>11    #11 
+                DF = (self.reg[key] & 0b10000000000 )>>10    #10 
+                IF = (self.reg[key] & 0b1000000000  )>>9     #9 
+                TF = (self.reg[key] & 0b100000000   )>>8     #8 
+                SF = (self.reg[key] & 0b10000000    )>>7     #7 
+                ZF = (self.reg[key] & 0b1000000     )>>6     #6 
+                AF = (self.reg[key] & 0b10000       )>>4     #4 
+                PF = (self.reg[key] & 0b100         )>>2     #2
+                CF = (self.reg[key] & 0b1           )        #0
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
                 d_format += f"\n    ZF {ZF} PF {PF} AF {AF}\n    OF {OF} SF {SF} DF {DF}\n    CF {CF} TF {TF} IF {IF}\n"
             if idx in [7, 15, 16]:
                 d_format += '\n'

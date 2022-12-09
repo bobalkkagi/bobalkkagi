@@ -10,7 +10,10 @@ def EndOfString(ByteData: bytes) -> str:
         byteString += chr(i)
     
     return byteString
+<<<<<<< HEAD
 
+=======
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
 def calc_export_offset_of_dll(dllpath, function_name):
     """This function calculates the offset of exported function of a DLL. It is slow, so hardcoded values are used"""
     with open(dllpath, 'rb') as rf:
@@ -56,6 +59,7 @@ def IsReadable(string):
         if 31 < ord(ch) < 127:
             pass
         else:
+<<<<<<< HEAD
             return False
     
     return True
@@ -78,3 +82,29 @@ def Devide8Bytes(bytedata):
 def ViewMemory(addr, listdata):
     for i in range(len(listdata)//2):
         print(f'{addr+i*16:016x}: {listdata[i*2]:016x} {listdata[i*2+1]:016x}')
+=======
+            yield tuple(saved)
+            saved[0] = lower
+            saved[1] = upper
+    yield tuple(saved)
+
+def print_Dll_Map():
+    from globalValue import PELoadDict
+    sorted_dict = sorted(PELoadDict.items(), key = lambda item: item[1]) #return -> tuple 
+    s = "="*40
+    print(s+" DLL LOAD MAP "+s)
+    for i, j in sorted_dict:
+        print(f"{i:<50}: 0x{j:012x}")
+
+    print("="*94)
+
+
+def IsReadable(string):
+    for ch in string:
+        if 31 < ord(ch) < 127:
+            pass
+        else:
+            return False
+    
+    return True
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4

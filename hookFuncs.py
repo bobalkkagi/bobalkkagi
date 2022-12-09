@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> de530b22f80fb30e7882052a2b000af778f21ac4
 HookFuncs={
     "kernel32.dll_GetModuleHandleA" : 0,
     "kernel32.dll_LoadLibraryA" : 1,
