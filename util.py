@@ -1,4 +1,3 @@
-from config import GLOBALVAR
 import pefile
 import sys
 
@@ -53,7 +52,7 @@ def merge(ranges):
     yield tuple(saved)
 
 def print_Dll_Map():
-    from config import PELoadDict
+    from globalValue import PELoadDict
     sorted_dict = sorted(PELoadDict.items(), key = lambda item: item[1]) #return -> tuple 
     s = "="*40
     print(s+" DLL LOAD MAP "+s)
@@ -62,41 +61,6 @@ def print_Dll_Map():
 
     print("="*94)
 
-
-
-def alloc(uc, size, log, offset = None):
-    page_size = 4 * 1024
-    aligned_size = align(size, page_size)
-    if offset is None:
-        for chunk_start, chunk_end in GLOBALVAR['allocated_chunks']:
-            if chunk_start <= GLOBALVAR['DynamicMemOffset'] <= chunk_end:
-                GLOBALVAR['DynamicMemOffset'] = chunk_end + 1
-        offset = GLOBALVAR['DynamicMemOffset']
-        GLOBALVAR['DynamicMemOffset'] += aligned_size
-    #new_offset_memory = offset % page_size
-    aligned_address = offset
-
-    if aligned_address % page_size != 0:
-        aligned_address = align(offset)
-    
-    mapped_partial = False
-    for chunk_start, chunk_end in GLOBALVAR['allocated_chunks']:
-        if chunk_start <= aligned_address < chunk_end:
-            log.info("Already fully mapped")
-        else:
-            log.info(f"Mapping missing piece 0x{chunk_end + 1:02x} to 0x{aligned_address + aligned_size:02x}")
-            uc.mem_map(chunk_end, aligned_address + aligned_size - chunk_end)
-        mapped_partial = True
-        break
-
-    if not mapped_partial:
-        uc.mem_map(aligned_address, aligned_size)
-
-    log.info(f"\tfrom 0x{aligned_address:02x} to 0x{(aligned_address + aligned_size):02x}")
-    GLOBALVAR['allocated_chunks'] = list( merge(GLOBALVAR['allocated_chunks'] + [(aligned_address, aligned_address + aligned_size)]))
-    GLOBALVAR['alloc_sizes'][aligned_address] = aligned_size
-
-    return aligned_address
 
 def IsReadable(string):
     for ch in string:

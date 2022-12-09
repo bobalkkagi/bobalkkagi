@@ -3,9 +3,9 @@ from unicorn.x86_const import *
 import struct
 import pefile
 import os
-from config import DLL_SETTING, GLOBALVAR, globar_var
-from cache import cache_dll
+from globalValue import DLL_SETTING, GLOBAL_VAR
 from util import EndOfString
+from reflector import REFLECTOR
 
 PRIVILEGE = {
         0x0:UC_PROT_NONE,
@@ -18,69 +18,7 @@ PRIVILEGE = {
         0xe:UC_PROT_ALL
     }
 
-REFLECTOR = {
-        "api-ms-win-core-sysinfo-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-sysinfo-l1-2-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-sysinfo-l1-2-1.dll" : "kernelbase.dll",
-        "api-ms-win-core-libraryloader-l1-2-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-libraryloader-l1-2-1.dll" : "kernelbase.dll",
-        "api-ms-win-core-errorhandling-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-libraryloader-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-threadpool-legacy-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-threadpool-private-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-timezone-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-crt-math-l1-1-0.dll" : "ucrtbase.dll",
-        "api-ms-win-crt-time-l1-1-0.dll" : "ucrtbase.dll",
-        "api-ms-win-crt-runtime-l1-1-0.dll" : "ucrtbase.dll",
-        "api-ms-win-crt-heap-l1-1-0.dll" : "ucrtbase.dll",
-        "api-ms-win-crt-heap-l1-1-0.dll" : "ucrtbase.dll",
-        "api-ms-win-crt-utility-l1-1-0.dll": "ucrtbase.dll",
-        "api-ms-win-crt-stdio-l1-1-0.dll" : "ucrtbase.dll",
-        "api-ms-win-crt-locale-l1-1-0.dll" : "ucrtbase.dll",
-        "api-ms-win-core-synch-l1-1-0.dll" : "ntdll.dll",
-        "api-ms-win-core-heap-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-processthreads-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-processthreads-l1-1-1.dll" : "kernelbase.dll",
-        "api-ms-win-core-processthreads-l1-1-2.dll" : "kernelbase.dll",
-        "api-ms-win-core-xstate-l2-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-wow64-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-realtime-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-io-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-io-l1-1-1.dll" : "kernelbase.dll",
-        "api-ms-win-core-memory-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-memory-l1-1-1.dll" : "kernelbase.dll",
-        "api-ms-win-core-memory-l1-1-2.dll" : "kernelbase.dll",
-        "api-ms-win-core-file-l1-1-0.dll" : "kernel32.dll",
-        "api-ms-win-core-file-l1-2-0.dll" : "kernel32.dll",
-        "api-ms-win-core-file-l1-2-1.dll" : "kernel32.dll",
-        "api-ms-win-core-file-l2-1-0.dll" : "kernel32.dll",
-        "api-ms-win-core-file-l2-1-1.dll" : "kernel32.dll",
-        "api-ms-win-core-rtlsupport-l1-1-0.dll" : "kernel32.dll",
-        "api-ms-win-core-console-l1-1-0.dll" : "kernel32.dll",
-        "api-ms-win-eventing-provider-l1-1-0.dll" : "advapi32.dll",
-        "api-ms-win-core-console-l1-1-0.dll" : "kernel32.dll",
-        "api-ms-win-core-datetime-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-datetime-l1-1-1.dll" : "kernelbase.dll",
-        "api-ms-win-core-datetime-l1-1-2.dll" : "kernelbase.dll",
-        "api-ms-win-core-debug-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-debug-l1-1-1.dll" : "kernelbase.dll",
-        "api-ms-win-core-fibers-l1-1-0.dll" : "kernel32.dll",
-        "api-ms-win-core-handle-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-localization-l1-2-0.dll" : "kernel32.dll",
-        "api-ms-win-core-namedpipe-l1-1-0.dll" : "kernel32.dll",
-        "api-ms-win-core-processenvironment-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-processenvironment-l1-2-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-profile-l1-1-0.dll" : "kernel32.dll",
-        "api-ms-win-core-string-l1-1-0.dll" : "kernel32.dll",
-        "api-ms-win-core-synch-l1-2-0.dll" : "kernel32.dll",
-        "api-ms-win-core-util-l1-1-0.dll" : "kernel32.dll",
-        "api-ms-win-security-base-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-security-base-l1-2-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-registry-l1-1-0.dll" : "kernelbase.dll",
-        "api-ms-win-core-registry-l1-1-1.dll" : "kernelbase.dll",
-        "api-ms-win-core-registry-l1-1-2.dll" : "kernelbase.dll",
-        
-    }
+
 RTL = {
     "InitializeSListHead" : "RtlInitializeSListHead",
     "QueryUnbiasedInterruptTime" : "RtlQueryUnbiasedInterruptTime",
@@ -88,14 +26,11 @@ RTL = {
 }
 
 
-IMAGE_BASE_START = 0x140000000
-IMAGE_BASE_END = 0x140000000
 #DLL_BASE = 0x7FF000000000
 
 
 
 def PE_Loader(uc, fileName, base, privilege=None, path=None) -> None: #
-    global IMAGE_BASE_END
     #global DLL_BASE
     
     originBase = base
@@ -115,14 +50,15 @@ def PE_Loader(uc, fileName, base, privilege=None, path=None) -> None: #
         pe = pefile.PE(path, fast_load=True)
         imageBase = pe.OPTIONAL_HEADER.ImageBase
         if dllFlag == True:
-            if fileName.lower() not in DLL_SETTING.LOADED_DLL:
-                DLL_SETTING.LOADED_DLL[fileName.lower()] = originBase
+            if fileName.lower() not in DLL_SETTING.LoadedDll:
+                DLL_SETTING.LoadedDll[fileName.lower()] = originBase
             else:
                 return
             fileName = fileName.lower()
         alignHeaderSize = align(len(pe.header)) 
         uc.mem_map(base, alignHeaderSize, UC_PROT_READ)
         uc.mem_write(base, pe.header)
+        GLOBAL_VAR.SectionInfo.append([base, 0x1000, 0x2]) # header
         base += alignHeaderSize
         sectionSize, sectionInfo = Section(uc, pe, originBase)
         base += sectionSize
@@ -130,21 +66,19 @@ def PE_Loader(uc, fileName, base, privilege=None, path=None) -> None: #
         DataFix(uc, sectionInfo, originBase, imageBase, base-originBase) #imagebase 기준으로 저장된 정보를 load한 base주소 기준으로 변경, 예외처리가 필요할 수 있다.
 
         if dllFlag == True:
-            GLOBALVAR['NEXT_DLL_BASE'] = base
+            GLOBAL_VAR.DllEnd = base
         else :
-            IMAGE_BASE_END = base
+            GLOBAL_VAR.ImageBaseEnd = base
         pe.parse_data_directories()
         if dllFlag == True:
             for entry in pe.DIRECTORY_ENTRY_EXPORT.symbols:
                 if entry.name:
                     dllFunction = entry.name.decode('utf-8')
                 try:
-                    if dllFunction not in DLL_SETTING.DLL_FUNCTIONS:
-                        if (fileName+"_"+dllFunction) in cache_dll:
-                            DLL_SETTING.CACHE_DLL_FUNCTIONS[fileName+"_"+dllFunction] = originBase+entry.address
-                        DLL_SETTING.DLL_FUNCTIONS[fileName+"_"+dllFunction] = originBase+entry.address
+                    if dllFunction not in DLL_SETTING.DllFuncs:
+                        DLL_SETTING.DllFuncs[fileName+"_"+dllFunction] = originBase+entry.address
                     else:
-                        print(f"ERROR! {dllFunction} is in DLL_FUNCTIONS")
+                        print(f"ERROR! {dllFunction} is in DllFuncs")
                 except:
                     pass
         
@@ -159,7 +93,7 @@ def PE_Loader(uc, fileName, base, privilege=None, path=None) -> None: #
 
 
 def Insert_IAT(uc, pe, base):
-    #global DLL_BASE
+    
     rva =pe.OPTIONAL_HEADER.DATA_DIRECTORY[1].VirtualAddress # DIRECTORY_ENTRY_IMPORT -> RVA
     imageBase = pe.OPTIONAL_HEADER.ImageBase 
     while True:
@@ -177,8 +111,8 @@ def Insert_IAT(uc, pe, base):
         dll = pe.get_string_at_rva(import_desc.Name, pefile.MAX_DLL_LENGTH).decode('utf-8') # dll Name 가져오기
 
     
-        if dll.lower() not in DLL_SETTING.LOADED_DLL:
-            PE_Loader(uc, dll, GLOBALVAR['NEXT_DLL_BASE'], None, os.path.abspath("vm_dll"))
+        if dll.lower() not in DLL_SETTING.LoadedDll:
+            PE_Loader(uc, dll, GLOBAL_VAR.DllEnd, None, os.path.abspath("vm_dll"))
             #print(dll)     
         peDataLen = len(pe.__data__) - file_offset
         dllnames_only=False 
@@ -209,7 +143,7 @@ def Insert_IAT(uc, pe, base):
                     funcName = RTL[funcName]
                     dll = "ntdll.dll"
                 
-                func_addr = DLL_SETTING.DLL_FUNCTIONS[dll.lower()+'_'+funcName]
+                func_addr = DLL_SETTING.DllFuncs[dll.lower()+'_'+funcName]
                 dll = origindll
             except:
                 continue
@@ -254,7 +188,7 @@ def Section(uc, pe, base):
         uc.mem_map(base+section.VirtualAddress, align(section.Misc_VirtualSize) , PRIVILEGE[section.Characteristics >>28])
         uc.mem_write(base+section.VirtualAddress, code)
         totalSize += align(section.Misc_VirtualSize)
-        globar_var.SECTIONINFO.append([base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(section.Characteristics >>28)])
+        GLOBAL_VAR.SectionInfo.append([base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(section.Characteristics >>28)])
     return totalSize, info
 
 def DataFix(uc,sectionInfo,originbase,imagebase,offset):
