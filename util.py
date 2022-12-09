@@ -2,7 +2,14 @@ from config import GLOBALVAR
 import pefile
 import sys
 
-
+def EndOfString(ByteData: bytes) -> str:
+    byteString = ""
+    for i in ByteData:
+        if i == 0:
+            break
+        byteString += chr(i)
+    
+    return byteString
 def calc_export_offset_of_dll(dllpath, function_name):
     """This function calculates the offset of exported function of a DLL. It is slow, so hardcoded values are used"""
     with open(dllpath, 'rb') as rf:

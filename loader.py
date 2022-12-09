@@ -4,6 +4,8 @@ import struct
 import pefile
 import os
 from config import DLL_SETTING, GLOBALVAR, globar_var
+from cache import cache_dll
+from util import EndOfString
 
 PRIVILEGE = {
         0x0:UC_PROT_NONE,
@@ -78,12 +80,9 @@ REFLECTOR = {
         "api-ms-win-core-registry-l1-1-1.dll" : "kernelbase.dll",
         "api-ms-win-core-registry-l1-1-2.dll" : "kernelbase.dll",
         
-
     }
 RTL = {
     "InitializeSListHead" : "RtlInitializeSListHead",
-    #"EnterCriticalSection" : "RtlEnterCriticalSection",
-    #"HeapAlloc" : "RtlAllocateHeap",
     "QueryUnbiasedInterruptTime" : "RtlQueryUnbiasedInterruptTime",
     "QueryPerformanceCounter" : "RtlQueryPerformanceCounter",
 }
@@ -93,14 +92,6 @@ IMAGE_BASE_START = 0x140000000
 IMAGE_BASE_END = 0x140000000
 #DLL_BASE = 0x7FF000000000
 
-def EndOfString(ByteData: bytes) -> str:
-    byteString = ""
-    for i in ByteData:
-        if i == 0:
-            break
-        byteString += chr(i)
-    
-    return byteString
 
 
 def PE_Loader(uc, fileName, base, privilege=None, path=None) -> None: #
@@ -149,6 +140,8 @@ def PE_Loader(uc, fileName, base, privilege=None, path=None) -> None: #
                     dllFunction = entry.name.decode('utf-8')
                 try:
                     if dllFunction not in DLL_SETTING.DLL_FUNCTIONS:
+                        if (fileName+"_"+dllFunction) in cache_dll:
+                            DLL_SETTING.CACHE_DLL_FUNCTIONS[fileName+"_"+dllFunction] = originBase+entry.address
                         DLL_SETTING.DLL_FUNCTIONS[fileName+"_"+dllFunction] = originBase+entry.address
                     else:
                         print(f"ERROR! {dllFunction} is in DLL_FUNCTIONS")
@@ -156,9 +149,12 @@ def PE_Loader(uc, fileName, base, privilege=None, path=None) -> None: #
                     pass
         
         Insert_IAT(uc, pe, originBase) #
+
+        if fileName == "ntdll.dll":
+            NtdllPatch(uc, originBase)
+
         print(f'[Load] {fileName}: {hex(originBase)}')
     except FileNotFoundError:
-        #print(" isn't exist in ")
         pass
 
 
@@ -216,9 +212,7 @@ def Insert_IAT(uc, pe, base):
                 func_addr = DLL_SETTING.DLL_FUNCTIONS[dll.lower()+'_'+funcName]
                 dll = origindll
             except:
-                #print(funcs.name)
                 continue
-            #print(funcs.name, hex(base),hex(funcs.address),hex(imageBase), hex(func_addr))
             uc.mem_write(base+funcs.address-imageBase,struct.pack('<Q', func_addr))
             
         rva += import_desc.sizeof()
@@ -276,7 +270,25 @@ def DataFix(uc,sectionInfo,originbase,imagebase,offset):
                     uc.mem_write(section[1]+count,struct.pack('<Q',data-imagebase+originbase))
                 count += 0x8
             uc.mem_protect(section[1],section[2],TPrivileage)
-            
+
+def NtdllPatch(uc,base):
+    uc.mem_write(base + 0x17A3F0,struct.pack('<Q',0x40000000006))
+    uc.mem_write(base + 0x17A3F0+0x8,struct.pack('<Q',base + 0x1d510))
+    uc.mem_write(base + 0x17A3F0+0x10,struct.pack('<Q',base + 0xA1215))
+    uc.mem_write(base + 0x17A3F0+0x18,struct.pack('<Q',base ))
+    uc.mem_write(base + 0x17A3F0+0x20,struct.pack('<Q',base + 0x16bdf8))
+    uc.mem_write(base + 0x17A3F0+0x28,struct.pack('<Q',base ))
+    uc.mem_write(base + 0x17A3F0+0x30,struct.pack('<Q',base + 0x170418)) 
+    uc.mem_write(base + 0x17A3F0+0x38,struct.pack('<Q',base ))
+    uc.mem_write(base + 0x17A3F0+0x40,struct.pack('<Q',base + 0x1728c0))
+    uc.mem_write(base + 0x17A3F0+0x48,struct.pack('<Q',base ))
+    uc.mem_write(base + 0x17A3F0+0x50,struct.pack('<Q',base + 0x16e828))
+    uc.mem_write(base + 0x17A3F0+0x58,struct.pack('<Q',base ))
+    uc.mem_write(base + 0x17A3F0+0x60,struct.pack('<Q',base + 0x16e81c))
+    uc.mem_write(base + 0x17A3F0+0x68,struct.pack('<Q',base ))
+    uc.mem_write(base + 0x17A3F0+0x70,struct.pack('<Q',base + 0x17277c))
+    uc.mem_write(base + 0x17A370+0x8,struct.pack('<Q',0x2000000000000000))
+   
 def Remove_EXEC(sectionName:str, Characteristics, cnt:int):
     if len(sectionName) > 0 and sectionName != '.text':
         return Characteristics >> 28
