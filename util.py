@@ -1,7 +1,15 @@
-from config import GlobalVar
 import pefile
 import sys
+import struct
 
+def EndOfString(ByteData: bytes) -> str:
+    byteString = ""
+    for i in ByteData:
+        if i == 0:
+            break
+        byteString += chr(i)
+    
+    return byteString
 
 def calc_export_offset_of_dll(dllpath, function_name):
     """This function calculates the offset of exported function of a DLL. It is slow, so hardcoded values are used"""
@@ -24,58 +32,49 @@ def getVirtualMemorySize(pe):
     total_size += min_offset
     return total_size
 
-def align(value, page_size=4096):
-    m = value % page_size
-    f = page_size - m
+def align(value, pageSize=0x1000):
+    m = value % pageSize
+    f = 0
+    if value % pageSize != 0:
+        f = pageSize - m
     aligned_size = value + f
-    return aligned_size
+    return aligned_size 
 
-def merge(ranges):
-    if not ranges:
-        return []
-    saved = list(ranges[0])
-    for lower, upper in sorted([sorted(t) for t in ranges]):
-        if lower <= saved[1] + 1:
-            saved[1] = max(saved[1], upper)
+def print_Dll_Map():
+    from globalValue import PELoadDict
+    sorted_dict = sorted(PELoadDict.items(), key = lambda item: item[1]) #return -> tuple 
+    s = "="*40
+    print(s+" DLL LOAD MAP "+s)
+    for i, j in sorted_dict:
+        print(f"{i:<50}: 0x{j:012x}")
+
+    print("="*94)
+
+
+def IsReadable(string):
+    for ch in string:
+        if 31 < ord(ch) < 127:
+            pass
         else:
-            yield tuple(saved)
-            saved[0] = lower
-            saved[1] = upper
-    yield tuple(saved)
-
-def printHex(addr):
-    print(hex(addr))
-
-def alloc(uc, size, log, offset = None):
-    page_size = 4 * 1024
-    aligned_size = align(size, page_size)
-    if offset is None:
-        for chunk_start, chunk_end in GlobalVar['allocated_chunks']:
-            if chunk_start <= GlobalVar['DynamicMemOffset'] <= chunk_end:
-                GlobalVar['DynamicMemOffset'] = chunk_end + 1
-        offset = GlobalVar['DynamicMemOffset']
-        GlobalVar['DynamicMemOffset'] += aligned_size
-    #new_offset_memory = offset % page_size
-    aligned_address = offset
-
-    if aligned_address % page_size != 0:
-        aligned_address = align(offset)
+            return False
     
-    mapped_partial = False
-    for chunk_start, chunk_end in GlobalVar['allocated_chunks']:
-        if chunk_start <= aligned_address < chunk_end:
-            log.info("Already fully mapped")
-        else:
-            log.info(f"Mapping missing piece 0x{chunk_end + 1:02x} to 0x{aligned_address + aligned_size:02x}")
-            uc.mem_map(chunk_end, aligned_address + aligned_size - chunk_end)
-        mapped_partial = True
-        break
+    return True
 
-    if not mapped_partial:
-        uc.mem_map(aligned_address, aligned_size)
+def PrintDict(dict: dict) -> None: #Print key, Hex(Value)
+    for key in dict:
+        print("key : {0}, value : {1}".format(key, hex(dict[key])))
+    
+def Devide8Bytes(bytedata):
+    r = len(bytedata) % 8
+    result = []
+    if r != 0:
+        bytedata += b'\x00' * (8-r)
+    
+    for i in range(len(bytedata)//8):
+        result.append(struct.unpack('<Q', bytedata[i*8:(i+1)*8])[0])
 
-    log.info(f"\tfrom 0x{aligned_address:02x} to 0x{(aligned_address + aligned_size):02x}")
-    GlobalVar['allocated_chunks'] = list( merge(GlobalVar['allocated_chunks'] + [(aligned_address, aligned_address + aligned_size)]))
-    GlobalVar['alloc_sizes'][aligned_address] = aligned_size
+    return result
 
-    return aligned_address
+def ViewMemory(addr, listdata):
+    for i in range(len(listdata)//2):
+        print(f'{addr+i*16:016x}: {listdata[i*2]:016x} {listdata[i*2+1]:016x}')
