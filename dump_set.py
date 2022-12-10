@@ -9,6 +9,7 @@ with open("testfile_protected_dump.exe","rb") as target:
     tdata=target.read()
 '''
 
+# unicorn 에서 dump  파일 가져오기
 with open("OEP_0x140001300testfile_protected.exe","rb") as target:
     tdata=target.read()
 
