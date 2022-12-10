@@ -622,9 +622,7 @@ def hook_RegQueryValueExA(rip, rsp, uc, log):
     rdx = uc.reg_read(UC_X86_REG_RDX)
     r8 = uc.reg_read(UC_X86_REG_R8)
     
-    
     log.warning(f"HOOK_API_CALL : RegQueryValueExA")
-    
     
     uc.reg_write(UC_X86_REG_RAX, 0x0)
     ret(uc, rsp)
