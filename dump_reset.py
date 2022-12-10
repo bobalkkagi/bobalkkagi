@@ -1,367 +1,229 @@
-from unicorn import *
-from unicorn.x86_const import *
-from capstone import *
-from loader import Insert_IAT, PE_Loader
-from logger import *
-from datetime import datetime
-from api_hook import *
-from config import DLL_SETTING, globar_var, InvHookFuncDict
-from peb import SetLdr, SetListEntry, SetProcessHeap, setup_peb, SetKuserSharedData
-from teb import *
-from cache import hook_func
-
-import logging
-import config
+import sys
+import os 
+import string
 import struct
-import pefile
-import os
-# 64bit 맞게 수정
-GS = 0xff10000000000000
-IMAGE_BASE = 0x140000000
-ADDRESS = 0x140000000
-COUNT=0
-Ldr = 0x000001B54C810000
-PROC_HEAP_ADDRESS=0x000001E9E3850000
-ALLOCATE_CHUNK=0x0000020000000000
-STACK_BASE=0x201000
-STACK_LIMIT= 0x100000
-MB = 2**20 #Mega Byte
-KUSER_SHARED_DATA = 0x000000007FFE0000
-PSHIM_DATA = 0x600000
-ACTIVATION_CONTEXT = 0x400000
-DEBUGFLAG = False
-HOOKINT=0
-HOOKREGION=0x7FF010000000
-BobLog = logging.getLogger("Bobalkkagi")
+import math
+
+'''
+with open("testfile_protected_dump.exe","rb") as target:
+    tdata=target.read()
+'''
+
+with open("OEP_0x140001300testfile_protected.exe","rb") as target:
+    tdata=target.read()
 
 
-def hook_fetch(uc, access, address, size, value, user_data):
+def readWord(offset):
+    return struct.unpack("<H",tdata[offset:offset+2])[0] # "<": 리틀 엔디안, ">": 빅 엔디안, "B": 1Byte, "H": 2Byte, "L": 4Byte, "Q": 8Byte
+
+def readDword(offset):
+    return struct.unpack("<L",tdata[offset:offset+4])[0]
+
+def readDwords(offset,n):
+    return struct.unpack("<"+"L"*n,tdata[offset:offset+4*n])
+
+def readLword(offset):
+    return struct.unpack("<Q",tdata[offset:offset+8])[0]
+
+def readLwords(offset,n):
+    return struct.unpack("<"+"Q"*n,tdata[offset:offset+8*n])
+
+def readByte(offset):
+    return struct.unpack("<B",tdata[offset:offset+1])[0]
+
+def readbytes(offset,n):
+    return list(struct.unpack("<"+"B"*n,tdata[offset:offset+n]))
+
+def readStringn(offset,n):
+    txt=""
+    for x in range(n):
+        char=struct.unpack("<B",tdata[offset+x:offset+x+1])[0]
+        if char in map(ord,string.printable) and char!=0:
+            txt+=chr(char)
+        else:
+            break
+    return txt
+
+def writeByte(offset, data):
+    global tdata
+    dat=struct.pack("<B",data)
+    tdata=tdata[:offset]+dat+tdata[offset+1:]
+
+def writeWord(offset,data):
+    global tdata
+    dat=struct.pack("<H",data)
+    tdata=tdata[:offset]+dat+tdata[offset+2:]
+
+def writeDword(offset,data):
+    global tdata
+    dat=struct.pack("<L",data)
+    tdata=tdata[:offset]+dat+tdata[offset+4:]
+
+def writeDwords(offset,data, n): # 이 함수는 안될 수 있음
+    global tdata
+    dat=struct.pack("<"+"L"*n, data)
+    tdata=tdata[:offset]+dat+tdata[offset+4*n:]
+
+def writeData(offset,data):
+    global tdata
+    l=len(data)
+    tdata=tdata[:offset]+data+tdata[offset+l:] # 마지막 Section Header부분까지의 데이터 + 새로운 섹션의 Header 정보 + 새로운 섹션을 더한 Section Header의 마지막 부분 이후부터의 데이터
+
+def writeLword(offset,data):
+    global tdata
+    dat=struct.pack("<Q",data)
+    tdata=tdata[:offset]+dat+tdata[offset+8:]
+
+mzsignature=readWord(0x00) # DOS signature (e_magic)
+peoffset=readDword(0x3c)   # 파일 시작부분부터 pe헤더까지 offset (NT Header Offset) (e_lfanew)
+pesignature=readDword(peoffset+0x00) # PE signature
+is_pefle=mzsignature==0x5a4d and pesignature==0x4550 # PE파일 확인 (1==PE파일, 0==PE파일 아님)
+
+if not is_pefle:
+    sys.exit(0)
+else:
+    noSections=readWord(peoffset+0x06) # File Hdr. sections count
+    imagebase=readLword(peoffset+0x30)  # Optional Hdr. Image Base
+    sectionAlignment=readDword(peoffset+0x38) # Optional Hdr. Section Alignment (메모리에서 섹션의 최소 단위 (시작 주소는 해당 값의 배수))
     
-    print(hex(access),hex(address),hex(size),hex(value))
-    rip=uc.reg_read(UC_X86_REG_RIP)
-    print(hex(rip))
+    fileAlignment=readDword(peoffset+0x3c)    # Optional Hdr. File Alignment (파일에서 섹션의 최소 단위 (파일 섹션의 시작 주소는 해당 값의 배수))
+    szoptionalhdr=readWord(peoffset+0x14)    # File Hdr. Size of OptionalHeadr (Optional Header 크기)
 
-def hook_mem_read_unmapped(uc, access, address, size, value, user_dat):
-    print("unmapped")
-    print(hex(access), hex(address), hex(size), hex(value))
-
-def hook_api(uc, address, size, user_data):
-    global HOOKREGION
-    rsp=uc.reg_read(UC_X86_REG_RSP)
-    rip=uc.reg_read(UC_X86_REG_RIP)
-    try:
-        globals()["hook_"+globar_var.INV_HOOK_FUNC[address-HOOKREGION].split(".dll_")[1]](rip, rsp, uc, BobLog)
-    except KeyError as e:
-        BobLog.info("Not Found : "+str(e))
-        #BobLog.debug("DEBUGING")
-        pass
+    print("=====================================================")
+    print("NT Header(PE Header) Offset:",hex(peoffset),"\nImage Base:",hex(imagebase),"\nSection Alignment:",sectionAlignment,"(",hex(sectionAlignment),")")
+    print("File Alignment:",fileAlignment,"(",hex(fileAlignment),")","\nNumber of sections:",noSections)
+     
+    lastSoffset=peoffset+0x18+szoptionalhdr+(noSections-1)*0x28  # (peoffset+0x18)(file Hdr 크기) + szoptionalhdr(optional hdr 크기) + 마지막 섹션 크기 제외한 섹션크기
+    lastSname=readStringn(lastSoffset,8)
     
+    print("last section offset:",hex(lastSoffset),"\nlast Section name:",lastSname)
+    print("=====================================================")
 
-def hook_block(uc, address, size, user_data):
-    global DEBUGFLAG
-    global HOOKINT
-    exitFlag=0
-    rsp=uc.reg_read(UC_X86_REG_RSP)
-    rip=uc.reg_read(UC_X86_REG_RIP)
-    
-    '''
-    tmp = {hex(address):size}
-    
-    if config.get_len() >=config.get_size():
-        config.p_queue()
-    config.i_queue(tmp)
-    '''
-    
-    '''
-    try :
-       if rip in DLL_SETTING.INV_CACHE_DLL_FUNCTIONS:
-            BobLog.info(f"This Function is {DLL_SETTING.INV_CACHE_DLL_FUNCTIONS[rip]}, RIP : {hex(rip)}")
-            #BobLog.debug("DEBUGING")
-            if DLL_SETTING.INV_CACHE_DLL_FUNCTIONS[rip].split('.dll_')[1] == "RtlVirtualUnwind":
-                HOOKINT=uc.hook_add(UC_HOOK_CODE, InsPatch)
-            
-            if DLL_SETTING.INV_CACHE_DLL_FUNCTIONS[rip].split('.dll_')[1] == "RegOpenKeyExA":
-                uc.hook_del(HOOKINT)
-            
-            
-            exitFlag=globals()['hook_'+DLL_SETTING.INV_CACHE_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
-        
-            if exitFlag ==1:
-                uc.emu_stop()
-    except KeyError as e:
-        #BobLog.info("Not Found : "+str(e))
-        #BobLog.debug("DEBUGING")
-        pass
-    '''
-    
-    try :
-       if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
-            BobLog.info(f"This Function is {DLL_SETTING.INV_DLL_FUNCTIONS[rip]}, RIP : {hex(rip)}")
-
-            exitFlag = globals()["hook_"+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split(".dll_")[1]](rip, rsp, uc, BobLog)
-            if exitFlag == 1:
-                uc.emu_stop()
-    except KeyError as e:
-        #BobLog.info("Not Found : "+str(e))
-        #BobLog.debug("DEBUGING")
-        pass
-    
-
-    if DEBUGFLAG:
-        BobLog.debug("DEBUGING")
-        while True:
-            ud = input("UNICORN DEBUG > ").lower()
-
-            if ud == 'f':
-                DEBUGFLAG = False
-                print("FINISHED DEBUG")
-                break
-            elif ud == 'n':
-                break
-            elif ud == 's':
-                while True:
-                    try:
-                        addr = input("address : ")
-                        addr = int(addr, 16)
-                        break
-                    except:
-                        print("input 0x1234")
-                try:
-                    print(f"result: {DLL_SETTING.INV_DLL_FUNCTIONS[addr]}")
-                except:
-                    print("No Search Result")
-
-            elif ud == 'x':
-                while True:
-                    try:
-                        addr, size = input("address size(min 0x8): ").split(' ')
-                        addr = int(addr, 16)
-                        size = int(size, 16)
-                        break
-                    except:
-                        print("input 0x1234 0x8")
-                try:
-                    print(f"result: {uc.mem_read(addr, size)}")
-                except:
-                    print("No Search Result")
-    
-def hook_code(uc, address, size, user_data):
-    global DEBUGFLAG
-    global HOOKINT
-    exitFlag=0
-    rsp=uc.reg_read(UC_X86_REG_RSP)
-    rip=uc.reg_read(UC_X86_REG_RIP)
-    #BobLog.debug("DEBUGING")
-    
-    tmp = {hex(address):size}
-    
-    if config.get_len() >=config.get_size():
-        config.p_queue()
-    config.i_queue(tmp)
-    
-   
-    try :
-       if rip in DLL_SETTING.INV_DLL_FUNCTIONS:
-            BobLog.info(f"This Function is {DLL_SETTING.INV_DLL_FUNCTIONS[rip]}, RIP : {hex(rip)}")
-            #BobLog.debug("DEBUGING")
-            
-            exitFlag=globals()['hook_'+DLL_SETTING.INV_DLL_FUNCTIONS[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
-        
-            if exitFlag ==1:
-                uc.emu_stop()
-    except KeyError as e:
-        BobLog.info("Not Found : "+str(e))
-        #BobLog.debug("DEBUGING")
-        pass
+    lastSvirtualSize,lastSvirtualAddress,lastSrawSize,lastSrawAddress=readDwords(lastSoffset+0x08,4) # 마지막 섹션의 멤버 값
 
 
-    if DEBUGFLAG:
-        BobLog.debug("DEBUGING")
-        while True:
-            ud = input("UNICORN DEBUG > ").lower()
+    ''''''
+    # unicorn dump파일 oep set
+    dumpSepoffset = (peoffset + 0x28)    
+    dumpSoep = 0x140001300  # emulation.py에 Find OEP에서 가져올것
+    writeDword(dumpSepoffset, (dumpSoep - imagebase))
 
-            if ud == 'f':
-                DEBUGFLAG = False
-                print("FINISHED DEBUG")
-                break
-            elif ud == 'n':
-                break
-            elif ud == 's':
-                while True:
-                    try:
-                        addr = input("address : ")
-                        addr = int(addr, 16)
-                        break
-                    except:
-                        print("input 0x1234")
-                try:
-                    print(f"result: {DLL_SETTING.INV_DLL_FUNCTIONS[addr]}")
-                except:
-                    print("No Search Result")
+    # unicorn 덤프파일 pe Virtual -> RA
+    for n in range(noSections):
+        dumpSoffset = peoffset+0x18 + szoptionalhdr + (n * 0x28)
+        dumpSvirtualSize, dumpSvirtualAddress, dumpSrawSize, dumpSrawAddress = readDwords(dumpSoffset+0x08,4)
+        print(hex(dumpSvirtualSize), hex(dumpSvirtualAddress), hex(dumpSrawSize), hex(dumpSrawAddress))
+        writeDword(dumpSoffset + 0x14, dumpSvirtualAddress)
+        writeDword(dumpSoffset + 0x10, dumpSvirtualSize)
+        if n < (noSections-1):
+            writeDword(dumpSoffset + 0x8, (readDword(dumpSoffset + 0x34) - readDword(dumpSoffset+ 0xC)))
 
-            elif ud == 'x':
-                while True:
-                    try:
-                        addr, size = input("address size(min 0x8): ").split(' ')
-                        addr = int(addr, 16)
-                        size = int(size, 16)
-                        break
-                    except:
-                        print("input 0x1234 0x8")
-                try:
-                    print(f"result: {uc.mem_read(addr, size)}")
-                except:
-                    print("No Search Result")
-    
-    
+        ''' # unicorn으로 덤프뜬 파일 섹션 VA주소에 저장되있는 데이터 RA로 옮기려 시도
+        # RA 깔끔하게 하려면 여기서 데이터를 한번에 가져와서 RA에 한번에 저장하는 방식으로
+        tmp = dumpSvirtualAddress
+        while (dumpSvirtualAddress <= tmp and tmp <= (dumpSvirtualAddress + dumpSvirtualSize)):
+            #if ((n+1) == noSections):
+            #    writeEnd()
+            writeLword(dumpSrawAddress, readLword(tmp))
+            writeLword(tmp, 0)
+            tmp += 0x8
+        '''
 
-def InsPatch(uc, address, size, user_data):
-    global HOOKINT
-    rip=uc.reg_read(UC_X86_REG_RIP)
-    rsp=uc.reg_read(UC_X86_REG_RSP)
-    if size ==0xf1f1f1f1 :
-        size = 0x3
-    code = uc.mem_read(address, size)
-    
-    asm=disas(bytes(code),address)
-    for a in asm:
-        if a.mnemonic == "xrstor":
-            uc.reg_write(UC_X86_REG_RIP,rip+0x3)
-        if a.mnemonic == "iretq":
-            nrip=struct.unpack('<Q',uc.mem_read(rsp,8))[0]
-            nflags=struct.unpack('<Q',uc.mem_read(rsp+0x10,8))[0]
-            nrsp=struct.unpack('<Q',uc.mem_read(rsp+0x18,8))[0]
-            uc.reg_write(UC_X86_REG_RIP, nrip)
-            uc.reg_write(UC_X86_REG_RSP, nrsp)
-            uc.reg_write(UC_X86_REG_EFLAGS, nflags)
-            uc.hook_del(HOOKINT)
 
-def InsertHookFlag(uc):
-    global HOOKREGION
-    for key in hook_func:
-        address = DLL_SETTING.DLL_FUNCTIONS[key]
-        offset = HOOKREGION-address-5 + hook_func[key]
-        byteOffset=struct.pack('<Q',offset)
-        jmp = struct.pack('<B',0xE9)
-        flagInstruction = (jmp+byteOffset)[:-1]
-        uc.mem_write(address,flagInstruction)
+    ''''''
 
-def setup_teb(uc):
-    teb_addr = 0xff10000000000000
-    peb_addr = 0xff20000000000000
-    teb = InitTeb()
-    teb_payload = bytes(teb)
-    uc.mem_map(teb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
-    uc.mem_map(peb_addr, 2 * 1024 * 1024,UC_PROT_ALL)
-    uc.mem_map(Ldr, 1 * MB, UC_PROT_ALL)
-    uc.mem_map(PROC_HEAP_ADDRESS, 10 * MB, UC_PROT_ALL)
-    uc.mem_map(ALLOCATE_CHUNK, 10 * MB, UC_PROT_ALL)
-    uc.mem_write(teb_addr, teb_payload)
-    uc.mem_write(peb_addr+ 0x30, struct.pack('<Q', PROC_HEAP_ADDRESS))
-    uc.mem_map(ACTIVATION_CONTEXT, 0x1000, UC_PROT_ALL)
-   
-    uc.mem_map(KUSER_SHARED_DATA, 0x1000, UC_PROT_READ) # KUSER_SHARED_DATA 구조체 만들어서 셋팅하기
-    
-    uc.mem_map(PSHIM_DATA, 0x2000, UC_PROT_READ | UC_PROT_WRITE)
 
-    uc.reg_write(UC_X86_REG_GS_BASE, teb_addr)
-    uc.reg_write(UC_X86_REG_CS, 0x400000)
 
-def emulate(program: str,  verbose):
-    
-    start = datetime.now()
-    print(f"[{start}]Emulating Binary!")
-    global InvDllFunctions
-    global HOOKINT
-    global HOOKREGION
-    pe = pefile.PE(program) # 실행할 프로그램 pe포멧으로 가져오기
+    '''''' # call emul
+    from unicorn import *
+    from unicorn.x86_const import *
+
+    address = 0x140000000
+    rip = 0
     uc = Uc(UC_ARCH_X86, UC_MODE_64)
 
-    setup_logger(uc, BobLog, verbose) #debuging 용 logger
+    while (rip < (len(tdata)-1)):
+        if(hex(readWord(rip)) == '0x15ff'): # ff 15 little-endian
+            
+            Soffset=peoffset+0x18+szoptionalhdr # 처음 시작하는 섹션 Hdr. offset
+            n = 0 # 섹션 위치 제어 변수
 
-    EP = pe.OPTIONAL_HEADER.AddressOfEntryPoint #Entry Point
-    uc.mem_map(STACK_LIMIT, STACK_BASE - STACK_LIMIT, UC_PROT_ALL) #스택 공간
-    
-    PE_Loader(uc,program,ADDRESS)
-    
-    setup_teb(uc)
-    setup_peb(uc)
-    SetProcessHeap(uc)
-    SetKuserSharedData(uc)
-    
-    uc.mem_map(HOOKREGION,0x1000,UC_PROT_ALL)
-    
-    
-    config.InvDllDict() # 함수 이름 : 주소 , -> 주소 : 이름
+            if  (n < noSections):
+                ripSoffset = Soffset + (0x28 * n)
+                ripSvirtualSize,ripSvirtualAddress,ripSrawSize,ripSrawAddress = readDwords(ripSoffset+0x08,4)
+                n += 1
+                if (ripSrawAddress <= rip and rip <= (ripSrawAddress + ripSrawSize)): # 현재 ff 15가 위치한 offset의 섹션 확인
+                    ripS = rip - ripSrawAddress + ripSvirtualAddress # 섹션의 VA offset값
+                    print("Relative", hex(ripS), ",", "Absolute", hex(imagebase+ripS))
+                    #tmp = readWord(rip)
+                    # print(hex(tmp)) # call맞나 확인 (0x15ff출력됨(ff 15))
 
-    #uc.reg_write(UC_X86_REG_RSP, STACK_BASE - pe.OPTIONAL_HEADER.SectionAlignment) #0x200000
-    uc.reg_write(UC_X86_REG_RSP, 0x14ff28) #0x200000
-    uc.reg_write(UC_X86_REG_RBP, 0x0) 
-    
-    InsertHookFlag(uc)
-    InvHookFuncDict()
-    
-    print("hook start!")
-    uc.hook_add(UC_HOOK_MEM_READ_UNMAPPED, hook_mem_read_unmapped)
-    #uc.hook_add(UC_HOOK_CODE, hook_code)
-    #uc.hook_add(UC_HOOK_BLOCK, hook_block) 
-    #uc.hook_add(UC_HOOK_BLOCK, hook_block, None,  0x7ff000000000,  0x7ff001000000)
-    print(hex(DLL_SETTING.LOADED_DLL["ntdll.dll"]), hex(DLL_SETTING.LOADED_DLL["kernel32.dll"]))
-    uc.hook_add(UC_HOOK_CODE, InsPatch, None,  DLL_SETTING.LOADED_DLL["ntdll.dll"], DLL_SETTING.LOADED_DLL["kernelbase.dll"])
-    uc.hook_add(UC_HOOK_BLOCK, hook_api, None, HOOKREGION, HOOKREGION+0x1000) 
-    
-    uc.reg_write(UC_X86_REG_RAX, ADDRESS+EP)
-    uc.reg_write(UC_X86_REG_RBX, 0x0)
-    uc.reg_write(UC_X86_REG_RCX, 0xff20000000000000)
-    uc.reg_write(UC_X86_REG_RDX, ADDRESS+EP)
-    uc.reg_write(UC_X86_REG_R8, 0xff20000000000000)
-    uc.reg_write(UC_X86_REG_R9, ADDRESS+EP)
-    uc.reg_write(UC_X86_REG_EFLAGS, 0x244)
-    #uc.mem_write(0x140003020,struct.pack('<Q',0x5A0058))
-    
-    ### 안티디버깅 우회에 필요한 셋팅 
-    #uc.mem_write(0x7ff00050a040,struct.pack('<Q',0xB0)) kernelbasr 값
-    #uc.mem_write(0x7ff00017187e,struct.pack('<B',0x90)) <- ntdll값
+            #test
+
+            #uc.hook_add(UC_HOOK_CODE, hook_code)
+            # hook추가 코딩할 것
+            # call jmp인지 확인해볼것 if (rip +1) == jmp * 여기 rip는 다른 위에랑 다른 rip변수
+            # call부터 jmp or jmp 일때, 레지스터 값 pay.txt에 저장
+
+            #test
+
+            uc.emu_start(imagebase + ripS, address + ripS) # imagebase + rip (call 위치에서 시작)
+        rip += 1 # 해당 위치가 ff 15인지 확인하는 제어변수
+    ''''''
+
+
+    print("=====================================================")
+    payload_size=os.stat("./bin/pay.txt").st_size  # 이거 전에 call 에뮬 돌려서 원본 API 주소 값 해당 위치에서 저장시킬것
+
+    # 새로운 섹션 값 계산
+    print("new section data size : "+str(payload_size/1024)+" KB")
    
-    ###
+    payload_virtualAddress=lastSvirtualAddress+math.ceil(lastSvirtualSize/sectionAlignment)*sectionAlignment  # 새로운 섹션 VA 위치 계산(마지막 섹션의 최소 단위의 갯수 * 섹션 최소 단위 + 마지막 섹션 VA 위치)
+    #payload_rawAddress=lastSrawAddress+math.ceil(lastSrawSize/fileAlignment)*fileAlignment # 새로운 섹션의 파일 offset 위치 계산
+    payload_rawAddress=lastSvirtualAddress+math.ceil(lastSvirtualSize/fileAlignment)*fileAlignment # 새로운 섹션의 파일 offset 위치 계산 (unicorn에서 dump뜬 상태에서 파일로 저장하여 VA -> RA offset 동일해짐)
+    payload_rawSize=math.ceil(payload_size/fileAlignment)*fileAlignment # 새로운 섹션의 파일 offset size 계산(새로운 섹션에 삽입할 바이너리 크기의 최소 크기의 갯수 * 최소 파일의 크기)
+    payload_virtualSize=math.ceil(payload_size/sectionAlignment)*sectionAlignment # 새로운 섹션의 size 계산
+    payload_characterstics=0xe0000060 # 섹션의 권한 설정
+    
+    NewSN = ".IT"
+    print("New Section Name:",NewSN)
+    print("Virtual address:",hex(payload_virtualAddress),"\nVirtual Size:",hex(payload_virtualSize),"\nRaw Size:",hex(payload_rawSize))
+    print("Raw Address:",hex(payload_rawAddress),"\nCharacterstics:",hex(payload_characterstics))
+    
+    
+    # 계산 값에 맞춰 Header 데이터 쓰기
+    sectionheader=bytearray(NewSN.encode("utf-8")+b"\x00"*(8-len(NewSN)))+struct.pack("<LLLLLLLL",payload_virtualSize,payload_virtualAddress,payload_rawSize,payload_rawAddress,0,0,0,payload_characterstics)
+    newsize=payload_virtualAddress+payload_virtualSize
+    noSections+=1
+    with open("./bin/pay.txt","rb") as payload:
+        pdata=payload.read()
+
+
+    print("Section Header:"," ".join([str(hex(x))[2:] for x in sectionheader]),"\nSection Header Length:",len(sectionheader),"( "+str(hex(len(sectionheader)))+" )","\nNew file size:",newsize,"(",hex(newsize),")","\nNo of sections(updated):",noSections)
+    print("=====================================================")
+    
+    writeDword(peoffset+0x50,newsize) # Optional Hdr. Size of Image (메모리 로딩되었을 때 전체 크기 변경)
+    writeWord(peoffset+0x06,noSections) # File Hdr. Sections Count (섹션의 갯수 변경)
+    writeData(lastSoffset+0x28,sectionheader) # 새로 만든 섹션 offset에 섹션 Header 정보 삽입
+
+    
+    '''''' # Data Directory 값 맞춰 쓰기
+    # 여기에 directory 섹션 값 변경하여 덮어쓰기 코드 작성? 확인해볼 것
+    writeDword(peoffset+0x58,0) #checksum값 0으로 변경
+    #print(tdata[peoffset+0x58:peoffset+0x58+0x04]) # checksum값 변경된거 확인 test
+    writeDword(peoffset+0x90, payload_virtualAddress + ((0x1*0x8) +(0x1*0x8)+(0x1*0x8)))#dll정보 offset) # dll정보 offset = (원본 API 개수 * 8byte) + ((모든 API 개수 *8byte) + (dll개수*8)) (Import Directory Addr. 부분)
+    writeDword(peoffset +0x90+0x04 , (0x5*0x4))#dll정보 크기) # dll정보 크기 = ((imports 객체 갯수(5개) * 4byte) * (dll 갯수 + 1)) (Import Directory Size부분)
+    # 새로운 섹션에 dll 이름 정보와 api 이름 정보 삽입
+
+    ''''''
+    
+    pdata=pdata+b"\x00"*(payload_rawSize-len(pdata)) # 넣을 데이터 저장 (넣을 데이터 + 나머지 크기는 \x00으로 채우기)
+    tdata=tdata+pdata # 전체 데이터에서 마지막부분에 데이터 추가
     
 
-    #P_DLL_Function()
-    #P_LOADED_DLL()
-   
-    uc.mem_protect(0x140001000,0x1000,UC_PROT_READ)
-    globar_var.SECTIONINFO[0][2]=0x2
-    print("PID : ",os.getpid())
-    try:
-        uc.emu_start(IMAGE_BASE + EP, ADDRESS)
-    except UcError as e:
-        print(f"[ERROR]: {e}")
-        BobLog.info("Find OEP : %s" % hex(uc.reg_read(UC_X86_REG_RIP)))
-        #print(hex(uc.reg_read(UC_X86_REG_RIP)))
-        #BobLog.debug("DEBUGING")
-  
-    end = datetime.now()
-    print(f"[{end}] Emulation done...")
-    print(f"Runtime: [{end-start}]")
+    newname="originalAPI.exe"
 
-
-def P_DLL_Function():
-    for key in DLL_SETTING.DLL_FUNCTIONS:
-        print("key : {0}, value : {1}".format(key,hex(DLL_SETTING.DLL_FUNCTIONS[key])))
+    with open(newname,"wb") as outfile:
+        outfile.write(tdata)
     
-
-def P_INV_DLL_Function():
-    for key in DLL_SETTING.INV_DLL_FUNCTIONS:
-        print("key : {0}, value : {1}".format(hex(key),DLL_SETTING.INV_DLL_FUNCTIONS[key]))
-
-def P_LOADED_DLL():
-    for key in DLL_SETTING.LOADED_DLL:
-        print("key : {0}, value : {1}".format(key,hex(DLL_SETTING.LOADED_DLL[key])))
-
-def P_CACHE_DLL_Function():
-    for key in DLL_SETTING.CACHE_DLL_FUNCTIONS:
-        print("key : {0}, value : {1}".format(key,hex(DLL_SETTING.CACHE_DLL_FUNCTIONS[key])))
-
-def P_INV_CACHE_DLL_Function():
-    for key in DLL_SETTING.INV_CACHE_DLL_FUNCTIONS:
-        print("key : {0}, value : {1}".format(hex(key),DLL_SETTING.INV_CACHE_DLL_FUNCTIONS[key]))
+    print("success")
