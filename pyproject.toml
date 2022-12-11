@@ -8,19 +8,11 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9, <3.11"
-unicorn = "^2.0.1"
+unicorn = "^2.0.1.post"
 lief = ">=0.12.2"
 fire = "^0.4"
 capstone = "^4.0.2"
 pefile = "^2022.5.30"
-toml = "^0.10.2"
-
-[tool.poetry.dev-dependencies]
-mypy = "^0.910"
-pylint = "^2.11"
-yapf = "^0.32.0"
-toml = "^0.10.2"
-pyinstaller = "^4.10"
 
 [tool.poetry.scripts]
 bobalkkagi = 'bobalkkagi.application:main'
