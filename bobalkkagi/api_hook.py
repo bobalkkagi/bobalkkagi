@@ -239,7 +239,7 @@ def hook_SetCurrentDirectoryW(uc, log, regs):
     log.warning(f"HOOK_API_CALL : SetCurrentDirectoryW")
     
     
-    uc.reg_write(UC_X86_REG_RAX,0x1)
+    uc.reg_write(UC_X86_REG_RAX, 0x1)
     ret(uc, REGS.rsp)
     
 

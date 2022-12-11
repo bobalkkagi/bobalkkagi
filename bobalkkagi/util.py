@@ -2,6 +2,7 @@ import sys
 import struct
 import os
 
+
 def EndOfString(ByteData: bytes) -> str:
     byteString = ""
     for i in ByteData:
@@ -30,9 +31,8 @@ def align(value, pageSize=0x1000):
     aligned_size = value + f
     return aligned_size 
 
-def printDllMap(Log:object):
-    from globalValue import DLL_SETTING
-    sorted_dict = sorted(DLL_SETTING.LoadedDll.items(), key = lambda item: item[1])
+def printDllMap(Log:object, LoadedDLL:dict):
+    sorted_dict = sorted(LoadedDLL.items(), key = lambda item: item[1])
     print("{0:=^100}".format("[ LOADED DLL ]"))
     for key, value in sorted_dict:
         Log.info(f"{key:<80}: {value:016x}")

@@ -260,8 +260,9 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
         OEP = uc.reg_read(UC_X86_REG_RIP)
         BobLog.info(f"Find OEP: {OEP:x}")
 
+
     if verbose:
-        printDllMap(BobLog)
+        printDllMap(BobLog, DLL_SETTING.LoadedDll)
         
 
     end = datetime.now()
