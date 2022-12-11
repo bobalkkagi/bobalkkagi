@@ -15,6 +15,10 @@ capstone = "^4.0.2"
 pefile = "^2022.5.30"
 
 [tool.poetry.dev-dependencies]
+mypy = "^0.910"
+pylint = "^2.11"
+yapf = "^0.32.0"
+toml = "^0.10.2"
 pyinstaller = "^4.10"
 
 [tool.poetry.scripts]
