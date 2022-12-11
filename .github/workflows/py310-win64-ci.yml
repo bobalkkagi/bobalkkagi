@@ -31,12 +31,6 @@ jobs:
       - name: Install Dependencies
         run: poetry install
 
-      - name: Run yapf
-        run: poetry run yapf -r -d bobalkkagi
-
-      - name: Run mypy
-        run: poetry run mypy --strict bobalkkagi
-
       - name: Build PyInstaller package
         run: poetry run pyinstaller bobalkkagi.spec
 
