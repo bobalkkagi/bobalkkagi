@@ -1,5 +1,5 @@
 from ctypes import *
-from .constValue import TebBase, PebBase, StackBase, StackLimit
+from bobalkkagi.constValue import TebBase, PebBase, StackBase, StackLimit
 
 
 class LIST_ENTRY(Structure):

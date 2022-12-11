@@ -2,7 +2,7 @@
 
 from PyInstaller.utils.hooks import collect_dynamic_libs
 
-dlls = collect_dynamic_libs("capstone") + collect_dynamic_libs("unicorn")
+dlls = collect_dynamic_libs("capstone") + collect_dynamic_libs("unicorn") + collect_dynamic_libs("fire")
 resource_files = [('bobalkkagi/', 'bobalkkagi')]
 block_cipher = None
 
@@ -29,8 +29,7 @@ exe = EXE(
     a.scripts,
     a.binaries,
     a.zipfiles,
-    a.datas,
-    [],
+    a.datas,[],
     name='bobalkkagi',
     debug=False,
     bootloader_ignore_signals=False,

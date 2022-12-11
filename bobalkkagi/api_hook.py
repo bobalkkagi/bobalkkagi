@@ -127,7 +127,7 @@ def hook_LoadLibraryA(uc, log, regs):
     dllName = EndOfString(bytes(uc.mem_read(REGS.rcx, 0x20))) #byte string
     
     if dllName not in DLL_SETTING.LoadedDll:
-        PE_Loader(uc, dllName, GLOBAL_VAR.DllEnd, None, os.path.abspath("vm_dll"))
+        PE_Loader(uc, dllName, GLOBAL_VAR.DllEnd)
         InvDllDict()
 
     d_address = DLL_SETTING.LoadedDll[dllName]

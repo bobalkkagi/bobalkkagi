@@ -2,17 +2,17 @@ from unicorn import *
 from unicorn.x86_const import *
 from datetime import datetime
 
-from .loader import PE_Loader
-from .logger import *
-from .api_hook import *
-from .globalValue import *
-from .peb import Initpeb, InitProcessHeap
-from .teb import InitTeb
-from .kuserSharedData import InitKuserSharedData
-from .hookFuncs import HookFuncs
-from .constValue import *
-from .debugger import Debugger
-from .util import saveDumpfile
+from bobalkkagi.loader import PE_Loader
+from bobalkkagi.logger import *
+from bobalkkagi.api_hook import *
+from bobalkkagi.globalValue import *
+from bobalkkagi.peb import Initpeb, InitProcessHeap
+from bobalkkagi.teb import InitTeb
+from bobalkkagi.kuserSharedData import InitKuserSharedData
+from bobalkkagi.hookFuncs import HookFuncs
+from bobalkkagi.constValue import *
+from bobalkkagi.debugger import Debugger
+from bobalkkagi.util import saveDumpfile
 
 import logging
 import struct

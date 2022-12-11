@@ -2,10 +2,10 @@ from unicorn import *
 from unicorn.x86_const import *
 from pathlib import Path
 
-from .globalValue import DLL_SETTING, GLOBAL_VAR
-from .constValue import PRIVILEGE, RTL
-from .reflector import REFLECTOR
-from .util import align
+from bobalkkagi.globalValue import DLL_SETTING, GLOBAL_VAR
+from bobalkkagi.constValue import PRIVILEGE, RTL
+from bobalkkagi.reflector import REFLECTOR
+from bobalkkagi.util import align
 
 import struct
 import pefile
@@ -213,7 +213,7 @@ def RemoveEXEC(sectionName:str, Characteristics):
     if len(sectionName) > 0 and sectionName != '.text':
         return Characteristics >> 28
     elif (Characteristics >> 28)&0x2:
-        #print(f"[Removed] No name {cnt} st section EXEC privilege!")
+        #print(f"[Removed] No name section EXEC privilege!")
         return (Characteristics >> 28)^0x2, '.text'
     else:
         return Characteristics >> 28
