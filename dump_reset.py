@@ -245,11 +245,7 @@ def dump_restart(dumps, OEP:int):
                         #tmp = readWord(rip)
                         # print(hex(tmp)) # call맞나 확인 (0x15ff출력됨(ff 15))
 
-                #test
-
-                #uc.hook_add(UC_HOOK_CODE, hook_code)
-                # hook추가 코딩할 것
-                # call jmp인지 확인해볼것 if (rip +1) == jmp * 여기 rip는 다른 위에랑 다른 rip변수
+                # 향후 e8 call사용하려면 jmp인지 확인해볼것 if (rip +1) == jmp * 여기 rip는 다른 위에랑 다른 rip변수
                 # call부터 jmp or jmp 일때, 레지스터 값 pay.txt에 저장
 
             rip += 1 # 해당 위치가 ff 15인지 확인하는 제어변수
