@@ -1,0 +1,957 @@
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : LoadLibraryA, user32.dll: 0x7ff0008d6000
+HOOK_API_CALL : LoadLibraryA, advapi32.dll: 0x7ff000545000
+HOOK_API_CALL : LoadLibraryA, ntdll.dll: 0x7ff0000b2000
+HOOK_API_CALL : LoadLibraryA, shell32.dll: 0x7ff0010af000
+HOOK_API_CALL : LoadLibraryA, shlwapi.dll: 0x7ff001879000
+HOOK_API_CALL : GetProcAddress, kernel32.dll_SetLastError: 0x7ff000016a60
+HOOK_API_CALL : GetProcAddress, kernel32.dll_GetLastError: 0x7ff000016780
+HOOK_API_CALL : GetProcAddress, kernel32.dll_IsWow64Process2: 0x7ff000098735
+HOOK_API_CALL : ZwOpenThread, handle : 0xb1
+HOOK_API_CALL : GetUserDefaultUILanguage, RCX : 0x14ff18
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3851000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3852000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3853000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3854000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3855000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3856000
+HOOK_API_CALL : GetCurrentDirectoryW, RCX : 0x208, RDX : 0x1e9e3855000, path : C:\Users\wlgns\Desktop\Bobalkkagi, len : 0x21
+HOOK_API_CALL : GetModuleFileNameW, RDX : 0x1e9e3853000, path : C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : GetCommandLineA, path : "C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe"
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3857000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : ZwSetInformationThread
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x20
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff000151ae0, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3858000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : NtUserGetForegroundWindow
+HOOK_API_CALL : GetWindowTextA
+HOOK_API_CALL : OpenThreadToken
+HOOK_API_CALL : OpenProcessToken, token : 0x163
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x1c0
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000000000, Size : 0x1c0, Privilege : 0x4
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x3c
+HOOK_API_CALL : ZwSetInformationProcess
+HOOK_API_CALL : ZwClose, handle : 0x163
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3859000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : VirtualFree, Address : 0x20000000000
+HOOK_API_CALL : GetProcAddress, shell32.dll_IsUserAnAdmin: 0x7ff0012fad10
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385a000
+HOOK_API_CALL : ZwOpenThreadTokenEx
+HOOK_API_CALL : ZwOpenProcessTokenEx, token : 0x137
+HOOK_API_CALL : ZwDuplicateToken
+HOOK_API_CALL : ZwClose, handle : 0x137
+HOOK_API_CALL : ZwAccessCheck
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000001000, Size : 0x8, Privilege : 0x4
+HOOK_API_CALL : ZwGetContextThread
+HOOK_API_CALL : VirtualFree, Address : 0x20000001000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385b000
+HOOK_API_CALL : ZwQuerySystemInformation
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385c000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385d000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000002000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000002000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x200000e8000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x200000e8000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000128000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000128000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000129000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000129000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000130000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000130000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000131000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000131000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000134000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000135000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000135000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000136000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000136000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000190000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000190000
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : GetModuleHandleA, RCX : gdi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : comdlg32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : ole32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : advapi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : imm32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : shell32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : user32.dll
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000192000, Size : 0xb090, Privilege : 0x4
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385e000
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlAllocateHeap: 0x7ff0000ed870
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlLeaveCriticalSection: 0x7ff0000eca00
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEnterCriticalSection: 0x7ff0000cd400
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDialogWndProc_A: 0x7ff00014de50
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEncodePointer: 0x7ff0001215e0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_A: 0x7ff00014dd90
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoCreateInstance: 0x7ff000d693f0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeSListHead: 0x7ff000125880
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlDeleteCriticalSection: 0x7ff0000e4bb0
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoUninitialize: 0x7ff000d36050
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlReAllocateHeap: 0x7ff0000f4cb0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_W: 0x7ff00014dda0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlSizeHeap: 0x7ff0000ecb40
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeCriticalSection: 0x7ff0001150b0
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x2
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385f000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3860000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : LoadLibraryA, user32.dll: 0x7ff0008d6000
+HOOK_API_CALL : LoadLibraryA, advapi32.dll: 0x7ff000545000
+HOOK_API_CALL : LoadLibraryA, ntdll.dll: 0x7ff0000b2000
+HOOK_API_CALL : LoadLibraryA, shell32.dll: 0x7ff0010af000
+HOOK_API_CALL : LoadLibraryA, shlwapi.dll: 0x7ff001879000
+HOOK_API_CALL : GetProcAddress, kernel32.dll_SetLastError: 0x7ff000016a60
+HOOK_API_CALL : GetProcAddress, kernel32.dll_GetLastError: 0x7ff000016780
+HOOK_API_CALL : GetProcAddress, kernel32.dll_IsWow64Process2: 0x7ff000098735
+HOOK_API_CALL : ZwOpenThread, handle : 0x1be
+HOOK_API_CALL : GetUserDefaultUILanguage, RCX : 0x14ff18
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3851000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3852000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3853000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3854000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3855000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3856000
+HOOK_API_CALL : GetCurrentDirectoryW, RCX : 0x208, RDX : 0x1e9e3855000, path : C:\Users\wlgns\Desktop\Bobalkkagi, len : 0x21
+HOOK_API_CALL : GetModuleFileNameW, RDX : 0x1e9e3853000, path : C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : GetCommandLineA, path : "C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe"
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3857000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : ZwSetInformationThread
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x20
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff000151ae0, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3858000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : NtUserGetForegroundWindow
+HOOK_API_CALL : GetWindowTextA
+HOOK_API_CALL : OpenThreadToken
+HOOK_API_CALL : OpenProcessToken, token : 0x92
+HOOK_API_CALL : ZwQueryInformationToken, token : 0xaf
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000000000, Size : 0xaf, Privilege : 0x4
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x92
+HOOK_API_CALL : ZwSetInformationProcess
+HOOK_API_CALL : ZwClose, handle : 0x92
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3859000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : VirtualFree, Address : 0x20000000000
+HOOK_API_CALL : GetProcAddress, shell32.dll_IsUserAnAdmin: 0x7ff0012fad10
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385a000
+HOOK_API_CALL : ZwOpenThreadTokenEx
+HOOK_API_CALL : ZwOpenProcessTokenEx, token : 0x60
+HOOK_API_CALL : ZwDuplicateToken
+HOOK_API_CALL : ZwClose, handle : 0x60
+HOOK_API_CALL : ZwAccessCheck
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000001000, Size : 0x8, Privilege : 0x4
+HOOK_API_CALL : ZwGetContextThread
+HOOK_API_CALL : VirtualFree, Address : 0x20000001000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385b000
+HOOK_API_CALL : ZwQuerySystemInformation
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385c000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385d000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000002000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000002000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x200000e8000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x200000e8000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000128000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000128000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000129000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000129000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000130000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000130000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000131000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000131000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000134000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000135000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000135000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000136000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000136000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000190000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000190000
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : GetModuleHandleA, RCX : gdi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : comdlg32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : ole32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : advapi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : imm32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : shell32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : user32.dll
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000192000, Size : 0xb090, Privilege : 0x4
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385e000
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlAllocateHeap: 0x7ff0000ed870
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlLeaveCriticalSection: 0x7ff0000eca00
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEnterCriticalSection: 0x7ff0000cd400
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDialogWndProc_A: 0x7ff00014de50
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEncodePointer: 0x7ff0001215e0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_A: 0x7ff00014dd90
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoCreateInstance: 0x7ff000d693f0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeSListHead: 0x7ff000125880
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlDeleteCriticalSection: 0x7ff0000e4bb0
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoUninitialize: 0x7ff000d36050
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlReAllocateHeap: 0x7ff0000f4cb0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_W: 0x7ff00014dda0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlSizeHeap: 0x7ff0000ecb40
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeCriticalSection: 0x7ff0001150b0
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x2
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385f000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3860000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : SetCurrentDirectoryW
+[ERROR]: Fetch from non-executable memory (UC_ERR_FETCH_PROT)
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : LoadLibraryA, user32.dll: 0x7ff0008d6000
+HOOK_API_CALL : LoadLibraryA, advapi32.dll: 0x7ff000545000
+HOOK_API_CALL : LoadLibraryA, ntdll.dll: 0x7ff0000b2000
+HOOK_API_CALL : LoadLibraryA, shell32.dll: 0x7ff0010af000
+HOOK_API_CALL : LoadLibraryA, shlwapi.dll: 0x7ff001879000
+HOOK_API_CALL : GetProcAddress, kernel32.dll_SetLastError: 0x7ff000016a60
+HOOK_API_CALL : GetProcAddress, kernel32.dll_GetLastError: 0x7ff000016780
+HOOK_API_CALL : GetProcAddress, kernel32.dll_IsWow64Process2: 0x7ff000098735
+HOOK_API_CALL : ZwOpenThread, handle : 0x199
+HOOK_API_CALL : GetUserDefaultUILanguage, RCX : 0x14ff18
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3851000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3852000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3853000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3854000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3855000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3856000
+HOOK_API_CALL : GetCurrentDirectoryW, RCX : 0x208, RDX : 0x1e9e3855000, path : C:\Users\wlgns\Desktop\Bobalkkagi, len : 0x21
+HOOK_API_CALL : GetModuleFileNameW, RDX : 0x1e9e3853000, path : C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : GetCommandLineA, path : "C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe"
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3857000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : ZwSetInformationThread
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x20
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff000151ae0, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3858000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : NtUserGetForegroundWindow
+HOOK_API_CALL : GetWindowTextA
+HOOK_API_CALL : OpenThreadToken
+HOOK_API_CALL : OpenProcessToken, token : 0xa7
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x18a
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000000000, Size : 0x18a, Privilege : 0x4
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x31
+HOOK_API_CALL : ZwSetInformationProcess
+HOOK_API_CALL : ZwClose, handle : 0xa7
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3859000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : VirtualFree, Address : 0x20000000000
+HOOK_API_CALL : GetProcAddress, shell32.dll_IsUserAnAdmin: 0x7ff0012fad10
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385a000
+HOOK_API_CALL : ZwOpenThreadTokenEx
+HOOK_API_CALL : ZwOpenProcessTokenEx, token : 0x1bd
+HOOK_API_CALL : ZwDuplicateToken
+HOOK_API_CALL : ZwClose, handle : 0x1bd
+HOOK_API_CALL : ZwAccessCheck
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000001000, Size : 0x8, Privilege : 0x4
+HOOK_API_CALL : ZwGetContextThread
+HOOK_API_CALL : VirtualFree, Address : 0x20000001000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385b000
+HOOK_API_CALL : ZwQuerySystemInformation
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385c000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385d000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000002000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000002000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x200000e8000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x200000e8000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000128000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000128000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000129000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000129000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000130000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000130000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000131000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000131000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000134000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000135000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000135000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000136000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000136000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000190000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000190000
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : GetModuleHandleA, RCX : gdi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : comdlg32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : ole32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : advapi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : imm32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : shell32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : user32.dll
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000192000, Size : 0xb090, Privilege : 0x4
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385e000
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlAllocateHeap: 0x7ff0000ed870
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlLeaveCriticalSection: 0x7ff0000eca00
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEnterCriticalSection: 0x7ff0000cd400
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDialogWndProc_A: 0x7ff00014de50
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEncodePointer: 0x7ff0001215e0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_A: 0x7ff00014dd90
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoCreateInstance: 0x7ff000d693f0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeSListHead: 0x7ff000125880
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlDeleteCriticalSection: 0x7ff0000e4bb0
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoUninitialize: 0x7ff000d36050
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlReAllocateHeap: 0x7ff0000f4cb0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_W: 0x7ff00014dda0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlSizeHeap: 0x7ff0000ecb40
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeCriticalSection: 0x7ff0001150b0
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x2
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385f000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3860000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : LoadLibraryA, user32.dll: 0x7ff0008d6000
+HOOK_API_CALL : LoadLibraryA, advapi32.dll: 0x7ff000545000
+HOOK_API_CALL : LoadLibraryA, ntdll.dll: 0x7ff0000b2000
+HOOK_API_CALL : LoadLibraryA, shell32.dll: 0x7ff0010af000
+HOOK_API_CALL : LoadLibraryA, shlwapi.dll: 0x7ff001879000
+HOOK_API_CALL : GetProcAddress, kernel32.dll_SetLastError: 0x7ff000016a60
+HOOK_API_CALL : GetProcAddress, kernel32.dll_GetLastError: 0x7ff000016780
+HOOK_API_CALL : GetProcAddress, kernel32.dll_IsWow64Process2: 0x7ff000098735
+HOOK_API_CALL : ZwOpenThread, handle : 0x154
+HOOK_API_CALL : GetUserDefaultUILanguage, RCX : 0x14ff18
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3851000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3852000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3853000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3854000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3855000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3856000
+HOOK_API_CALL : GetCurrentDirectoryW, RCX : 0x208, RDX : 0x1e9e3855000, path : C:\Users\wlgns\Desktop\Bobalkkagi, len : 0x21
+HOOK_API_CALL : GetModuleFileNameW, RDX : 0x1e9e3853000, path : C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : GetCommandLineA, path : "C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe"
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3857000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : ZwSetInformationThread
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x20
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff000151ae0, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3858000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : NtUserGetForegroundWindow
+HOOK_API_CALL : GetWindowTextA
+HOOK_API_CALL : OpenThreadToken
+HOOK_API_CALL : OpenProcessToken, token : 0x74
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x7c
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000000000, Size : 0x7c, Privilege : 0x4
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x72
+HOOK_API_CALL : ZwSetInformationProcess
+HOOK_API_CALL : ZwClose, handle : 0x74
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3859000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : VirtualFree, Address : 0x20000000000
+HOOK_API_CALL : GetProcAddress, shell32.dll_IsUserAnAdmin: 0x7ff0012fad10
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385a000
+HOOK_API_CALL : ZwOpenThreadTokenEx
+HOOK_API_CALL : ZwOpenProcessTokenEx, token : 0x1b7
+HOOK_API_CALL : ZwDuplicateToken
+HOOK_API_CALL : ZwClose, handle : 0x1b7
+HOOK_API_CALL : ZwAccessCheck
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000001000, Size : 0x8, Privilege : 0x4
+HOOK_API_CALL : ZwGetContextThread
+HOOK_API_CALL : VirtualFree, Address : 0x20000001000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385b000
+HOOK_API_CALL : ZwQuerySystemInformation
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385c000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385d000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000002000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000002000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x200000e8000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x200000e8000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000128000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000128000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000129000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000129000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000130000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000130000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000131000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000131000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000134000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000135000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000135000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000136000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000136000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000190000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000190000
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : GetModuleHandleA, RCX : gdi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : comdlg32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : ole32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : advapi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : imm32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : shell32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : user32.dll
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000192000, Size : 0xb090, Privilege : 0x4
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385e000
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlAllocateHeap: 0x7ff0000ed870
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlLeaveCriticalSection: 0x7ff0000eca00
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEnterCriticalSection: 0x7ff0000cd400
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDialogWndProc_A: 0x7ff00014de50
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEncodePointer: 0x7ff0001215e0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_A: 0x7ff00014dd90
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoCreateInstance: 0x7ff000d693f0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeSListHead: 0x7ff000125880
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlDeleteCriticalSection: 0x7ff0000e4bb0
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoUninitialize: 0x7ff000d36050
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlReAllocateHeap: 0x7ff0000f4cb0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_W: 0x7ff00014dda0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlSizeHeap: 0x7ff0000ecb40
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeCriticalSection: 0x7ff0001150b0
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x2
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385f000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3860000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : SetCurrentDirectoryW
+Fetch from non-executable memory (UC_ERR_FETCH_PROT)
+Find OEP: 1400b8814
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : LoadLibraryA, user32.dll: 0x7ff0008d6000
+HOOK_API_CALL : LoadLibraryA, advapi32.dll: 0x7ff000545000
+HOOK_API_CALL : LoadLibraryA, ntdll.dll: 0x7ff0000b2000
+HOOK_API_CALL : LoadLibraryA, shell32.dll: 0x7ff0010af000
+HOOK_API_CALL : LoadLibraryA, shlwapi.dll: 0x7ff001879000
+HOOK_API_CALL : GetProcAddress, kernel32.dll_SetLastError: 0x7ff000016a60
+HOOK_API_CALL : GetProcAddress, kernel32.dll_GetLastError: 0x7ff000016780
+HOOK_API_CALL : GetProcAddress, kernel32.dll_IsWow64Process2: 0x7ff000098735
+HOOK_API_CALL : ZwOpenThread, handle : 0x144
+HOOK_API_CALL : GetUserDefaultUILanguage, RCX : 0x14ff18
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3851000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3852000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3853000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3854000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3855000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3856000
+HOOK_API_CALL : GetCurrentDirectoryW, RCX : 0x208, RDX : 0x1e9e3855000, path : C:\Users\wlgns\Desktop\Bobalkkagi, len : 0x21
+HOOK_API_CALL : GetModuleFileNameW, RDX : 0x1e9e3853000, path : C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : GetCommandLineA, path : "C:\Users\wlgns\Desktop\Bobalkkagi\testfiles\putty_protected.exe"
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3857000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : ZwSetInformationThread
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x20
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff000151ae0, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3858000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : NtUserGetForegroundWindow
+HOOK_API_CALL : GetWindowTextA
+HOOK_API_CALL : OpenThreadToken
+HOOK_API_CALL : OpenProcessToken, token : 0xad
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x1dc
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000000000, Size : 0x1dc, Privilege : 0x4
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x1ac
+HOOK_API_CALL : ZwSetInformationProcess
+HOOK_API_CALL : ZwClose, handle : 0xad
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3859000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : VirtualFree, Address : 0x20000000000
+HOOK_API_CALL : GetProcAddress, shell32.dll_IsUserAnAdmin: 0x7ff0012fad10
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385a000
+HOOK_API_CALL : ZwOpenThreadTokenEx
+HOOK_API_CALL : ZwOpenProcessTokenEx, token : 0x138
+HOOK_API_CALL : ZwDuplicateToken
+HOOK_API_CALL : ZwClose, handle : 0x138
+HOOK_API_CALL : ZwAccessCheck
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000001000, Size : 0x8, Privilege : 0x4
+HOOK_API_CALL : ZwGetContextThread
+HOOK_API_CALL : VirtualFree, Address : 0x20000001000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385b000
+HOOK_API_CALL : ZwQuerySystemInformation
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385c000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385d000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000002000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000002000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x200000e8000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x200000e8000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000128000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000128000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000129000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000129000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000130000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000130000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000131000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000131000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000134000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000135000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000135000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000136000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000136000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000190000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000190000
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : GetModuleHandleA, RCX : gdi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : comdlg32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : ole32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : advapi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : imm32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : shell32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : user32.dll
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000192000, Size : 0xb090, Privilege : 0x4
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385e000
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlAllocateHeap: 0x7ff0000ed870
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlLeaveCriticalSection: 0x7ff0000eca00
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEnterCriticalSection: 0x7ff0000cd400
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDialogWndProc_A: 0x7ff00014de50
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEncodePointer: 0x7ff0001215e0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_A: 0x7ff00014dd90
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoCreateInstance: 0x7ff000d693f0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeSListHead: 0x7ff000125880
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlDeleteCriticalSection: 0x7ff0000e4bb0
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoUninitialize: 0x7ff000d36050
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlReAllocateHeap: 0x7ff0000f4cb0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_W: 0x7ff00014dda0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlSizeHeap: 0x7ff0000ecb40
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeCriticalSection: 0x7ff0001150b0
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x2
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385f000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3860000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : SetCurrentDirectoryW
+Fetch from non-executable memory (UC_ERR_FETCH_PROT)
+Find OEP: 1400b8814
+===========================================[ LOADED DLL ]===========================================
+kernel32.dll                                                                    : 00007ff000000000
+ntdll.dll                                                                       : 00007ff0000b2000
+kernelbase.dll                                                                  : 00007ff0002a2000
+advapi32.dll                                                                    : 00007ff000545000
+msvcrt.dll                                                                      : 00007ff0005e8000
+api-ms-win-eventing-controller-l1-1-0.dll                                       : 00007ff000686000
+api-ms-win-eventing-consumer-l1-1-0.dll                                         : 00007ff000689000
+sechost.dll                                                                     : 00007ff00068c000
+rpcrt4.dll                                                                      : 00007ff000723000
+api-ms-win-core-interlocked-l1-1-0.dll                                          : 00007ff000843000
+api-ms-win-core-threadpool-l1-2-0.dll                                           : 00007ff000846000
+api-ms-win-core-delayload-l1-1-0.dll                                            : 00007ff000849000
+api-ms-win-service-core-l1-1-0.dll                                              : 00007ff00084c000
+api-ms-win-service-core-l1-1-1.dll                                              : 00007ff00084f000
+api-ms-win-service-management-l1-1-0.dll                                        : 00007ff000852000
+api-ms-win-service-management-l2-1-0.dll                                        : 00007ff000855000
+api-ms-win-service-private-l1-1-0.dll                                           : 00007ff000858000
+api-ms-win-service-winsvc-l1-1-0.dll                                            : 00007ff00085b000
+api-ms-win-core-comm-l1-1-0.dll                                                 : 00007ff00085e000
+gdi32.dll                                                                       : 00007ff000861000
+win32u.dll                                                                      : 00007ff000887000
+imm32.dll                                                                       : 00007ff0008a8000
+user32.dll                                                                      : 00007ff0008d6000
+api-ms-win-core-string-l2-1-0.dll                                               : 00007ff000a69000
+api-ms-win-core-privateprofile-l1-1-0.dll                                       : 00007ff000a6c000
+api-ms-win-core-heap-obsolete-l1-1-0.dll                                        : 00007ff000a6f000
+api-ms-win-core-string-obsolete-l1-1-0.dll                                      : 00007ff000a72000
+api-ms-win-core-localization-obsolete-l1-2-0.dll                                : 00007ff000a75000
+api-ms-win-core-stringansi-l1-1-0.dll                                           : 00007ff000a78000
+api-ms-win-core-kernel32-private-l1-1-0.dll                                     : 00007ff000a7b000
+api-ms-win-core-kernel32-legacy-l1-1-0.dll                                      : 00007ff000a7e000
+ole32.dll                                                                       : 00007ff000a81000
+api-ms-win-core-com-l1-1-0.dll                                                  : 00007ff000bd7000
+api-ms-win-crt-string-l1-1-0.dll                                                : 00007ff000bdb000
+ucrtbase.dll                                                                    : 00007ff000bdf000
+api-ms-win-crt-private-l1-1-0.dll                                               : 00007ff000cd9000
+api-ms-win-core-shlwapi-legacy-l1-1-0.dll                                       : 00007ff000ce9000
+api-ms-win-eventlog-legacy-l1-1-0.dll                                           : 00007ff000ced000
+api-ms-win-core-registry-l2-1-0.dll                                             : 00007ff000cf0000
+combase.dll                                                                     : 00007ff000cf3000
+api-ms-win-core-fibers-l1-1-1.dll                                               : 00007ff001029000
+bcryptprimitives.dll                                                            : 00007ff00102c000
+api-ms-win-security-sddl-l1-1-0.dll                                             : 00007ff0010ac000
+shell32.dll                                                                     : 00007ff0010af000
+api-ms-win-devices-config-l1-1-1.dll                                            : 00007ff001794000
+api-ms-win-core-version-l1-1-0.dll                                              : 00007ff001797000
+api-ms-win-eventing-classicprovider-l1-1-0.dll                                  : 00007ff00179a000
+api-ms-win-core-shlwapi-obsolete-l1-1-0.dll                                     : 00007ff00179d000
+api-ms-win-core-kernel32-legacy-l1-1-1.dll                                      : 00007ff0017a0000
+api-ms-win-core-url-l1-1-0.dll                                                  : 00007ff0017a3000
+api-ms-win-security-cryptoapi-l1-1-0.dll                                        : 00007ff0017a6000
+comdlg32.dll                                                                    : 00007ff0017a9000
+shlwapi.dll                                                                     : 00007ff001879000
+comctl32.dll                                                                    : 00007ff0018cb000
+==============================================[ END ]===============================================
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : LoadLibraryA, user32.dll: 0x7ff0008d6000
+HOOK_API_CALL : LoadLibraryA, advapi32.dll: 0x7ff000545000
+HOOK_API_CALL : LoadLibraryA, ntdll.dll: 0x7ff0000b2000
+HOOK_API_CALL : LoadLibraryA, shell32.dll: 0x7ff0010af000
+HOOK_API_CALL : LoadLibraryA, shlwapi.dll: 0x7ff001879000
+HOOK_API_CALL : GetProcAddress, kernel32.dll_SetLastError: 0x7ff000016a60
+HOOK_API_CALL : GetProcAddress, kernel32.dll_GetLastError: 0x7ff000016780
+HOOK_API_CALL : GetProcAddress, kernel32.dll_IsWow64Process2: 0x7ff000098735
+HOOK_API_CALL : ZwOpenThread, handle : 0x1c2
+HOOK_API_CALL : GetUserDefaultUILanguage, RCX : 0x14ff18
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3851000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3852000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3853000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3854000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3855000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3856000
+HOOK_API_CALL : GetCurrentDirectoryW, RCX : 0x208, RDX : 0x1e9e3855000, path : C:\Users\wlgns\Desktop\Bobalkkagi\bobalkkagi, len : 0x2c
+HOOK_API_CALL : GetModuleFileNameW, RDX : 0x1e9e3853000, path : C:\Users\wlgns\Desktop\Bobalkkagi\bobalkkagi\testfiles\putty_protected.exe
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : GetCommandLineA, path : "C:\Users\wlgns\Desktop\Bobalkkagi\bobalkkagi\testfiles\putty_protected.exe"
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3857000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : SetCurrentDirectoryW
+HOOK_API_CALL : ZwSetInformationThread
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff00017f490, Size : 0x1000, Privilege : 0x20
+HOOK_API_CALL : VirtualProtect, Address : 0x7ff000151ae0, Size : 0x1000, Privilege : 0x40
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3858000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : NtUserGetForegroundWindow
+HOOK_API_CALL : GetWindowTextA
+HOOK_API_CALL : OpenThreadToken
+HOOK_API_CALL : OpenProcessToken, token : 0x187
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x78
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000000000, Size : 0x78, Privilege : 0x4
+HOOK_API_CALL : ZwQueryInformationToken, token : 0x1dd
+HOOK_API_CALL : ZwSetInformationProcess
+HOOK_API_CALL : ZwClose, handle : 0x187
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3859000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : VirtualFree, Address : 0x20000000000
+HOOK_API_CALL : GetProcAddress, shell32.dll_IsUserAnAdmin: 0x7ff0012fad10
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385a000
+HOOK_API_CALL : ZwOpenThreadTokenEx
+HOOK_API_CALL : ZwOpenProcessTokenEx, token : 0x1cd
+HOOK_API_CALL : ZwDuplicateToken
+HOOK_API_CALL : ZwClose, handle : 0x1cd
+HOOK_API_CALL : ZwAccessCheck
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000001000, Size : 0x8, Privilege : 0x4
+HOOK_API_CALL : ZwGetContextThread
+HOOK_API_CALL : VirtualFree, Address : 0x20000001000
+HOOK_API_CALL : ZwQueryInformationProcess
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385b000
+HOOK_API_CALL : ZwQuerySystemInformation
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegQueryValueExA
+HOOK_API_CALL : RegCloseKey
+HOOK_API_CALL : RegOpenKeyExA
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385c000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385d000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000002000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140001000, Size : 0xe5a00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000002000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x200000e8000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x1400e7000, Size : 0x40000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x200000e8000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000128000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140127000, Size : 0x1000, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000128000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000129000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14012d000, Size : 0x6e00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000129000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000130000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140134000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000130000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000131000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140135000, Size : 0x2c00, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000131000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000134000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140138000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualFree, Address : 0x20000134000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000135000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140139000, Size : 0x200, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000135000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000136000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x14013a000, Size : 0x5a000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000136000
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000190000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140194000, Size : 0x2000, Privilege : 0x2
+HOOK_API_CALL : VirtualFree, Address : 0x20000190000
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : GetModuleHandleA, RCX : gdi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : comdlg32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : ole32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : kernel32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : advapi32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : imm32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : shell32.dll
+HOOK_API_CALL : GetModuleHandleA, RCX : user32.dll
+HOOK_API_CALL : ZwAllocateVirtualMemory, Address : 0x20000192000, Size : 0xb090, Privilege : 0x4
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385e000
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlAllocateHeap: 0x7ff0000ed870
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlLeaveCriticalSection: 0x7ff0000eca00
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEnterCriticalSection: 0x7ff0000cd400
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDialogWndProc_A: 0x7ff00014de50
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlEncodePointer: 0x7ff0001215e0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_A: 0x7ff00014dd90
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoCreateInstance: 0x7ff000d693f0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeSListHead: 0x7ff000125880
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlDeleteCriticalSection: 0x7ff0000e4bb0
+HOOK_API_CALL : GetModuleHandleA, RCX : api-ms-win-core-com-l1-1-0
+HOOK_API_CALL : GetProcAddress, combase.dll_CoUninitialize: 0x7ff000d36050
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlReAllocateHeap: 0x7ff0000f4cb0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_NtdllDefWindowProc_W: 0x7ff00014dda0
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlSizeHeap: 0x7ff0000ecb40
+HOOK_API_CALL : GetProcAddress, ntdll.dll_RtlInitializeCriticalSection: 0x7ff0001150b0
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xad0, Privilege : 0x40
+HOOK_API_CALL : VirtualProtect, Address : 0x140121d28, Size : 0xae0, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140121190, Size : 0xb4, Privilege : 0x2
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x4
+HOOK_API_CALL : VirtualProtect, Address : 0x140000000, Size : 0x180, Privilege : 0x2
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e385f000
+HOOK_API_CALL : RtlAllocateHeap, handle : 0x1e9e3850000, RAX : 0x1e9e3860000
+HOOK_API_CALL : RtlFreeHeap, handle : 0x1e9e3850000,
+HOOK_API_CALL : SetCurrentDirectoryW
+Fetch from non-executable memory (UC_ERR_FETCH_PROT)
+Find OEP: 1400b8814
