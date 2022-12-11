@@ -2,8 +2,8 @@ from unicorn import *
 from unicorn.x86_const import *
 from capstone import Cs, CS_ARCH_X86, CS_MODE_64
 
-from bobalkkagi.globalValue import get_queue, GLOBAL_VAR
-from bobalkkagi.util import IsReadable
+from .globalValue import get_queue, GLOBAL_VAR
+from .util import IsReadable
 
 import logging
 import struct

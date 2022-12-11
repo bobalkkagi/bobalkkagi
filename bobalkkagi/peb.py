@@ -1,6 +1,6 @@
 from ctypes import *
 
-from bobalkkagi.constValue import LdrBase, ProcessHeapBase, PshimDataBase
+from .constValue import LdrBase, ProcessHeapBase, PshimDataBase
 
 
 class UNICODE_STRING(Structure):

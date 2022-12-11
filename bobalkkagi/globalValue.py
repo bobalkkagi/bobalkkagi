@@ -1,4 +1,4 @@
-from bobalkkagi.hookFuncs import HookFuncs
+from .hookFuncs import HookFuncs
 
 class GLOBAL_VAR:
     ImageBaseStart = 0x140000000
