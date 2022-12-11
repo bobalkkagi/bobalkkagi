@@ -13,6 +13,7 @@ import math
 list=[]
 ripS = []
 tdata = None
+addr = []
 
 def readWord(offset):
     global tdata
@@ -109,11 +110,18 @@ def hooking_code(uc, address, size, user_data):
 
 def find_api(uc, access, address, size, value, user_data):
     global list
+    global addr
     #print("==================================")
     print("address : ", hex(address))
     print("size : ", hex(size))
+
+    tmp = address
+    with open('./bin/pay','ab') as payload:
+            payload.write(str(hex(tmp)).encode('utf-8'))
+            payload.close() 
     
     list.append(DLL_SETTING.InverseDllFuncs[address])
+    addr.append(address.encode('utf-8'))
     #rsp = uc.reg_read(UC_X86_REG_RSP)
     #print("Find funcion : ", hex(struct.unpack('<Q',uc.mem_read(rsp-0x8,8))[0]))
     
@@ -154,7 +162,7 @@ def dstart(tdata):
         try:
             uc.emu_start(imagebase + ip, address + 0x2000) # imagebase + rip (call 위치에서 시작)
         except UcError as e:
-            uc.emu_stop()
+            pass
     print(list)
     ''''''
 
@@ -162,11 +170,10 @@ def dstart(tdata):
 def dump_restart(dumps, OEP:int):
     global ripS
     global tdata
+    global addr
     
     with open("dumpfile","rb") as target:
         tdata=target.read()
-
-    print(hex(OEP))
 
     mzsignature=readWord(0x00) # DOS signature (e_magic)
     peoffset=readDword(0x3c)   # 파일 시작부분부터 pe헤더까지 offset (NT Header Offset) (e_lfanew)
@@ -257,6 +264,7 @@ def dump_restart(dumps, OEP:int):
 
 
         print("=====================================================")
+        
         payload_size=os.stat("./bin/pay.txt").st_size  # 이거 전에 call 에뮬 돌려서 원본 API 주소 값 해당 위치에서 저장시킬것
 
         # 새로운 섹션 값 계산
@@ -273,7 +281,6 @@ def dump_restart(dumps, OEP:int):
         print("New Section Name:",NewSN)
         print("Virtual address:",hex(payload_virtualAddress),"\nVirtual Size:",hex(payload_virtualSize),"\nRaw Size:",hex(payload_rawSize))
         print("Raw Address:",hex(payload_rawAddress),"\nCharacterstics:",hex(payload_characterstics))
-        
         
         # 계산 값에 맞춰 Header 데이터 쓰기
         sectionheader=bytearray(NewSN.encode("utf-8")+b"\x00"*(8-len(NewSN)))+struct.pack("<LLLLLLLL",payload_virtualSize,payload_virtualAddress,payload_rawSize,payload_rawAddress,0,0,0,payload_characterstics)
