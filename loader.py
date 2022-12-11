@@ -11,7 +11,7 @@ import pefile
 import os
 
 
-def PE_Loader(uc, fileName, base, oep: bool = False, path = None) -> None: #
+def PE_Loader(uc, fileName, base, oep: bool = False) -> None: #
   
     originBase = base
     dllFlag = False
@@ -22,7 +22,7 @@ def PE_Loader(uc, fileName, base, oep: bool = False, path = None) -> None: #
         if fileName in REFLECTOR:
             fileName = REFLECTOR[fileName]
         dllFlag = True
-        path = GetDLLPath(fileName, path)
+        path = GetDLLPath(fileName)
 
     else :
         path = Path(fileName)
@@ -95,7 +95,7 @@ def Insert_IAT(uc, pe, base):
 
     
         if dll.lower() not in DLL_SETTING.LoadedDll:
-            PE_Loader(uc, dll, GLOBAL_VAR.DllEnd, None, os.path.abspath("vm_dll"))
+            PE_Loader(uc, dll, GLOBAL_VAR.DllEnd)
     
         peDataLen = len(pe.__data__) - file_offset
         dllnames_only=False 
@@ -136,13 +136,9 @@ def Insert_IAT(uc, pe, base):
         rva += import_desc.sizeof()
 
 
-def GetDLLPath(dll:str, path=None)->str:
-    dllPath =""
-    if path:
-        root = path
-    else:
-        root = os.getcwd()
-    for path, dirs, files in os.walk(root):
+def GetDLLPath(dll:str)->str:
+    dllPath = ""
+    for path, dirs, files in os.walk(GLOBAL_VAR.DirectoryPath):
         for file in files:
             if file.lower() == dll.lower():
                 dllPath = os.path.join(path, file)

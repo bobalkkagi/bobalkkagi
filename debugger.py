@@ -1,4 +1,4 @@
-from globalValue import *
+from globalValue import GLOBAL_VAR, DLL_SETTING
 from logger import regis
 from util import Devide8Bytes, ViewMemory
 import struct

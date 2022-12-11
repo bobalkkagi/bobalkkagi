@@ -1,6 +1,5 @@
 from unicorn import *
 from unicorn.x86_const import *
-from capstone import *
 from loader import PE_Loader
 from logger import *
 from datetime import datetime
@@ -24,6 +23,30 @@ import pefile
 
 BobLog = logging.getLogger("Bobalkkagi")
 
+def get_register(uc):
+    register={
+        "rax": uc.reg_read(UC_X86_REG_RAX),
+        "rbx": uc.reg_read(UC_X86_REG_RBX),
+        "rcx": uc.reg_read(UC_X86_REG_RCX),
+        "rdx": uc.reg_read(UC_X86_REG_RDX),
+        "rdi": uc.reg_read(UC_X86_REG_RDI),
+        "rsi": uc.reg_read(UC_X86_REG_RSI),
+        "rsp": uc.reg_read(UC_X86_REG_RSP),
+        "rbp": uc.reg_read(UC_X86_REG_RBP),
+        "rip": uc.reg_read(UC_X86_REG_RIP),
+        "r8": uc.reg_read(UC_X86_REG_R8),
+        "r9": uc.reg_read(UC_X86_REG_R9),
+        "r10": uc.reg_read(UC_X86_REG_R10),
+        "r11": uc.reg_read(UC_X86_REG_R11),
+        "r12": uc.reg_read(UC_X86_REG_R12),
+        "r13": uc.reg_read(UC_X86_REG_R13),
+        "r14": uc.reg_read(UC_X86_REG_R14),
+        "r15": uc.reg_read(UC_X86_REG_R15),
+        "rflags": uc.reg_read(UC_X86_REG_EFLAGS),
+    }
+
+    return register
+
 
 def hook_fetch(uc, access, address, size, value, user_data):
     
@@ -38,7 +61,6 @@ def hook_mem_read_unmapped(uc, access, address, size, value, user_data):
     asm=disas(bytes(code),address)
     print(code)
     print(asm)
-    print("hi")
     
     for a in asm:
         print("  0x%x: " % a.address +"\t%s" % a.mnemonic +"\t%s\n" % a.op_str)
@@ -48,7 +70,7 @@ def hook_api(uc, address, size, user_data):
     rsp=uc.reg_read(UC_X86_REG_RSP)
     rip=uc.reg_read(UC_X86_REG_RIP)
     try:
-        globals()["hook_"+GLOBAL_VAR.InverseHookFuncs[address-GLOBAL_VAR.HookRegion].split(".dll_")[1]](rip, rsp, uc, BobLog)
+        globals()["hook_"+GLOBAL_VAR.InverseHookFuncs[address-GLOBAL_VAR.HookRegion].split(".dll_")[1]](uc, BobLog, get_register(uc))
     except KeyError as e:
         BobLog.info("Not Found : "+str(e))
         pass
@@ -70,12 +92,12 @@ def hook_block(uc, address, size, user_data):
             if rip in GLOBAL_VAR.BreakPoint:
                 GLOBAL_VAR.DebugFlag = True
 
-            exitFlag = globals()["hook_"+DLL_SETTING.InverseDllFuncs[rip].split(".dll_")[1]](rip, rsp, uc, BobLog)
+            exitFlag = globals()["hook_"+DLL_SETTING.InverseDllFuncs[rip].split(".dll_")[1]](uc, BobLog, get_register(uc))
             
             if exitFlag == 1:
                 uc.emu_stop()
     except KeyError as e:
-        BobLog.info("Not Found : "+str(e))
+        #BobLog.info("Not Found : "+str(e))
         pass
 
     if GLOBAL_VAR.DebugFlag:
@@ -104,12 +126,12 @@ def hook_code(uc, address, size, user_data):
             if rip in GLOBAL_VAR.BreakPoint:
                 GLOBAL_VAR.DebugFlag = True
 
-            exitFlag=globals()['hook_'+DLL_SETTING.InverseDllFuncs[rip].split('.dll_')[1]](rip,rsp,uc,BobLog)
+            exitFlag=globals()['hook_'+DLL_SETTING.InverseDllFuncs[rip].split('.dll_')[1]](uc, BobLog, get_register(uc))
         
             if exitFlag ==1:
                 uc.emu_stop()
     except KeyError as e:
-        BobLog.info("Not Found : "+str(e))
+        #BobLog.info("Not Found : "+str(e))
         pass
 
     if GLOBAL_VAR.DebugFlag:
@@ -147,7 +169,13 @@ def InsertHookFlag(uc):
         uc.mem_write(address,flagInstruction)
 
 def setUpStructure(uc: object) -> None: #Set up TEB, PEB, ProcessHeap, KuserSharedData Structure. If you Need More, you can add 
-    
+    global TebBase
+    global PebBase
+    global LdrBase
+    global ProcessHeapBase
+    global KuserSharedDataBase
+    global PshimDataBase
+
     teb = InitTeb()
     peb = Initpeb()
     procHeap = InitProcessHeap()
@@ -157,10 +185,10 @@ def setUpStructure(uc: object) -> None: #Set up TEB, PEB, ProcessHeap, KuserShar
     procHeapPayload = bytes(procHeap)
     kuserSharedDataPayload = bytes(kuserSharedData)
 
-    uc.mem_map(TebBase, MB, UC_PROT_ALL)
-    uc.mem_map(PebBase, MB, UC_PROT_ALL)
-    uc.mem_map(LdrBase, MB, UC_PROT_ALL)
-    uc.mem_map(ProcessHeapBase, 10 * MB, UC_PROT_ALL)
+    uc.mem_map(TebBase, MB, UC_PROT_READ | UC_PROT_WRITE)
+    uc.mem_map(PebBase, MB, UC_PROT_READ | UC_PROT_WRITE)
+    uc.mem_map(LdrBase, MB, UC_PROT_READ | UC_PROT_WRITE)
+    uc.mem_map(ProcessHeapBase, 10 * MB, UC_PROT_READ | UC_PROT_WRITE)
     # uc.mem_map(ActivationContextBase, 0x1000, UC_PROT_ALL) # Not Used
     uc.mem_map(KuserSharedDataBase, 0x1000, UC_PROT_READ)
     uc.mem_map(PshimDataBase, 0x2000, UC_PROT_READ | UC_PROT_WRITE)
@@ -182,9 +210,8 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
     
     EP = pe.OPTIONAL_HEADER.AddressOfEntryPoint #Entry Point
     uc.mem_map(StackLimit, StackBase - StackLimit, UC_PROT_ALL) #스택 공간
-    
+
     PE_Loader(uc, program, GLOBAL_VAR.ImageBaseStart, oep)
-    
     setUpStructure(uc)
     
     uc.mem_map(GLOBAL_VAR.HookRegion, 0x1000, UC_PROT_ALL)
@@ -202,7 +229,7 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
     
     #uc.hook_add(UC_HOOK_MEM_READ_UNMAPPED, hook_mem_read_unmapped)
     uc.hook_add(UC_HOOK_MEM_WRITE_PROT, hook_mem_read_unmapped)
-
+    uc.hook_add(UC_HOOK_CODE, InsPatch, None,  DLL_SETTING.LoadedDll["ntdll.dll"], DLL_SETTING.LoadedDll["kernelbase.dll"])
     if mode == 'c':
         uc.hook_add(UC_HOOK_CODE, hook_code)
         verbose = True
@@ -211,8 +238,8 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
         verbose = True
         uc.hook_add(UC_HOOK_BLOCK, hook_block) 
     elif mode == 'f':
-        uc.hook_add(UC_HOOK_CODE, InsPatch, None,  DLL_SETTING.LoadedDll["ntdll.dll"], DLL_SETTING.LoadedDll["kernelbase.dll"])
         uc.hook_add(UC_HOOK_BLOCK, hook_api, None, GLOBAL_VAR.HookRegion, GLOBAL_VAR.HookRegion + 0x1000)
+    
     
     setup_logger(uc, BobLog, verbose)
     
@@ -223,7 +250,7 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
     uc.reg_write(UC_X86_REG_R8, PebBase)
     uc.reg_write(UC_X86_REG_R9, GLOBAL_VAR.ImageBaseStart+EP)
     uc.reg_write(UC_X86_REG_EFLAGS, 0x244)
-   
+    
     try:
         uc.emu_start(GLOBAL_VAR.ImageBaseStart + EP, GLOBAL_VAR.ImageBaseEnd)
     except UcError as e:
@@ -241,14 +268,11 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
     end = datetime.now()
     print(f"\033[93m[{start}] Unpacking done...\033[0m")
     print(f"\033[94mRuntime: [{end-start}]\033[0m")
-
+    
     dump= uc.mem_read(GLOBAL_VAR.ImageBaseStart, GLOBAL_VAR.ImageBaseEnd - GLOBAL_VAR.ImageBaseStart)
     oepOffset = OEP-GLOBAL_VAR.ImageBaseStart
+    '''
     save(f'{OEP}',dump)
-    
+    '''
     return dump, oepOffset
 
-def save(file,data):
-    f =open(file,'wb')
-    f.write(data)
-    f.close()

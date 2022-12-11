@@ -16,6 +16,7 @@ class GLOBAL_VAR:
     SectionInfo=[]
     InverseHookFuncs={}
     ProtectedFile = None
+    DirectoryPath = None
     a_queue=[]
     queue_size = 20
     text = []

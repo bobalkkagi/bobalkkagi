@@ -78,3 +78,10 @@ def Devide8Bytes(bytedata):
 def ViewMemory(addr, listdata):
     for i in range(len(listdata)//2):
         print(f'{addr+i*16:016x}: {listdata[i*2]:016x} {listdata[i*2+1]:016x}')
+
+def saveDumpfile(file,data):
+    path = '\\'.join(['dumpfiles', file])
+    f =open(path,'wb')
+    f.write(data)
+    f.close()
+
