@@ -7,10 +7,15 @@ license = "MIT"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = ">=3.9, <3.11"
 unicorn = "^2.0.1.post1"
+lief = ">=0.12.2"
+fire = "^0.4"
 capstone = "^4.0.2"
 pefile = "^2022.5.30"
+
+[tool.poetry.dev-dependencies]
+pyinstaller = "^4.10"
 
 [tool.poetry.scripts]
 bobalkkagi = 'bobalkkagi.application:main'
