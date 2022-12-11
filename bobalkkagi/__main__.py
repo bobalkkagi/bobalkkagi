@@ -1,4 +1,4 @@
-from application import main
+from bobalkkagi.application import main
 
 if __name__ == '__main__':
     main()
