@@ -276,3 +276,34 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
     '''
     return dump, oepOffset
 
+<<<<<<< HEAD
+=======
+
+def save(file,data):
+    f =open(file,'wb')
+    f.write(data)
+    f.close()
+
+def get_register(uc):
+    register={
+        "rax": uc.reg_read(UC_X86_REG_RAX),
+        "rbx": uc.reg_read(UC_X86_REG_RBX),
+        "rcx": uc.reg_read(UC_X86_REG_RCX),
+        "rdx": uc.reg_read(UC_X86_REG_RDX),
+        "rdi": uc.reg_read(UC_X86_REG_RDI),
+        "rsi": uc.reg_read(UC_X86_REG_RSI),
+        "rsp": uc.reg_read(UC_X86_REG_RSP),
+        "rbp": uc.reg_read(UC_X86_REG_RBP),
+        "rip": uc.reg_read(UC_X86_REG_RIP),
+        "r8": uc.reg_read(UC_X86_REG_R8),
+        "r9": uc.reg_read(UC_X86_REG_R9),
+        "r10": uc.reg_read(UC_X86_REG_R10),
+        "r11": uc.reg_read(UC_X86_REG_R11),
+        "r12": uc.reg_read(UC_X86_REG_R12),
+        "r13": uc.reg_read(UC_X86_REG_R13),
+        "r14": uc.reg_read(UC_X86_REG_R14),
+        "r15": uc.reg_read(UC_X86_REG_R15),
+        "rflags": uc.reg_read(UC_X86_REG_EFLAGS),
+    }
+    return register
+>>>>>>> b6e8c50e6db8bb3a8020edff27f95b9237ce6ac8
