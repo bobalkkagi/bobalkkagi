@@ -7,7 +7,7 @@ from .globalValue import GLOBAL_VAR
 import fire #type: ignore
 import sys
 
-TFdict= {'T':True, 'F':False}
+TFdict= {'T':True, 'F':False, 't':True, 'f':False}
 
 def main() -> None:
     fire.Fire(run_Bobalkkagi)
@@ -15,10 +15,10 @@ def main() -> None:
 def run_Bobalkkagi(
     protectedFile:str,
     mode:str = 'f', #fast
-    verbose = False,
+    verbose:str = 'f',
     dllPath:str = "win10_v1903",
-    oep:bool = True,
-    debugger:bool = False
+    oep:str = 't',
+    debugger:str = 'f'
     ) -> None:
 
     filePath = Path(protectedFile)
@@ -26,7 +26,9 @@ def run_Bobalkkagi(
         print(f"{filePath} isn't a file or doesn't exist")
         sys.exit(1)
 
-    if mode not in ['f', 'c', 'b']:
+    if mode in ['f', 'c', 'b']:
+        pass
+    else:
         print(f"{mode} isn't defined mode[f, c, b]")
         sys.exit(1)
 
@@ -48,8 +50,10 @@ def run_Bobalkkagi(
     #unwrap(dumps, oepOffset)
 
 def checkInput(userInput):
-    if userInput not in ['T', 'F', True, False]:
-        print("verbose isn't in [T/F, True/False]")
+    if userInput in ['T', 'F', 't', 'f']:
+        pass
+    else:
+        print("verbose isn't in [T/F, t/f]")
         sys.exit(1)
 
     if userInput in TFdict:

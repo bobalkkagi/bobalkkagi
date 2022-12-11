@@ -69,6 +69,7 @@ def ViewMemory(addr, listdata):
         print(f'{addr+i*16:016x}: {listdata[i*2]:016x} {listdata[i*2+1]:016x}')
 
 def saveDumpfile(file,data):
+    print("[Create] Dumpfile!")
     if not os.path.isdir('dumpfiles'):
         os.mkdir('dumpfiles')
     if os.path.isfile(file):
