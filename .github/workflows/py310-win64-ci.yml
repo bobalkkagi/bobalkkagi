@@ -32,17 +32,17 @@ jobs:
         run: poetry install
 
       - name: Run yapf
-        run: poetry run yapf -r -d unlicense
+        run: poetry run yapf -r -d bobalkkagi
 
       - name: Run mypy
-        run: poetry run mypy --strict unlicense
+        run: poetry run mypy --strict bobalkkagi
 
       - name: Build PyInstaller package
-        run: poetry run pyinstaller unlicense.spec
+        run: poetry run pyinstaller bobalkkagi.spec
 
       - name: 'Upload PyInstaller Artifact'
         uses: actions/upload-artifact@v3
         with:
-          name: unlicense-py310-win64
+          name: bobalkkagi-py310-win64
           path: dist/*.exe
           retention-days: 3
