@@ -226,7 +226,7 @@ tests = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "unicorn"
-version = "2.0.1"
+version = "2.0.1.post1"
 description = "Unicorn CPU emulator engine"
 category = "main"
 optional = false
@@ -246,4 +246,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9, <3.11"
-content-hash = "4a585389cd272b7ddd255a7b13193198b1a1bec4341b264c363d95a8b454ec03"
+content-hash = "230ca463c7324ebcfe167b633bd6e20209d537906ca199c509fce3383eeece7e"
