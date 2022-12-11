@@ -2,10 +2,10 @@ from unicorn import *
 from unicorn.x86_const import *
 from pathlib import Path
 
-from bobalkkagi.globalValue import DLL_SETTING, GLOBAL_VAR
-from bobalkkagi.constValue import PRIVILEGE, RTL
-from bobalkkagi.reflector import REFLECTOR
-from bobalkkagi.util import align
+from .globalValue import DLL_SETTING, GLOBAL_VAR
+from .constValue import PRIVILEGE, RTL
+from .reflector import REFLECTOR
+from .util import align
 
 import struct
 import pefile

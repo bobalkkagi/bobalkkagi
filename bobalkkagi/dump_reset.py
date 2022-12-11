@@ -2,7 +2,7 @@ from capstone import *
 from unicorn import *
 from unicorn.x86_const import *
 
-from bobalkkagi.globalValue import DLL_SETTING
+from .globalValue import DLL_SETTING
 
 import sys
 import os 

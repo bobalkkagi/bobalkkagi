@@ -1,8 +1,9 @@
 from unicorn import *
 from unicorn.x86_const import *
-from globalValue import get_queue, GLOBAL_VAR
 from capstone import Cs, CS_ARCH_X86, CS_MODE_64
-from util import IsReadable
+
+from .globalValue import get_queue, GLOBAL_VAR
+from .util import IsReadable
 
 import logging
 import struct

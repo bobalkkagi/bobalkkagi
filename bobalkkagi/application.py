@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from bobalkkagi.emulation import emulate
-from bobalkkagi.globalValue import GLOBAL_VAR
+from .emulation import emulate
+from .globalValue import GLOBAL_VAR
 
 #from unwrapping import unwrap
 import fire #type: ignore

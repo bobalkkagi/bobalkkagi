@@ -1,10 +1,10 @@
 from unicorn import *
 from unicorn.x86_const import *
 
-from bobalkkagi.loader import PE_Loader
-from bobalkkagi.reflector import REFLECTOR
-from bobalkkagi.globalValue import DLL_SETTING, HEAP_HANDLE, InvDllDict, GLOBAL_VAR
-from bobalkkagi.util import *
+from .loader import PE_Loader
+from .reflector import REFLECTOR
+from .globalValue import DLL_SETTING, HEAP_HANDLE, InvDllDict, GLOBAL_VAR
+from .util import *
 
 import struct
 import os
