@@ -226,49 +226,6 @@ def dstart(tdata):
 
     addrafter = (8*len(dll_list))+(8*(len(dll_dic)))+(20*(len(dll_dic))) # API이름 위치
 
-    '''
-        dll_info_list = dll_info.split('_')
-
-        if api_count == 0:
-            be_dll = dll_info_list[0]
-                       
-        if be_dll == dll_info_list[0]:
-            #f.write(dll_info_list[0].encoding('utf-8'))
-            api_count += 1
-            api_dic[dll_info_list[-1]] = 0
-            api_list.append(dll_info_list[-1])
-            print(dll_info_list[-1])
-            print(api_list)
-            if (dll_info == dll_list[-1]):
-                dll_count +=1
-                print(be_dll)
-                dll_dic[be_dll] = api_list
-                print(dll_dic)
-        else:
-            #f.write(dll_)
-            dll_count += 1
-            print(be_dll)#api함수 갯수 구하기            
-            dll_dic[be_dll] = api_list
-            api_list.clear()
-            api_count = 1
-        
-        be_dll = dll_info_list[0]
-
-    
-    print(dll_dic)
-    print(api_count)
-    for i in range(0, 3): 
-        f.write(struct.pack("<L",0))
-        f.write(struct.pack("<L",0))
-        f.write(struct.pack("<L",0))
-        f.write(struct.pack("<L",0))
-        f.write(struct.pack("<L",0))
-    
-    
-    f.write(struct.pack("<Q",0))
-    f.close()
-    '''
-
 
 def dump_restart(dumps, OEP:int):
     global ripS
@@ -397,7 +354,6 @@ def dump_restart(dumps, OEP:int):
         print("call 함수 주소", ripS)
 
         ''''''
-        
         payload_size=os.stat("./set_file/api_addr").st_size
 
 
@@ -421,6 +377,7 @@ def dump_restart(dumps, OEP:int):
         print("Virtual address:",hex(payload_virtualAddress),"\nVirtual Size:",hex(payload_virtualSize),"\nRaw Size:",hex(payload_rawSize))
         print("Raw Address:",hex(payload_rawAddress),"\nCharacterstics:",hex(payload_characterstics))
         
+
         # 계산 값에 맞춰 Header 데이터 쓰기
         sectionheader=bytearray(NewSN.encode("utf-8")+b"\x00"*(8-len(NewSN)))+struct.pack("<LLLLLLLL",payload_virtualSize,payload_virtualAddress,payload_rawSize,payload_rawAddress,0,0,0,payload_characterstics)
         newsize=payload_virtualAddress+payload_virtualSize
@@ -432,66 +389,69 @@ def dump_restart(dumps, OEP:int):
         print("Section Header:"," ".join([str(hex(x))[2:] for x in sectionheader]),"\nSection Header Length:",len(sectionheader),"( "+str(hex(len(sectionheader)))+" )","\nNew file size:",newsize,"(",hex(newsize),")","\nNo of sections(updated):",noSections)
         print("=====================================================")
         
+
         writeDword(peoffset+0x50,newsize) # Optional Hdr. Size of Image (메모리 로딩되었을 때 전체 크기 변경)
         writeWord(peoffset+0x06,noSections) # File Hdr. Sections Count (섹션의 갯수 변경)
         writeData(lastSoffset+0x28,sectionheader) # 새로 만든 섹션 offset에 섹션 Header 정보 삽입
+
 
         '''''' # Data Directory 값 맞춰 쓰기
         # 여기에 directory 섹션 값 변경하여 덮어쓰기 코드 작성? 확인해볼 것
         writeDword(peoffset+0x58,0) #checksum값 0으로 변경
         #print(tdata[peoffset+0x58:peoffset+0x58+0x04]) # checksum값 변경된거 확인 test
-        writeDword(peoffset+0x90, payload_virtualAddress + ((0x1*0x8) +(0x1*0x8)+(0x1*0x8)))#dll정보 offset) # dll정보 offset = (원본 API 개수 * 8byte) + ((모든 API 개수 *8byte) + (dll개수*8)) (Import Directory Addr. 부분)
-        writeDword(peoffset +0x90+0x04 , (0x5*0x4))#dll정보 크기) # dll정보 크기 = ((imports 객체 갯수(5개) * 4byte) * (dll 갯수 + 1)) (Import Directory Size부분)
+        #writeDword(peoffset+0x90, payload_virtualAddress + ((0x1*0x8) +(0x1*0x8)+(0x1*0x8)))#dll정보 offset) # dll정보 offset = (원본 API 개수 * 8byte) + ((모든 API 개수 *8byte) + (dll개수*8)) (Import Directory Addr. 부분)
+        #writeDword(peoffset +0x90+0x04 , (0x5*0x4))#dll정보 크기) # dll정보 크기 = ((imports 객체 갯수(5개) * 4byte) * (dll 갯수 + 1)) (Import Directory Size부분)
         # 새로운 섹션에 dll 이름 정보와 api 이름 정보 삽입
 
         
-        
-        
-        pdata=pdata+b"\x00"*(payload_rawSize-len(pdata)) # 넣을 데이터 저장 (넣을 데이터 + 나머지 크기는 \x00으로 채우기)
+        #pdata=pdata+b"\x00"*(payload_rawSize-len(pdata)) # 넣을 데이터 저장 (넣을 데이터 + 나머지 크기는 \x00으로 채우기)
+        pdata=b"\x00"*(payload_rawSize)
         tdata=tdata+pdata # 전체 데이터에서 마지막부분에 데이터 추가
+
 
         ''''''
         # Data 
         dll_addr={} # dll이름 : 주소
         api_addr={} # 함수이름 : 주소
-        print(tdata[0x841500:0x841510])
-        base = 0x841500   # dll이름, 함수 이름 적는 base 주소
+        nameRVA = payload_rawAddress + math.ceil(payload_rawSize/3)   # dll이름, 함수 이름 적는 base 주소
+
         for i in dll_dic:
             for j in dll_dic[i]:
-                api_addr[j]=base
-                base+=2
-                base +=writeData(base, j.encode("utf-8"))
-            dll_addr[i]=base    
-            base +=writeData(base, i.encode("utf-8"))
+                api_addr[j]=nameRVA
+                nameRVA+=2
+                nameRVA +=writeData(nameRVA, j.encode("utf-8"))
+            dll_addr[i]=nameRVA    
+            nameRVA +=writeData(nameRVA, i.encode("utf-8"))
 
-        print(tdata[0x841500:0x841700])
         for i in api_addr:
             print("{0} : {1}".format(i,hex(api_addr[i])))
         for i in dll_addr:
             print("{0} : {1}".format(i,hex(dll_addr[i])))
 
+
         newSoffset = copy.deepcopy(payload_rawAddress) # dll함수들의 실제 주소가 적히는 곳의 base address, FirstThunk
-        base3 = 0x841700 # OriginalFirstThunk 들이 저장되는 base address 
-        newSimportaddress = 0x841300 # IMAGE_IMPORT_DSCRIPTER 구조체들이 저장되는 base address
+        dll_OriginalFT = payload_rawAddress + (math.ceil(payload_rawSize/3) * 2) # OriginalFirstThunk 들이 저장되는 base address 
+        newSimportaddress = payload_rawAddress + ((call_count+5) * 8) # IMAGE_IMPORT_DSCRIPTER 구조체들이 저장되는 base address
+
+        print("어느 값 ", call_count)
+
         for i in dll_dic:
             Iid = _IMAGE_IMPORT_DESCRIPTOR()
             Iid.FirstThunk = newSoffset
             Iid.Name = dll_addr[i]
-            Iid.OriginalFirstThunk = base3
+            Iid.OriginalFirstThunk = dll_OriginalFT
             for j in dll_dic[i]:
-                #print(hex(DLL_SETTING.DllFuncs[i+"_"+j]))
-                writeLword(newSoffset, DLL_SETTING.DllFuncs[i+"_"+j])
+                print(hex(DLL_SETTING.DllFuncs[i+"_"+j]))
+                writeLword(newSoffset, DLL_SETTING.DllFuncs[i+"_"+j]) # new 섹션 처음 부분 원본 api 주소 값 쓰기
                 newSoffset+=0x8
-                writeLword(base3, api_addr[j])
-                base3+=0x8
-            newSoffset+=0x8
-            base3+=0x8
+                writeLword(dll_OriginalFT, api_addr[j])
+                dll_OriginalFT+=0x8
+            #newSoffset+=0x8
+            #dll_OriginalFT+=0x8
             tdata=tdata[:newSimportaddress]+bytes(Iid)+tdata[newSimportaddress+0x14:]
             newSimportaddress += 0x14 #20byte
-
-        print(tdata[0x841300:0x841400])
-                
-        writeDword(peoffset+0x90,0x841300) #import address 주소 값 넣기
+            
+        writeDword(peoffset+0x90, (payload_rawAddress + ((call_count+5) * 8))) #import address 주소 값 넣기
         
         #writeData(0x841500,api_)
         #writeDword(0x841500, 'aaaa')
