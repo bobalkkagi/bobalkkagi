@@ -228,7 +228,7 @@ def dstart(tdata):
     addrafter = (8*len(dll_list))+(8*(len(dll_dic)))+(20*(len(dll_dic))) # API이름 위치
 
 
-def dump_restart(dumps, OEP:int):
+def dump_restart(dumpFileName, OEP:int):
     global ripS
     global tdata
     global addr
@@ -243,7 +243,7 @@ def dump_restart(dumps, OEP:int):
     if os.path.exists("set_file") == 0:
         os.mkdir("set_file")
 
-    with open("dumpfile","rb") as target:
+    with open(dumpFileName,"rb") as target:
         tdata=target.read()
     '''
     with open("putty_protected_dump.exe","rb") as target:
@@ -467,10 +467,12 @@ def dump_restart(dumps, OEP:int):
             call_VA += 0x8
 
         
-        newname="originalAPI.exe"
+        newname=dumpFileName+".exe"
 
+        '''
         if os.path.exists("dumpfile"):
             os.remove("dumpfile")
+        '''
 
         with open(newname,"wb") as outfile:
             outfile.write(tdata)
