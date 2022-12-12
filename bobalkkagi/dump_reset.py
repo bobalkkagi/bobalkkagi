@@ -1,19 +1,18 @@
-from capstone import *
-from unicorn import *
-from unicorn.x86_const import *
-
-from .globalValue import DLL_SETTING
-
 import sys
 import os 
 import string
 import struct
 import math
+from capstone import *
+from unicorn import *
+from unicorn.x86_const import *
+from globalValue import DLL_SETTING
 
-list=[]
+dll_list=[]
 ripS = []
 tdata = None
 addr = []
+tmp = 0x0 #test
 
 def readWord(offset):
     global tdata
@@ -109,25 +108,37 @@ def hooking_code(uc, address, size, user_data):
         print("  0x%x: " % a.address +"\t%s" % a.mnemonic +"\t%s\n" % a.op_str)
 
 def find_api(uc, access, address, size, value, user_data):
-    global list
+    global dll_list
     global addr
+
     #print("==================================")
     print("address : ", hex(address))
     print("size : ", hex(size))
 
-    tmp = address
-    with open('./bin/pay','ab') as payload:
-            payload.write(str(hex(tmp)).encode('utf-8'))
-            payload.close() 
+    with open('./bin/pay.txt','ab') as payload:
+        payload.write(str(hex(address)).encode('utf-8'))
+        payload.write("\n".encode('utf-8'))
     
-    list.append(DLL_SETTING.InverseDllFuncs[address])
+    dll_list.append(DLL_SETTING.InverseDllFuncs[address])
     addr.append(address.encode('utf-8'))
     #rsp = uc.reg_read(UC_X86_REG_RSP)
     #print("Find funcion : ", hex(struct.unpack('<Q',uc.mem_read(rsp-0x8,8))[0]))
+
+#test
+def hooking_operand(uc, address, size, user_data):
+    global tmp
+    imagebase = readLword(readDword(0x3c)+0x30)
+    code = uc.mem_read(address, size)
+    asm=disas(bytes(code),address)
+    
+    tmp = readDword((address - imagebase)+0x2)
+    uc.emu_stop()
+        
     
 def dstart(tdata):
-    global list
+    global dll_list
     global ripS
+    global tmp
     
     address = 0x140000000
     imagebase = 0x140000000
@@ -137,6 +148,7 @@ def dstart(tdata):
     for ip in ripS:
         print("==================================")#
         print("call address :", hex(imagebase + ip))
+        
         uc = Uc(UC_ARCH_X86, UC_MODE_64)
         StackBase = 0x201000
         StackLimit = 0x100000
@@ -158,12 +170,53 @@ def dstart(tdata):
         #uc.hook_add(UC_HOOK_MEM_WRITE_UNMAPPED, hook_mem_write_unmapped)
         uc.hook_add(UC_HOOK_MEM_FETCH_UNMAPPED, find_api)
         #uc.hook_add(UC_HOOK_CODE, hooking_code)
+        #uc.hook_add(UC_HOOK_CODE,hooking_operand)
+        
         uc.emu_stop()
+        
         try:
             uc.emu_start(imagebase + ip, address + 0x2000) # imagebase + rip (call 위치에서 시작)
         except UcError as e:
             pass
-    print(list)
+
+    api_count = 0
+    dll_count = 0
+    dll_info_list = []
+    be_dll = None
+    f = open('bin/pay.txt', 'ab')
+
+    print(dll_list)
+    for dll_info in dll_list:
+        dll_info_list = dll_info.split('___')
+        if len(dll_info_list) == 1:
+            dll_info_list = dll_info_list[0].split('_')
+        
+        print(be_dll)
+        print(dll_info_list[0])
+
+        if api_count == 0:
+            be_dll = dll_info_list[0]            
+        
+        if be_dll == dll_info_list[0]:
+            f.write(struct.pack("<Q",0))
+            api_count += 1
+        else:
+            dll_count += 1
+            print(dll_info_list[0])#api함수 갯수 구하기
+            f.write(struct.pack("<Q",0))
+            
+            api_count = 1
+        be_dll = dll_info_list[0]
+    
+    for i in range(0, dll_count+1): 
+        f.write(struct.pack("<L",0))
+        f.write(struct.pack("<L",0))
+        f.write(struct.pack("<L",0))
+        f.write(struct.pack("<L",0))
+        f.write(struct.pack("<L",0))
+    print((8*len(dll_list))+(8*(dll_count+1))+(20*(dll_count+1))) # API이름 위치
+    f.write(struct.pack("<Q",0))
+    f.close()
     ''''''
 
 
@@ -172,6 +225,12 @@ def dump_restart(dumps, OEP:int):
     global tdata
     global addr
     
+    if os.path.exists("bin/pay.txt"):
+        os.remove("bin/pay.txt")
+
+    if os.path.exists("bin") == 0:
+        os.mkdir("bin")
+
     with open("dumpfile","rb") as target:
         tdata=target.read()
 
@@ -232,8 +291,6 @@ def dump_restart(dumps, OEP:int):
 
         ''''''
 
-
-
         '''''' # call emul
         rip = 0
 
@@ -265,8 +322,28 @@ def dump_restart(dumps, OEP:int):
 
         print("=====================================================")
         
-        payload_size=os.stat("./bin/pay.txt").st_size  # 이거 전에 call 에뮬 돌려서 원본 API 주소 값 해당 위치에서 저장시킬것
+        
+        '''''' # unicorn으로 원본 API 주소 값 byte값으로 변환
 
+        with open('bin/pay.txt','rb') as payload:
+            cdata = payload.readlines()
+        f = open('bin/pay.txt', 'wb')
+        for line in cdata:
+            line1 = line.decode('utf-8').strip('\n')
+            if(len(line1) == 14):
+                newdata1 = (int(line1,16))
+                f.write(struct.pack("<Q",newdata1))
+        f.close()
+
+        ''''''
+        
+        payload_size=os.stat("./bin/pay.txt").st_size
+
+
+        ''''''#지금 테스트 하는 부분
+        print(hex(math.ceil(payload_size/8)))
+
+        ''''''
         # 새로운 섹션 값 계산
         print("new section data size : "+str(payload_size/1024)+" KB")
     
@@ -314,8 +391,8 @@ def dump_restart(dumps, OEP:int):
 
         newname="originalAPI.exe"
 
-        if os.path.exists("dumpfile"):
-            os.remove("dumpfile")
+        #if os.path.exists("dumpfile"):
+        #    os.remove("dumpfile")
 
         with open(newname,"wb") as outfile:
             outfile.write(tdata)

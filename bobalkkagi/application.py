@@ -3,6 +3,8 @@ from pathlib import Path
 from .emulation import emulate
 from .globalValue import GLOBAL_VAR
 
+from dump_reset import dump_restart
+
 #from unwrapping import unwrap
 import fire #type: ignore
 import sys
@@ -46,7 +48,7 @@ def run_Bobalkkagi(
     GLOBAL_VAR.ProtectedFile = protectedFile
     GLOBAL_VAR.DirectoryPath = dllPath
     dumps, oepOffset = emulate(protectedFile, verbose, mode, oep)
-    
+    dump_restart(dumps, oepOffset)
     #unwrap(dumps, oepOffset)
 
 def checkInput(userInput):
