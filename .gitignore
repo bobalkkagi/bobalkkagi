@@ -2,3 +2,6 @@
 /dist/
 /build/
 /bobalkkagi/dumpfiles
+/log/
+/dumpfiles/
+*.exe

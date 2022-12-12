@@ -231,6 +231,7 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
     #uc.hook_add(UC_HOOK_MEM_READ_UNMAPPED, hook_mem_read_unmapped)
     uc.hook_add(UC_HOOK_MEM_WRITE_PROT, hook_mem_read_unmapped)
     uc.hook_add(UC_HOOK_CODE, InsPatch, None,  DLL_SETTING.LoadedDll["ntdll.dll"], DLL_SETTING.LoadedDll["kernelbase.dll"])
+    
     if mode == 'c':
         uc.hook_add(UC_HOOK_CODE, hook_code)
         verbose = True
