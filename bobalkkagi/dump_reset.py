@@ -176,7 +176,8 @@ def dstart(tdata):
         StackBase = 0x201000
         StackLimit = 0x100000
 
-        uc.mem_map(0x140000000,0x850000, UC_PROT_ALL)
+        #uc.mem_map(0x140000000,0x850000, UC_PROT_ALL)
+        uc.mem_map(0x140000000,0x1000000, UC_PROT_ALL)
         uc.mem_map(StackLimit, StackBase - StackLimit, UC_PROT_ALL)
 
         uc.mem_write(0x140000000,tdata)
@@ -242,9 +243,12 @@ def dump_restart(dumps, OEP:int):
     if os.path.exists("set_file") == 0:
         os.mkdir("set_file")
 
-    
     with open("dumpfile","rb") as target:
         tdata=target.read()
+    '''
+    with open("putty_protected_dump.exe","rb") as target:
+        tdata=target.read()
+    '''
 
     mzsignature=readWord(0x00) # DOS signature (e_magic)
     peoffset=readDword(0x3c)   # 파일 시작부분부터 pe헤더까지 offset (NT Header Offset) (e_lfanew)
@@ -465,8 +469,8 @@ def dump_restart(dumps, OEP:int):
         
         newname="originalAPI.exe"
 
-        #if os.path.exists("dumpfile"):
-        #    os.remove("dumpfile")
+        if os.path.exists("dumpfile"):
+            os.remove("dumpfile")
 
         with open(newname,"wb") as outfile:
             outfile.write(tdata)
