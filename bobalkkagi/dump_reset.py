@@ -433,8 +433,6 @@ def dump_restart(dumps, OEP:int):
         dll_OriginalFT = payload_rawAddress + (math.ceil(payload_rawSize/3) * 2) # OriginalFirstThunk 들이 저장되는 base address 
         newSimportaddress = payload_rawAddress + ((call_count+5) * 8) # IMAGE_IMPORT_DSCRIPTER 구조체들이 저장되는 base address
 
-        print("어느 값 ", call_count)
-
         for i in dll_dic:
             Iid = _IMAGE_IMPORT_DESCRIPTOR()
             Iid.FirstThunk = newSoffset
@@ -447,7 +445,7 @@ def dump_restart(dumps, OEP:int):
                 writeLword(dll_OriginalFT, api_addr[j])
                 dll_OriginalFT+=0x8
             #newSoffset+=0x8
-            #dll_OriginalFT+=0x8
+            dll_OriginalFT+=0x8
             tdata=tdata[:newSimportaddress]+bytes(Iid)+tdata[newSimportaddress+0x14:]
             newSimportaddress += 0x14 #20byte
             
@@ -457,6 +455,14 @@ def dump_restart(dumps, OEP:int):
         #writeDword(0x841500, 'aaaa')
         #print(readDword(0x841500))
 
+        # call operand 상대주소 변경
+        call_VA = imagebase + payload_virtualAddress
+        for rip in real_call:
+            rip_VA = imagebase + ripS[rip-1]
+            writeDword(ripS[rip-1]+0x2, call_VA-rip_VA-6)
+            call_VA += 0x8
+
+        
         newname="originalAPI.exe"
 
         #if os.path.exists("dumpfile"):
