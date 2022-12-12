@@ -3,6 +3,8 @@ from pathlib import Path
 from .emulation import emulate
 from .globalValue import GLOBAL_VAR
 
+from dump_reset import dump_restart
+
 #from unwrapping import unwrap
 import fire #type: ignore
 import sys
