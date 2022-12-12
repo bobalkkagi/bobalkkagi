@@ -48,7 +48,7 @@ def run_Bobalkkagi(
     GLOBAL_VAR.ProtectedFile = protectedFile
     GLOBAL_VAR.DirectoryPath = dllPath
     dumps, oepOffset = emulate(protectedFile, verbose, mode, oep)
-    dump_restart(dumps, oepOffset)
+    dump_restart(f'{dumpFileName}', oepOffset)
     #unwrap(dumps, oepOffset)
 
 def checkInput(userInput):
