@@ -43,16 +43,17 @@ FLAGS
         Type: str
         Default: 'f'
     --verbose=VERBOSE
-        Default: False
+        Type: str
+        Default: 'f'
     --dllPath=DLLPATH
         Type: str
         Default: 'win10_v1903'
     --oep=OEP
-        Type: bool
-        Default: True
+        Type: str
+        Default: 't'
     --debugger=DEBUGGER
-        Type: bool
-        Default: False
+        Type: str
+        Default: 'f'
 
 NOTES
     You can also use flags syntax for POSITIONAL ARGUMENTS
