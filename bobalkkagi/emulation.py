@@ -274,7 +274,6 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
     oepOffset = OEP-GLOBAL_VAR.ImageBaseStart
 
     dumpFileName = program.split('\\')[-1].split('.')[0]+"_dump"
-    #saveDumpfile(f'{dumpFileName}', dump)
-    saveDumpfile("dumpfile", dump)
+    save(f'{dumpFileName}',dump)
     return dump, oepOffset
 
