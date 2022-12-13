@@ -8,10 +8,10 @@ from .util import saveDumpfile, align
 
 import copy
 import sys
+import os 
 import string
 import struct
 import math
-import gc
 
 dll_list=[]
 ripS = []
@@ -23,6 +23,7 @@ api_dic = {}
 api_count = {}
 addrafter = 0x0
 payload_size = 0
+startShdr = 0
 
 class _IMAGE_IMPORT_DESCRIPTOR(Structure):
     _fields_ = [
@@ -134,18 +135,17 @@ def hooking_code(uc, address, size, user_data):
 
 def find_api(uc, access, address, size, value, user_data):
     global dll_list
-    global addr
     global payload_size
 
     #print("==================================")
     #print("address : ", hex(address))
     #print("size : ", hex(size))
-
     payload_size += 0x8
     #print(payload_size)
 
     dll_list.append(DLL_SETTING.InverseDllFuncs[address])
-    
+
+    uc.emu_stop()
     #rsp = uc.reg_read(UC_X86_REG_RSP)
     #print("Find funcion : ", hex(struct.unpack('<Q',uc.mem_read(rsp-0x8,8))[0]))
 
@@ -196,9 +196,8 @@ def rip_emulate(rip):
     try:
         uc.emu_start(imagebase + rip, address + 0x2000) # imagebase + rip (call 위치에서 시작)
     except UcError as e:
-        uc.emu_stop()
-        gc.collect()
-        return 0
+        #uc.emu_stop()
+        pass
     
 def dstart(tdata):
     global dll_list
@@ -223,9 +222,31 @@ def dstart(tdata):
     global api_count
     global addrafter
     #f = open('bin/dll_api_info', 'wb')
-    
+
+    '''''' #기존 import넣기
+    '''
+    peoffset+0x18+szoptionalhdr
+    for i in range(0,8):
+            Iid = _IMAGE_IMPORT_DESCRIPTOR()
+            Iid.FirstThunk = newSoffset
+            Iid.Name = dll_addr[i]
+            Iid.OriginalFirstThunk = dll_OriginalFT
+            for j in dll_dic[i]:
+                #print(hex(DLL_SETTING.DllFuncs[i+"_"+j]))
+                writeLword(newSoffset, DLL_SETTING.DllFuncs[i+"_"+j]) # new 섹션 처음 부분 원본 api 주소 값 쓰기
+                newSoffset+=0x8
+                writeLword(dll_OriginalFT, api_addr[j])
+                dll_OriginalFT+=0x8
+            #newSoffset+=0x8
+            dll_OriginalFT+=0x8
+            tdata=tdata[:newSimportaddress]+bytes(Iid)+tdata[newSimportaddress+0x14:]
+            newSimportaddress += 0x14 #20byte
+    '''
+        
+    ''''''
+
     dll_list=list(set(dll_list))
-    #print(list(set(dll_list)))
+    print(list(set(dll_list)))
     for dll_info in dll_list:
         
         dllName = dll_info.split('_')[0]
@@ -244,7 +265,6 @@ def dstart(tdata):
 def dump_restart(dump, OEP:int):
     global ripS
     global tdata
-    global addr
     global dll_dic
     global api_dic
     global addrafter
@@ -299,7 +319,7 @@ def dump_restart(dump, OEP:int):
 
         ''''''
         # unicorn dump파일 oep set
-        dumpSepoffset = (peoffset + 0x28)    
+        dumpSepoffset = (peoffset + 0x28) 
         #0x140001300  # emulation.py에 Find OEP에서 가져올것
         writeDword(dumpSepoffset, (OEP - imagebase))
 
@@ -331,11 +351,11 @@ def dump_restart(dump, OEP:int):
 
         while (rip < (len(tdata)-1)):
             if(hex(readWord(rip)) == '0x15ff'): # ff 15 little-endian
-                
                 Soffset=peoffset+0x18+szoptionalhdr # 처음 시작하는 섹션 Hdr. offset
                 n = 0 # 섹션 위치 제어 변수
 
-                if  (n < noSections):
+                for n in range(noSections-1):
+                #if  (n < noSections):
                     ripSoffset = Soffset + (0x28 * n)
                     ripSvirtualSize,ripSvirtualAddress,ripSrawSize,ripSrawAddress = readDwords(ripSoffset+0x08,4)
                     n += 1
@@ -350,7 +370,7 @@ def dump_restart(dump, OEP:int):
                 # call부터 jmp or jmp 일때, 레지스터 값 pay.txt에 저장
 
             rip += 1 # 해당 위치가 ff 15인지 확인하는 제어변수
-
+        print(ripS, "ripS")
         dstart(tdata)
         ''''''
 
@@ -396,7 +416,7 @@ def dump_restart(dump, OEP:int):
         payload_rawSize += 0x8000
         payload_virtualSize += 0x8000
 
-        NewSN = ".IT"
+        NewSN = ".bobalkkagi"
         print("New Section Name:",NewSN)
         print("Virtual address:",hex(payload_virtualAddress),"\nVirtual Size:",hex(payload_virtualSize),"\nRaw Size:",hex(payload_rawSize))
         print("Raw Address:",hex(payload_rawAddress),"\nCharacterstics:",hex(payload_characterstics))
@@ -440,9 +460,11 @@ def dump_restart(dump, OEP:int):
         dll_addr={} # dll이름 : 주소
         api_addr={} # 함수이름 : 주소
         #nameRVA = payload_rawAddress + math.ceil(payload_rawSize/3)   # dll이름, 함수 이름 적는 base 주소
-        
+        print(hex(payload_size))
+        print(hex(payload_rawAddress))
+        print(hex(align(payload_size, 0x100)))
         nameRVA = payload_rawAddress + align(payload_size, 0x100)
-    
+        print(hex(nameRVA))
         for i in dll_dic:
             for j in dll_dic[i]:
                 api_addr[j]=nameRVA
@@ -458,12 +480,14 @@ def dump_restart(dump, OEP:int):
         '''
 
         newSoffset = copy.deepcopy(payload_rawAddress) # dll함수들의 실제 주소가 적히는 곳의 base address, FirstThunk
-        
+        print(hex(newSoffset))
+        # OriginalFirstThunk 들이 저장되는 base address 
         newSimportaddress = align(nameRVA, 0x100) # IMAGE_IMPORT_DSCRIPTER 구조체들이 저장되는 base address
-        newSimportaddressBase = newSimportaddress # OriginalFirstThunk 들이 저장되는 base address 
-       
+        newSimportaddressBase = newSimportaddress
+        print(hex(newSimportaddress))
         dll_OriginalFT = align(newSimportaddress + len(dll_dic)*20, 0x100) 
-        
+        print(hex(dll_OriginalFT))
+        print(len(dll_dic), "dll_setting")
         for i in dll_dic:
             Iid = _IMAGE_IMPORT_DESCRIPTOR()
             Iid.FirstThunk = newSoffset
@@ -480,6 +504,7 @@ def dump_restart(dump, OEP:int):
             tdata=tdata[:newSimportaddress]+bytes(Iid)+tdata[newSimportaddress+0x14:]
             newSimportaddress += 0x14 #20byte
         
+        print(hex(newSimportaddressBase))
         writeDword(peoffset+0x90, newSimportaddressBase) #import address 주소 값 넣기
         
         # call operand 상대주소 변경
@@ -489,7 +514,7 @@ def dump_restart(dump, OEP:int):
             writeDword(ripS[rip-1]+0x2, call_VA-rip_VA-6)
             call_VA += 0x8
 
-        dumpFileName = GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '_dump'
+        dumpFileName = GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '.dump'
         saveDumpfile(dumpFileName, tdata)
         
         print("success")
