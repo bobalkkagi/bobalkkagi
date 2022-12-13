@@ -1,15 +1,14 @@
 from pathlib import Path
 
-from .emulation import emulate
+from .unpacking import unpack
 from .globalValue import GLOBAL_VAR
-
-from dump_reset import dump_restart
+from .unwrapping import unwrap
+from .util import checkInput
 
 #from unwrapping import unwrap
 import fire #type: ignore
 import sys
 
-TFdict= {'T':True, 'F':False, 't':True, 'f':False}
 
 def main() -> None:
     fire.Fire(run_Bobalkkagi)
@@ -47,18 +46,9 @@ def run_Bobalkkagi(
     GLOBAL_VAR.DebugOption = debugger
     GLOBAL_VAR.ProtectedFile = protectedFile
     GLOBAL_VAR.DirectoryPath = dllPath
-    dumps, oepOffset = emulate(protectedFile, verbose, mode, oep)
-    dump_restart(f'{dumpFileName}', oepOffset)
-    #unwrap(dumps, oepOffset)
 
-def checkInput(userInput):
-    if userInput in ['T', 'F', 't', 'f']:
-        pass
-    else:
-        print("verbose isn't in [T/F, t/f]")
-        sys.exit(1)
+    dump, OrignalEntryPoint = unpack(protectedFile, verbose, mode, oep)
+    unwrap(dump, OrignalEntryPoint)
 
-    if userInput in TFdict:
-        userInput = TFdict[userInput]
 
-    return userInput
+

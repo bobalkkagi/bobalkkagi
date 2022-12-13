@@ -1,14 +1,16 @@
-import sys
-import os 
-import string
-import struct
-import math
+from ctypes import *
 from capstone import *
 from unicorn import *
 from unicorn.x86_const import *
-from globalValue import DLL_SETTING
-from ctypes import *
+
+from .globalValue import DLL_SETTING, GLOBAL_VAR
+from .util import saveDumpfile, align
+
 import copy
+import sys
+import string
+import struct
+import math
 
 dll_list=[]
 ripS = []
@@ -19,6 +21,7 @@ dll_dic ={}
 api_dic = {}
 api_count = {}
 addrafter = 0x0
+payload_size = 0
 
 class _IMAGE_IMPORT_DESCRIPTOR(Structure):
     _fields_ = [
@@ -131,19 +134,17 @@ def hooking_code(uc, address, size, user_data):
 def find_api(uc, access, address, size, value, user_data):
     global dll_list
     global addr
+    global payload_size
 
     #print("==================================")
-    print("address : ", hex(address))
-    print("size : ", hex(size))
+    #print("address : ", hex(address))
+    #print("size : ", hex(size))
 
-    
-    with open('./set_file/api_addr','ab') as payload:
-        payload.write(str(hex(address)).encode('utf-8'))
-        payload.write("\n".encode('utf-8'))
-    
-    
+    payload_size += 0x8
+    #print(payload_size)
+
     dll_list.append(DLL_SETTING.InverseDllFuncs[address])
-    addr.append(address.encode('utf-8'))
+    
     #rsp = uc.reg_read(UC_X86_REG_RSP)
     #print("Find funcion : ", hex(struct.unpack('<Q',uc.mem_read(rsp-0x8,8))[0]))
 
@@ -156,7 +157,46 @@ def hooking_operand(uc, address, size, user_data):
     
     tmp = readDword((address - imagebase)+0x2)
     uc.emu_stop()
+
+
+def rip_emulate(rip):
+    address = 0x140000000
+    imagebase = 0x140000000
+    StackBase = 0x201000
+    StackLimit = 0x100000
+    #print("==================================")#
+    #print("call address :", hex(imagebase + rip))
+    
+    uc = Uc(UC_ARCH_X86, UC_MODE_64)
+    uc.mem_map(0x140000000, 0x1000000, UC_PROT_ALL)
+    uc.mem_map(StackLimit, StackBase - StackLimit, UC_PROT_ALL)
+
+    uc.mem_write(0x140000000, tdata)
         
+    uc.reg_write(UC_X86_REG_RAX, 0x0)
+    uc.reg_write(UC_X86_REG_RCX, 0x0)
+    uc.reg_write(UC_X86_REG_RDX, 0x0)
+    uc.reg_write(UC_X86_REG_RBX, 0x0)
+    uc.reg_write(UC_X86_REG_R8, 0x0)
+    uc.reg_write(UC_X86_REG_R9, 0x0)
+    uc.reg_write(UC_X86_REG_R10, 0x0)
+    uc.reg_write(UC_X86_REG_R11, 0x0)
+    uc.reg_write(UC_X86_REG_R12, 0x0)
+    uc.reg_write(UC_X86_REG_RSP, 0x14ff28)
+    uc.reg_write(UC_X86_REG_RBP, 0x0) 
+
+
+    #uc.hook_add(UC_HOOK_MEM_WRITE_UNMAPPED, hook_mem_write_unmapped)
+    uc.hook_add(UC_HOOK_MEM_FETCH_UNMAPPED, find_api)
+    #uc.hook_add(UC_HOOK_CODE, hooking_code)
+    #uc.hook_add(UC_HOOK_CODE,hooking_operand)
+    #uc.emu_stop()
+
+    try:
+        uc.emu_start(imagebase + rip, address + 0x2000) # imagebase + rip (call 위치에서 시작)
+    except UcError as e:
+        #uc.emu_stop()
+        pass
     
 def dstart(tdata):
     global dll_list
@@ -166,54 +206,24 @@ def dstart(tdata):
     address = 0x140000000
     imagebase = 0x140000000
     #rip = [0x1038, 0x1057, 0x1093, 0x1246, 0x1590, 0x159e, 0x15aa, 0x15ba, 0x16a0, 0x16cd, 0x16e7, 0x1728, 0x177c, 0x179d, 0x17a8, 0x17de, 0x18ba, 0x18f6]
+    StackBase = 0x201000
+    StackLimit = 0x100000
+
+    #uc.mem_map(0x140000000,0x850000, UC_PROT_ALL)
 
 
     for ip in ripS:
-        print("==================================")#
-        print("call address :", hex(imagebase + ip))
-        
-        uc = Uc(UC_ARCH_X86, UC_MODE_64)
-        StackBase = 0x201000
-        StackLimit = 0x100000
-
-        #uc.mem_map(0x140000000,0x850000, UC_PROT_ALL)
-        uc.mem_map(0x140000000,0x1000000, UC_PROT_ALL)
-        uc.mem_map(StackLimit, StackBase - StackLimit, UC_PROT_ALL)
-
-        uc.mem_write(0x140000000,tdata)
-            
-        uc.reg_write(UC_X86_REG_RAX, 0x0)
-        uc.reg_write(UC_X86_REG_RCX, 0x0)
-        uc.reg_write(UC_X86_REG_RDX, 0x0)
-        uc.reg_write(UC_X86_REG_RBX, 0x0)
-        uc.reg_write(UC_X86_REG_R9, 0x0)
-        uc.reg_write(UC_X86_REG_RSP, 0x14ff28)
-        uc.reg_write(UC_X86_REG_RBP, 0x0) 
+        rip_emulate(ip)
 
 
-        #uc.hook_add(UC_HOOK_MEM_WRITE_UNMAPPED, hook_mem_write_unmapped)
-        uc.hook_add(UC_HOOK_MEM_FETCH_UNMAPPED, find_api)
-        #uc.hook_add(UC_HOOK_CODE, hooking_code)
-        #uc.hook_add(UC_HOOK_CODE,hooking_operand)
-        
-        uc.emu_stop()
-        
-        try:
-            uc.emu_start(imagebase + ip, address + 0x2000) # imagebase + rip (call 위치에서 시작)
-        except UcError as e:
-            pass
-
-    dll_count = 0
-    dll_info_list = []
-    be_dll = None
     global api_dic
     global dll_dic
-    api_list = []
     global api_count
     global addrafter
     #f = open('bin/dll_api_info', 'wb')
-
-    print(list(set(dll_list)))
+    
+    dll_list=list(set(dll_list))
+    #print(list(set(dll_list)))
     for dll_info in dll_list:
         
         dllName = dll_info.split('_')[0]
@@ -226,9 +236,10 @@ def dstart(tdata):
             api_count[dllName]= 1
 
     addrafter = (8*len(dll_list))+(8*(len(dll_dic)))+(20*(len(dll_dic))) # API이름 위치
+    
 
 
-def dump_restart(dumpFileName, OEP:int):
+def dump_restart(dump, OEP:int):
     global ripS
     global tdata
     global addr
@@ -236,15 +247,21 @@ def dump_restart(dumpFileName, OEP:int):
     global api_dic
     global addrafter
     global dll_list
+    global payload_size
     
+    '''
     if os.path.exists("set_file/api_addr"):
         os.remove("set_file/api_addr")
 
+
     if os.path.exists("set_file") == 0:
         os.mkdir("set_file")
+    '''
 
-    with open(dumpFileName,"rb") as target:
-        tdata=target.read()
+    # with open(dumpFileName,"rb") as target:
+    #     tdata=target.read()
+    tdata = bytes(dump)
+    
     '''
     with open("putty_protected_dump.exe","rb") as target:
         tdata=target.read()
@@ -265,24 +282,24 @@ def dump_restart(dumpFileName, OEP:int):
         fileAlignment=readDword(peoffset+0x3c)    # Optional Hdr. File Alignment (파일에서 섹션의 최소 단위 (파일 섹션의 시작 주소는 해당 값의 배수))
         szoptionalhdr=readWord(peoffset+0x14)    # File Hdr. Size of OptionalHeadr (Optional Header 크기)
 
-        print("=====================================================")
-        print("NT Header(PE Header) Offset:",hex(peoffset),"\nImage Base:",hex(imagebase),"\nSection Alignment:",sectionAlignment,"(",hex(sectionAlignment),")")
-        print("File Alignment:",fileAlignment,"(",hex(fileAlignment),")","\nNumber of sections:",noSections)
+        # print("=====================================================")
+        # print("NT Header(PE Header) Offset:",hex(peoffset),"\nImage Base:",hex(imagebase),"\nSection Alignment:",sectionAlignment,"(",hex(sectionAlignment),")")
+        # print("File Alignment:",fileAlignment,"(",hex(fileAlignment),")","\nNumber of sections:",noSections)
         
         lastSoffset=peoffset+0x18+szoptionalhdr+(noSections-1)*0x28  # (peoffset+0x18)(file Hdr 크기) + szoptionalhdr(optional hdr 크기) + 마지막 섹션 크기 제외한 섹션크기
         lastSname=readStringn(lastSoffset,8)
         
-        print("last section offset:",hex(lastSoffset),"\nlast Section name:",lastSname)
-        print("=====================================================")
+        # print("last section offset:",hex(lastSoffset),"\nlast Section name:",lastSname)
+        # print("=====================================================")
 
-        lastSvirtualSize,lastSvirtualAddress,lastSrawSize,lastSrawAddress=readDwords(lastSoffset+0x08,4) # 마지막 섹션의 멤버 값
+        lastSvirtualSize,lastSvirtualAddress, lastSrawSize, lastSrawAddress=readDwords(lastSoffset+0x08,4) # 마지막 섹션의 멤버 값
 
 
         ''''''
         # unicorn dump파일 oep set
         dumpSepoffset = (peoffset + 0x28)    
-        dumpSoep = imagebase + OEP#0x140001300  # emulation.py에 Find OEP에서 가져올것
-        writeDword(dumpSepoffset, (dumpSoep - imagebase))
+        #0x140001300  # emulation.py에 Find OEP에서 가져올것
+        writeDword(dumpSepoffset, (OEP - imagebase))
 
         # unicorn 덤프파일 pe Virtual -> RA
         for n in range(noSections):
@@ -337,34 +354,31 @@ def dump_restart(dumpFileName, OEP:int):
 
 
         print("=====================================================")
-        
-        
-        '''''' # unicorn으로 원본 API 주소 값 byte값으로 변환
-        call_count = 0
-        real_call=[]
+        # unicorn으로 원본 API 주소 값 byte값으로 변환
+        callCount = 0
+        realCall=[]
+        '''
         with open('set_file/api_addr','rb') as payload:
             cdata = payload.readlines()
         os.remove("set_file/api_addr")
         for line in cdata:
             api_origin_addr = line.decode('utf-8').strip('\n')
-            call_count += 1
+            callCount += 1
             if(len(api_origin_addr) == 14):
-                real_call.append(call_count)
+                realCall.append(callCount)
                 with open('set_file/api_addr','ab') as payload:
                     payload.write(struct.pack("<Q",int(api_origin_addr, 16)))
+        '''
 
-        print("real_call횟수",real_call)
+        #print(f"Real call times: {realCall}" )
 
-        print("call 함수 주소", ripS)
+        #print(f"Call functions address: {ripS}")
 
-        ''''''
-        payload_size=os.stat("./set_file/api_addr").st_size
+        #payload_size=os.stat("./set_file/api_addr").st_size
+        #payload_size = 0x1000
 
+        #print(hex(math.ceil(payload_size/8)))
 
-        ''''''#지금 테스트 하는 부분
-        print(hex(math.ceil(payload_size/8)))
-
-        ''''''
         # 새로운 섹션 값 계산
         print("new section data size : "+str(payload_size/1024)+" KB")
     
@@ -376,6 +390,10 @@ def dump_restart(dumpFileName, OEP:int):
         payload_virtualSize=math.ceil(payload_size/sectionAlignment)*sectionAlignment # 새로운 섹션의 size 계산
         payload_characterstics=0xe0000060 # 섹션의 권한 설정
 
+        
+        payload_rawSize += 0x8000
+        payload_virtualSize += 0x8000
+
         NewSN = ".IT"
         print("New Section Name:",NewSN)
         print("Virtual address:",hex(payload_virtualAddress),"\nVirtual Size:",hex(payload_virtualSize),"\nRaw Size:",hex(payload_rawSize))
@@ -386,8 +404,10 @@ def dump_restart(dumpFileName, OEP:int):
         sectionheader=bytearray(NewSN.encode("utf-8")+b"\x00"*(8-len(NewSN)))+struct.pack("<LLLLLLLL",payload_virtualSize,payload_virtualAddress,payload_rawSize,payload_rawAddress,0,0,0,payload_characterstics)
         newsize=payload_virtualAddress+payload_virtualSize
         noSections+=1
+        '''
         with open("./set_file/api_addr","rb") as payload:
             pdata=payload.read()
+        '''
 
 
         print("Section Header:"," ".join([str(hex(x))[2:] for x in sectionheader]),"\nSection Header Length:",len(sectionheader),"( "+str(hex(len(sectionheader)))+" )","\nNew file size:",newsize,"(",hex(newsize),")","\nNo of sections(updated):",noSections)
@@ -417,8 +437,10 @@ def dump_restart(dumpFileName, OEP:int):
         # Data 
         dll_addr={} # dll이름 : 주소
         api_addr={} # 함수이름 : 주소
-        nameRVA = payload_rawAddress + math.ceil(payload_rawSize/3)   # dll이름, 함수 이름 적는 base 주소
-
+        #nameRVA = payload_rawAddress + math.ceil(payload_rawSize/3)   # dll이름, 함수 이름 적는 base 주소
+        
+        nameRVA = payload_rawAddress + align(payload_size, 0x100)
+    
         for i in dll_dic:
             for j in dll_dic[i]:
                 api_addr[j]=nameRVA
@@ -426,24 +448,27 @@ def dump_restart(dumpFileName, OEP:int):
                 nameRVA +=writeData(nameRVA, j.encode("utf-8"))
             dll_addr[i]=nameRVA    
             nameRVA +=writeData(nameRVA, i.encode("utf-8"))
-
+        '''
         for i in api_addr:
             print("{0} : {1}".format(i,hex(api_addr[i])))
         for i in dll_addr:
             print("{0} : {1}".format(i,hex(dll_addr[i])))
-
+        '''
 
         newSoffset = copy.deepcopy(payload_rawAddress) # dll함수들의 실제 주소가 적히는 곳의 base address, FirstThunk
-        dll_OriginalFT = payload_rawAddress + (math.ceil(payload_rawSize/3) * 2) # OriginalFirstThunk 들이 저장되는 base address 
-        newSimportaddress = payload_rawAddress + ((call_count+5) * 8) # IMAGE_IMPORT_DSCRIPTER 구조체들이 저장되는 base address
-
+        
+        newSimportaddress = align(nameRVA, 0x100) # IMAGE_IMPORT_DSCRIPTER 구조체들이 저장되는 base address
+        newSimportaddressBase = newSimportaddress # OriginalFirstThunk 들이 저장되는 base address 
+       
+        dll_OriginalFT = align(newSimportaddress + len(dll_dic)*20, 0x100) 
+        
         for i in dll_dic:
             Iid = _IMAGE_IMPORT_DESCRIPTOR()
             Iid.FirstThunk = newSoffset
             Iid.Name = dll_addr[i]
             Iid.OriginalFirstThunk = dll_OriginalFT
             for j in dll_dic[i]:
-                print(hex(DLL_SETTING.DllFuncs[i+"_"+j]))
+                #print(hex(DLL_SETTING.DllFuncs[i+"_"+j]))
                 writeLword(newSoffset, DLL_SETTING.DllFuncs[i+"_"+j]) # new 섹션 처음 부분 원본 api 주소 값 쓰기
                 newSoffset+=0x8
                 writeLword(dll_OriginalFT, api_addr[j])
@@ -452,29 +477,17 @@ def dump_restart(dumpFileName, OEP:int):
             dll_OriginalFT+=0x8
             tdata=tdata[:newSimportaddress]+bytes(Iid)+tdata[newSimportaddress+0x14:]
             newSimportaddress += 0x14 #20byte
-            
-        writeDword(peoffset+0x90, (payload_rawAddress + ((call_count+5) * 8))) #import address 주소 값 넣기
         
-        #writeData(0x841500,api_)
-        #writeDword(0x841500, 'aaaa')
-        #print(readDword(0x841500))
-
+        writeDword(peoffset+0x90, newSimportaddressBase) #import address 주소 값 넣기
+        
         # call operand 상대주소 변경
         call_VA = imagebase + payload_virtualAddress
-        for rip in real_call:
+        for rip in realCall:
             rip_VA = imagebase + ripS[rip-1]
             writeDword(ripS[rip-1]+0x2, call_VA-rip_VA-6)
             call_VA += 0x8
 
-        
-        newname=dumpFileName+".exe"
-
-        '''
-        if os.path.exists("dumpfile"):
-            os.remove("dumpfile")
-        '''
-
-        with open(newname,"wb") as outfile:
-            outfile.write(tdata)
+        dumpFileName = GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '_dump'
+        saveDumpfile(dumpFileName, tdata)
         
         print("success")

@@ -2,7 +2,6 @@ import sys
 import struct
 import os
 
-
 def EndOfString(ByteData: bytes) -> str:
     byteString = ""
     for i in ByteData:
@@ -68,13 +67,28 @@ def ViewMemory(addr, listdata):
     for i in range(len(listdata)//2):
         print(f'{addr+i*16:016x}: {listdata[i*2]:016x} {listdata[i*2+1]:016x}')
 
-def saveDumpfile(file,data):
+
+TFdict= {'T':True, 'F':False, 't':True, 'f':False}
+
+def checkInput(userInput):
+    if userInput in ['T', 'F', 't', 'f']:
+        pass
+    else:
+        print("verbose isn't in [T/F, t/f]")
+        sys.exit(1)
+
+    if userInput in TFdict:
+        userInput = TFdict[userInput]
+
+    return userInput
+
+def saveDumpfile(fileName:str, data:bytes) -> None:
     print("[Create] Dumpfile!")
     if not os.path.isdir('dumpfiles'):
         os.mkdir('dumpfiles')
-    if os.path.isfile(file):
-        file = file + '_new'
-    path = '\\'.join(['dumpfiles', file])
+    if os.path.isfile(fileName):
+        fileName = fileName + '_new'
+    path = '\\'.join(['dumpfiles', fileName])
     f =open(path,'wb')
     f.write(data)
     f.close()

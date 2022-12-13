@@ -12,7 +12,6 @@ from .kuserSharedData import InitKuserSharedData
 from .hookFuncs import HookFuncs
 from .constValue import *
 from .debugger import Debugger
-from .util import saveDumpfile
 
 import logging
 import struct
@@ -201,7 +200,7 @@ def setUpStructure(uc: object) -> None: #Set up TEB, PEB, ProcessHeap, KuserShar
     uc.reg_write(UC_X86_REG_GS_BASE, TebBase)
     uc.reg_write(UC_X86_REG_CS, 0x400000)
 
-def emulate(program: str,  verbose: bool, mode:str, oep: bool):
+def unpack(program: str,  verbose: bool, mode:str, oep: bool):
     start = datetime.now()
     print(f"\033[93m[{start}] Unpacking Start!\033[0m")
 
@@ -267,13 +266,11 @@ def emulate(program: str,  verbose: bool, mode:str, oep: bool):
         
 
     end = datetime.now()
-    print(f"\033[93m[{start}] Unpacking done...\033[0m")
-    print(f"\033[94mRuntime: [{end-start}]\033[0m")
+    print(f"\033[93m[{end}] Unpacking done...\033[0m")
+    print(f"\033[93mUnpacking Runtime: [{end-start}]\033[0m")
     
-    dump= uc.mem_read(GLOBAL_VAR.ImageBaseStart, GLOBAL_VAR.ImageBaseEnd - GLOBAL_VAR.ImageBaseStart)
-    oepOffset = OEP-GLOBAL_VAR.ImageBaseStart
+    dump, OEP = uc.mem_read(GLOBAL_VAR.ImageBaseStart, GLOBAL_VAR.ImageBaseEnd - GLOBAL_VAR.ImageBaseStart)
 
-    dumpFileName = program.split('\\')[-1].split('.')[0]+"_dump"
-    save(f'{dumpFileName}',dump)
-    return dump, oepOffset
+
+    return dump, OEP
 

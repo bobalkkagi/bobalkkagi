@@ -135,7 +135,7 @@ class CustomFormatter(logging.Formatter):
         self.FORMATS = {
             logging.DEBUG: self.green + "%(levelname)s - %(message)s\n"+d_format +self.reset,
             logging.INFO: self.green + "%(levelname)s" + self.yellow + " - %(message)s"+self.reset,
-            logging.WARNING: self.green + "HOOKING" + self.bold_red + " - %(message)s"+self.reset,
+            logging.WARNING: self.green + "HOOKING" + self.yellow + " - %(message)s"+self.reset,
             logging.ERROR: self.red + self.format_problem_str + self.reset,
             logging.CRITICAL: self.bold_red + self.format_problem_str + self.reset
         }

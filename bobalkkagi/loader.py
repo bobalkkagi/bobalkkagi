@@ -160,20 +160,20 @@ def Section(uc, pe, base, oep):
         if oep:
             try:
                 priv, sectionName = RemoveEXEC(sectionName, section.Characteristics)
-                GLOBAL_VAR.text = [section.VirtualAddress, align(section.Misc_VirtualSize)]
+                GLOBAL_VAR.text = [section.VirtualAddress, align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment)]
             except:
                 priv = RemoveEXEC(sectionName, section.Characteristics)
             
-            info.append([section.Name,base+section.VirtualAddress, align(section.Misc_VirtualSize), PRIVILEGE[priv]])
-            uc.mem_map(base+section.VirtualAddress, align(section.Misc_VirtualSize) , PRIVILEGE[priv])
+            info.append([section.Name,base+section.VirtualAddress, align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment), PRIVILEGE[priv]])
+            uc.mem_map(base+section.VirtualAddress, align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment) , PRIVILEGE[priv])
             GLOBAL_VAR.SectionInfo.append([base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(priv)])
         else:
-            info.append([section.Name,base+section.VirtualAddress,align(section.Misc_VirtualSize),PRIVILEGE[section.Characteristics >>28]])
-            uc.mem_map(base+section.VirtualAddress, align(section.Misc_VirtualSize) , PRIVILEGE[section.Characteristics >>28])
+            info.append([section.Name,base+section.VirtualAddress,align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment),PRIVILEGE[section.Characteristics >>28]])
+            uc.mem_map(base+section.VirtualAddress, align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment) , PRIVILEGE[section.Characteristics >>28])
             GLOBAL_VAR.SectionInfo.append([base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(section.Characteristics >>28)])
 
         uc.mem_write(base+section.VirtualAddress, code)
-        totalSize += align(section.Misc_VirtualSize)
+        totalSize += align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment)
         
     return totalSize, info
 
