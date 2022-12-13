@@ -196,6 +196,8 @@ def rip_emulate(rip):
     try:
         uc.emu_start(imagebase + rip, address + 0x2000) # imagebase + rip (call 위치에서 시작)
     except UcError as e:
+        uc.emu_stop()
+        gc.collect()
         return 0
     
 def dstart(tdata):
