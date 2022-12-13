@@ -269,7 +269,7 @@ def unpack(program: str,  verbose: bool, mode:str, oep: bool):
     print(f"\033[93m[{end}] Unpacking done...\033[0m")
     print(f"\033[93mUnpacking Runtime: [{end-start}]\033[0m")
     
-    dump, OEP = uc.mem_read(GLOBAL_VAR.ImageBaseStart, GLOBAL_VAR.ImageBaseEnd - GLOBAL_VAR.ImageBaseStart)
+    dump = uc.mem_read(GLOBAL_VAR.ImageBaseStart, GLOBAL_VAR.ImageBaseEnd - GLOBAL_VAR.ImageBaseStart)
 
 
     return dump, OEP
