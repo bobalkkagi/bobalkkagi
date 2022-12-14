@@ -25,7 +25,7 @@ dll_list=[]
 call_rip = []
 
 address_size = 0
-
+hookint = 0
 @dataclass
 class _SECTION_MEMBER:
     virtualsize:int = None
@@ -121,7 +121,7 @@ def newSection(lastSection_offset,sectionAlignment):
 
     rawSize += 0x8000
     virtualSize += 0x8000
-    NewSN = ".unwrap"
+    NewSN = "alkkagi"
 
     return virtualAddress, rawAddress, rawSize, virtualSize, characterstics, NewSN
     
@@ -180,6 +180,7 @@ def find_api(uc, access, address, size, value, user_data):
     global dll_list
     global address_size
     global call_addrfunc
+    global hookint
 
     # #print("==================================")
     # print("address : ", hex(address))
@@ -192,12 +193,13 @@ def find_api(uc, access, address, size, value, user_data):
         call_addrfunc[hex(user_data)]=[funcName]
         address_size += 0x8
 
+    uc.hook_del(hookint)
     #print("Find funcion : ", hex(struct.unpack('<Q',uc.mem_read(rsp-0x8,8))[0]))
     uc.emu_stop()
 
 
 def emulate_rip(uc, rip):
-
+    global hookint
         
     uc.reg_write(UC_X86_REG_RAX, 0x0)
     uc.reg_write(UC_X86_REG_RCX, 0x0)
@@ -213,7 +215,7 @@ def emulate_rip(uc, rip):
 
 
     #uc.hook_add(UC_HOOK_MEM_WRITE_UNMAPPED, hook_mem_write_unmapped)
-    uc.hook_add(UC_HOOK_MEM_FETCH_UNMAPPED, find_api, rip)
+    hookint =uc.hook_add(UC_HOOK_MEM_FETCH_UNMAPPED, find_api, rip)
     #uc.hook_add(UC_HOOK_CODE, hooking_code)
 
     try:
@@ -240,6 +242,7 @@ def emulate_start(origin_data):
     uc.mem_write(0x140000000, origin_data)
 
     for ip in call_rip:
+        
         uc.mem_map(StackLimit, StackBase - StackLimit, UC_PROT_ALL)
         emulate_rip(uc, ip)
         uc.mem_unmap(StackLimit, StackBase - StackLimit)
@@ -320,6 +323,7 @@ def dump_restart(dump, OEP:int):
                 if call_check:
                     if isThemidaSection(rip):
                         call_rip.append(rip + section_size)
+                    
             rip += 1
             
         emulate_start(origin_data)
