@@ -41,7 +41,7 @@ def PE_Loader(uc, fileName, base, oep: bool = False) -> None: #
         alignHeaderSize = align(len(pe.header)) 
         uc.mem_map(base, alignHeaderSize, UC_PROT_READ)
         uc.mem_write(base, pe.header)
-        GLOBAL_VAR.SectionInfo.append([base, 0x1000, 0x2]) # header
+        GLOBAL_VAR.SectionInfo.append(["header", base, 0x1000, 0x2]) # header
         base += alignHeaderSize
        
         sectionSize, sectionInfo = Section(uc, pe, originBase, oep)
@@ -94,7 +94,7 @@ def Insert_IAT(uc, pe, base):
         
         dll = pe.get_string_at_rva(import_desc.Name, pefile.MAX_DLL_LENGTH).decode('utf-8') # dll Name 가져오기
 
-    
+        
         if dll.lower() not in DLL_SETTING.LoadedDll:
             PE_Loader(uc, dll, GLOBAL_VAR.DllEnd)
     
@@ -157,6 +157,8 @@ def Section(uc, pe, base, oep):
     for i, section in enumerate(pe.sections): 
         code = section.get_data()
         sectionName = str(section.Name, 'utf-8').replace(' ','').replace('\x00','')
+        if sectionName == ".themida":
+            GLOBAL_VAR.themida = [sectionName, base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(priv)]
         if oep:
             try:
                 priv, sectionName = RemoveEXEC(sectionName, section.Characteristics)
@@ -166,11 +168,11 @@ def Section(uc, pe, base, oep):
             
             info.append([section.Name,base+section.VirtualAddress, align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment), PRIVILEGE[priv]])
             uc.mem_map(base+section.VirtualAddress, align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment) , PRIVILEGE[priv])
-            GLOBAL_VAR.SectionInfo.append([base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(priv)])
+            GLOBAL_VAR.SectionInfo.append([sectionName, base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(priv)])
         else:
             info.append([section.Name,base+section.VirtualAddress,align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment),PRIVILEGE[section.Characteristics >>28]])
             uc.mem_map(base+section.VirtualAddress, align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment) , PRIVILEGE[section.Characteristics >>28])
-            GLOBAL_VAR.SectionInfo.append([base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(section.Characteristics >>28)])
+            GLOBAL_VAR.SectionInfo.append([sectionName, base + section.VirtualAddress, section.Misc_VirtualSize, PrivChange(section.Characteristics >>28)])
 
         uc.mem_write(base+section.VirtualAddress, code)
         totalSize += align(section.Misc_VirtualSize, pe.OPTIONAL_HEADER.SectionAlignment)

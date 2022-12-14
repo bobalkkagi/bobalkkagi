@@ -20,6 +20,7 @@ class GLOBAL_VAR:
     a_queue=[]
     queue_size = 20
     text = []
+    themida = []
 
 
 

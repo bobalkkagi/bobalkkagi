@@ -1,10 +1,10 @@
 from unicorn import *
 from unicorn.x86_const import *
 
-from .loader import PE_Loader
-from .reflector import REFLECTOR
-from .globalValue import DLL_SETTING, HEAP_HANDLE, InvDllDict, GLOBAL_VAR
-from .util import *
+from loader import PE_Loader
+from reflector import REFLECTOR
+from globalValue import DLL_SETTING, HEAP_HANDLE, InvDllDict, GLOBAL_VAR
+from util import *
 
 import struct
 import os
@@ -106,7 +106,7 @@ def hook_GetModuleHandleA(uc, log, regs):
     d_address = 0
     
     handle = EndOfString(bytes(uc.mem_read(REGS.rcx, 0x50))).lower()
-    log.warning(f"HOOK_API_CALL : GetModuleHandleA, RCX : {handle}")    
+     
     
     if handle in REFLECTOR:
         handle = REFLECTOR[handle]
@@ -114,6 +114,7 @@ def hook_GetModuleHandleA(uc, log, regs):
     if handle in DLL_SETTING.LoadedDll:
         d_address = DLL_SETTING.LoadedDll[handle]
 
+    log.warning(f"HOOK_API_CALL : GetModuleHandleA, Handle : {handle}, Address : {hex(d_address)}")   
     if d_address:
         uc.reg_write(UC_X86_REG_RAX, d_address)
     
@@ -442,16 +443,16 @@ def hook_VirtualProtect(uc, log, regs):
     
     log.warning(f"HOOK_API_CALL : VirtualProtect, Address : {hex(REGS.rcx)}, Size : {hex(REGS.rdx)}, Privilege : {hex(REGS.r8)}")
     
-    if align(REGS.rcx) > REGS.rcx:	
+    if align(REGS.rcx) > REGS.rcx:   
         offset =  REGS.rcx - (align(REGS.rcx)- 0x1000)
-        uc.mem_protect(align(REGS.rcx)-0x1000, align(REGS.rdx+offset), privilege[REGS.r8])	
-    else:	
+        uc.mem_protect(align(REGS.rcx)-0x1000, align(REGS.rdx+offset), privilege[REGS.r8])   
+    else:   
         uc.mem_protect(align(REGS.rcx), align(REGS.rdx), privilege[REGS.r8])
     
     oldPriv=0
     for section in GLOBAL_VAR.SectionInfo:
-        if (REGS.rcx - section[0]) >= 0 and (REGS.rcx - section[0]) < section[1] :
-            oldPriv = section[2]
+        if (REGS.rcx - section[1]) >= 0 and (REGS.rcx - section[1]) < section[2] :
+            oldPriv = section[3]
             break         
     
     uc.mem_write(REGS.rsp+8, struct.pack('<Q',REGS.rdx))
