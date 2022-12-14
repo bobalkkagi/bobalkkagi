@@ -121,7 +121,7 @@ def newSection(lastSection_offset,sectionAlignment):
 
     rawSize += 0x8000
     virtualSize += 0x8000
-    NewSN = "alkkagi"
+    NewSN = ".unwrap"
 
     return virtualAddress, rawAddress, rawSize, virtualSize, characterstics, NewSN
     
