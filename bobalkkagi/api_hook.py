@@ -1,10 +1,10 @@
 from unicorn import *
 from unicorn.x86_const import *
 
-from loader import PE_Loader
-from reflector import REFLECTOR
-from globalValue import DLL_SETTING, HEAP_HANDLE, InvDllDict, GLOBAL_VAR
-from util import *
+from .loader import PE_Loader
+from .reflector import REFLECTOR
+from .globalValue import DLL_SETTING, HEAP_HANDLE, InvDllDict, GLOBAL_VAR
+from .util import *
 
 import struct
 import os
