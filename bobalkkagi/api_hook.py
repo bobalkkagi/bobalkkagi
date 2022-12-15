@@ -106,7 +106,9 @@ def hook_GetModuleHandleA(uc, log, regs):
     d_address = 0
     
     handle = EndOfString(bytes(uc.mem_read(REGS.rcx, 0x50))).lower()
-     
+    
+    if ".dll" not in handle: #nc load ws2_32
+        handle += ".dll" 
     
     if handle in REFLECTOR:
         handle = REFLECTOR[handle]

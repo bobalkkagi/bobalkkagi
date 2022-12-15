@@ -210,8 +210,9 @@ def unpack(program: str,  verbose: bool, mode:str, oep: bool):
     
     EP = pe.OPTIONAL_HEADER.AddressOfEntryPoint #Entry Point
     uc.mem_map(StackLimit, StackBase - StackLimit, UC_PROT_ALL) #스택 공간
-
+    
     PE_Loader(uc, program, GLOBAL_VAR.ImageBaseStart, oep)
+    PE_Loader(uc, "user32.dll", GLOBAL_VAR.DllEnd, False)
     setUpStructure(uc)
     
     uc.mem_map(GLOBAL_VAR.HookRegion, 0x1000, UC_PROT_ALL)
@@ -270,7 +271,6 @@ def unpack(program: str,  verbose: bool, mode:str, oep: bool):
     print(f"\033[93mUnpacking Runtime: [{end-start}]\033[0m")
     
     dump = uc.mem_read(GLOBAL_VAR.ImageBaseStart, GLOBAL_VAR.ImageBaseEnd - GLOBAL_VAR.ImageBaseStart)
-
 
     return dump, OEP
 

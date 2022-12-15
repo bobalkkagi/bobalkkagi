@@ -314,6 +314,8 @@ def dump_restart(dump, OEP:int):
             if n < (sections_num-1):
                 writeDword(dumpSection_offset + 0x8, (readDword(dumpSection_offset + 0x34) - readDword(dumpSection_offset+ 0xC)))
 
+        unwrapDumpFileName = GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '.dump'
+        saveDumpfile(unwrapDumpFileName, origin_data)
         '''''' # call emul
         rip = 0
 
@@ -404,7 +406,7 @@ def dump_restart(dump, OEP:int):
             writeDword(call_off+0x2, call_virtualvia - call_virtualrip - 0x6)
 
 
-        dumpFileName = GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '.dump'
+        dumpFileName = 'unwrap_'+GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '.dump'
         saveDumpfile(dumpFileName, origin_data)
         
         print("success")

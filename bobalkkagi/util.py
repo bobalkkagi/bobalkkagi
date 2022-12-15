@@ -86,8 +86,8 @@ def saveDumpfile(fileName:str, data:bytes) -> None:
     print("[Create] Dumpfile!")
     if not os.path.isdir('dumpfiles'):
         os.mkdir('dumpfiles')
-    if os.path.isfile(fileName):
-        fileName = fileName + '_new'
+    if os.path.isfile('dumpfiles\\'+fileName):
+        fileName = fileName.split('.')[0] + '_new.dump'
     path = '\\'.join(['dumpfiles', fileName])
     f =open(path,'wb')
     f.write(data)
