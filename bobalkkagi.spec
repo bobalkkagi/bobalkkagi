@@ -2,7 +2,7 @@
 
 from PyInstaller.utils.hooks import collect_dynamic_libs
 
-dlls = collect_dynamic_libs("capstone") + collect_dynamic_libs("unicorn") + collect_dynamic_libs("fire")
+dlls = collect_dynamic_libs("capstone") + collect_dynamic_libs("unicorn") + collect_dynamic_libs("fire")+collect_dynamic_libs("distorm3")
 resource_files = [('bobalkkagi/', 'bobalkkagi')]
 block_cipher = None
 

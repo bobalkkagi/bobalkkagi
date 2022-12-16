@@ -28,6 +28,18 @@ files = [
 ]
 
 [[package]]
+name = "distorm3"
+version = "3.5.2"
+description = "The goal of diStorm3 is to decode x86/AMD64 binary streams and return a structure that describes each instruction."
+category = "main"
+optional = false
+python-versions = "*"
+files = [
+    {file = "distorm3-3.5.2-cp37-cp37m-win32.whl", hash = "sha256:42724d36b88d06fb72630e0790acca768b381d94e3ad0e720ba0181821643857"},
+    {file = "distorm3-3.5.2.tar.gz", hash = "sha256:7528228b905d128972205e9b6cb69f328dce0febaa7355b92fae101a8309e144"},
+]
+
+[[package]]
 name = "fire"
 version = "0.4.0"
 description = "A library for automatically generating command line interfaces."
@@ -247,4 +259,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9, <3.11"
-content-hash = "a15079683b5b5f30641bbfd6b844d3b6c4003f9042563bcb68982981fe1b3754"
+content-hash = "96981c1959e0d3e265559c9855e348763117ef3cc764cb6bcec6c829e17376f2"

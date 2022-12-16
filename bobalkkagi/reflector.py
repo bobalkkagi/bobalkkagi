@@ -59,5 +59,5 @@ REFLECTOR = {
         "api-ms-win-core-registry-l1-1-0.dll" : "kernelbase.dll",
         "api-ms-win-core-registry-l1-1-1.dll" : "kernelbase.dll",
         "api-ms-win-core-registry-l1-1-2.dll" : "kernelbase.dll",
-        "api-ms-win-core-com-l1-1-0" : "combase.dll"
+        "api-ms-win-core-com-l1-1-0.dll" : "ole32.dll"
     }
