@@ -11,11 +11,10 @@ from .constValue import *
 
 import copy
 import sys
-import os 
 import string
 import struct
 import math
-import gc
+
 
 origin_data = None
 
@@ -26,6 +25,8 @@ call_addrfunc = {}
 call_test={}
 mov_offset = []
 mov_addrfunc = {}
+jmp_offset = []
+jmp_addrfunc = {}
 dll_list=[]
 call_rip = []
 
@@ -283,15 +284,15 @@ def Injection_call(new_virtualAddress):
                 change_jmp[jmp_offset] = len(change_jmp)
                 writeWord(jmp_offset, 0x15ff)
                 writeDword(jmp_offset+0x2, call_virtualvia - jmp_virtualaddr - 0x6)
-                print("success : call change", hex(jmp_offset), hex(call_offset))
+                #print("success : call change", hex(jmp_offset), hex(call_offset))
             else:
-                print("error : call change False", hex(jmp_offset), hex(call_offset))
+                #print("error : call change False", hex(jmp_offset), hex(call_offset))
                 for change in change_jmp:
                     if hex(readLword(change+(0x06+change_jmp[change]))) == "0xcccccccccccccccc":
                         change_jmp[change+(0x06+change_jmp[change])] = 0
                         writeWord(change+(0x6+change_jmp[change]), 0x15ff)
                         writeDword(change+((0x6+change_jmp[change])+0x2), call_virtualvia - (imagebase + (change+0x6+change_jmp[change])) - 0x6)
-                        print("retry : call change", hex(change+0x6+change_jmp[change]), hex(call_offset))
+                        #print("retry : call change", hex(change+0x6+change_jmp[change]), hex(call_offset))
                         break
                     else:
                         pass
@@ -315,8 +316,25 @@ def Injection_mov(new_virtualAddress):
         
         writeDword(mov_offset+0x3, call_virtualvia - call_virtualrip - 0x7)
        
-
-
+def Injection_jmp(new_virtualAddress):
+    global origin_data
+    # call operand 상대주소 변경
+    imagebase = PEinfo(0, "imagebase")
+    
+    for jmp_offset in jmp_addrfunc: # call_offset 
+        #call_virtualrip = imagebase + call_offset # Call offset + VA imagebase
+        
+        call_virtualrip = imagebase + jmp_offset
+        if (jmp_addrfunc[jmp_offset] == None):
+            pass
+        else:
+            for compare_api in jmp_addrfunc[jmp_offset]: # func_name
+                call_virtualvia = imagebase + new_virtualAddress + api_dic[compare_api]
+            #writeDword(call_offset+0x2, call_virtualvia - call_virtualrip - 0x6)
+            writeWord(jmp_offset, 0x15ff)
+            writeDword(jmp_offset+0x2, call_virtualvia - call_virtualrip - 0x6)
+            writeByte(jmp_offset+0x6, 0xcc)
+        
 def newSection():
     global origin_data
     peoffset, lastSection_offset, sectionAlignment, sections_num = PEinfo("newSection", 0)
@@ -333,7 +351,7 @@ def newSection():
 
     new_rawSize += 0x8000
     new_virtualSize += 0x8000
-    NewSN = ".unwrap"
+    NewSN = ".alkkagi"
 
     # 새로운 섹션 값 계산
 
@@ -397,12 +415,12 @@ def disas(code, address):
     return assem
 
 def hook_mem_write_unmapped(uc, access, address, size, value, user_data):
-    print("unmapped")
-    print(hex(access), hex(address), hex(size), hex(value))
+    #print("unmapped")
+    #print(hex(access), hex(address), hex(size), hex(value))
     code = uc.mem_read(address, size)
     asm=disas(bytes(code),address)
-    print(code)
-    print(asm)
+    #print(code)
+    #print(asm)
     
     for a in asm:
         print("  0x%x: " % a.address +"\t%s" % a.mnemonic +"\t%s\n" % a.op_str)
@@ -449,6 +467,35 @@ def find_api(uc, access, address, size, value, user_data):
     uc.hook_del(hookint)
     uc.emu_stop()
 
+def find_api2(uc, access, address, size, value, user_data):
+    call_addrfunc
+
+    global dll_list
+    global hookint
+    global hookint2
+    global address_size
+
+    #print("==================================")
+    #print("offset : ", hex(user_data))
+    #print("address : ", hex(address))
+    #print("size : ", hex(size))
+    
+    rsp = uc.reg_read(UC_X86_REG_RSP)
+   
+    
+    try:
+        dll_list.append(DLL_SETTING.InverseDllFuncs[address])
+        funcName=DLL_SETTING.InverseDllFuncs[address].split('.dll_')[1]
+        jmp_addrfunc[user_data]=[funcName]
+        address_size += 0x8
+    except :
+        pass
+        #print("error")
+    #print("Find funcion : ", hex(struct.unpack('<Q',uc.mem_read(rsp-0x8,8))[0]))
+    uc.hook_del(hookint2)
+    uc.hook_del(hookint)
+    uc.emu_stop()
+
 def emulate_rip(uc, rip):
     global hookint
     global hookint2
@@ -486,6 +533,43 @@ def emulate_rip(uc, rip):
         uc.emu_stop()
         pass
 
+def emulate_rip2(uc, rip):
+    global hookint
+    global hookint2
+    global count
+    #print("==================================")#
+    #print("call address :", hex(imagebase + rip))
+    
+    count =0
+    uc.reg_write(UC_X86_REG_RAX, 0x0)
+    uc.reg_write(UC_X86_REG_RCX, 0x0)
+    uc.reg_write(UC_X86_REG_RDX, 0x0)
+    uc.reg_write(UC_X86_REG_RBX, 0x0)
+    uc.reg_write(UC_X86_REG_R8, 0x0)
+    uc.reg_write(UC_X86_REG_R9, 0x0)
+    uc.reg_write(UC_X86_REG_R10, 0x0)
+    uc.reg_write(UC_X86_REG_R11, 0x0)
+    uc.reg_write(UC_X86_REG_R12, 0x0)
+    uc.reg_write(UC_X86_REG_RSP, 0x14ff28)
+    uc.reg_write(UC_X86_REG_RBP, 0x0) 
+
+    
+    #uc.hook_add(UC_HOOK_MEM_WRITE_UNMAPPED, hook_mem_write_unmapped)
+    hookint = uc.hook_add(UC_HOOK_MEM_FETCH_UNMAPPED, find_api2, rip)
+    hookint2 = uc.hook_add(UC_HOOK_CODE, hooking_code)
+
+
+    try:
+        
+        uc.emu_start(GLOBAL_VAR.ImageBaseStart + rip, GLOBAL_VAR.ImageBaseStart +rip+ 0x20000) # imagebase + rip (call 위치에서 시작)
+        uc.hook_del(hookint2)
+        uc.hook_del(hookint)
+    except UcError as e:
+        uc.hook_del(hookint)
+        uc.hook_del(hookint2)
+        uc.emu_stop()
+        pass
+
 def check_mov_Instruction(rip):
     global mov_addrfunc
     global dll_list
@@ -499,6 +583,17 @@ def check_mov_Instruction(rip):
             mov_addrfunc[rip] = [funcName]
         except:
             pass
+    except :
+        pass
+
+def check_jmp_Instruction(rip):
+    global jmp_addrfunc
+    global dll_list
+    try:
+        offset = readDword(rip + 3)
+        address = readLword(offset + rip+ 7)
+        if GLOBAL_VAR.themida[1] <= address and address < (GLOBAL_VAR.themida[1]+GLOBAL_VAR.themida[2]):
+            jmp_addrfunc[rip] = None
     except :
         pass
 
@@ -581,7 +676,8 @@ def dump_restart(dump, OEP:int):
     global call_rip
     global mov_offset
     global address_size    
-
+    global jmp_offset
+    global jmp_addrfunc
     origin_data = bytes(dump)
 
     if not PEcompare():
@@ -603,6 +699,8 @@ def dump_restart(dump, OEP:int):
                     call_test[i[0]]=0
             if i[2].split(" ")[0] == "MOV":
                 mov_offset.append(i[0])
+            if i[2].split(" ")[0] == "JMP":
+                jmp_offset.append(i[0])
 
         uc = Uc(UC_ARCH_X86, UC_MODE_64)
         uc.mem_map(0x140000000, 0x1000000, UC_PROT_ALL)
@@ -622,6 +720,13 @@ def dump_restart(dump, OEP:int):
         for rip in mov_offset:
             check_mov_Instruction(rip)
 
+        for rip in jmp_offset:
+            check_jmp_Instruction(rip)
+        
+        for rip in jmp_addrfunc:
+            uc.mem_map(StackLimit, StackBase - StackLimit, UC_PROT_ALL)
+            emulate_rip2(uc , rip)
+            uc.mem_unmap(StackLimit, StackBase - StackLimit)
         
         dll_list=list(set(dll_list))
         
@@ -637,12 +742,13 @@ def dump_restart(dump, OEP:int):
                 api_count[dllName]= 1
             
         #emulate_start()
-        
+        #print(call_addrfunc)
         new_rawAddress = newSection()
         insertIAT(new_rawAddress)
         # call operand 상대주소 변경
         Injection_call(new_rawAddress)
         Injection_mov(new_rawAddress)
+        Injection_jmp(new_rawAddress)
 
         dumpFileName = GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '.dump'
         

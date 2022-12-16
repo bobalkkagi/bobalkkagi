@@ -12,7 +12,7 @@ def Debugger(uc: object, BobLog: object) -> bool:
         ud = input("UNICORN DEBUG > ").lower()
 
         if ud == 'q': #quit 
-
+            GLOBAL_VAR.DebugOption = False
             print("FINISHED DEBUG")
             return False
 
