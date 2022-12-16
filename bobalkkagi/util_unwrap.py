@@ -333,7 +333,7 @@ def newSection():
 
     new_rawSize += 0x8000
     new_virtualSize += 0x8000
-    NewSN = "alkkagi"
+    NewSN = ".unwrap"
 
     # 새로운 섹션 값 계산
 
@@ -644,7 +644,7 @@ def dump_restart(dump, OEP:int):
         Injection_call(new_rawAddress)
         Injection_mov(new_rawAddress)
 
-        dumpFileName = GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '_dump'
+        dumpFileName = GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '.dump'
         
         saveDumpfile(dumpFileName, origin_data)
         
