@@ -271,6 +271,7 @@ def unpack(program: str,  verbose: bool, mode:str, oep: bool):
     print(f"\033[93mUnpacking Runtime: [{end-start}]\033[0m")
     
     dump = uc.mem_read(GLOBAL_VAR.ImageBaseStart, GLOBAL_VAR.ImageBaseEnd - GLOBAL_VAR.ImageBaseStart)
-
+    filename = GLOBAL_VAR.ProtectedFile.split('\\')[-1].split('.')[0] + '.dump'
+    saveDumpfile(filename, dump)
     return dump, OEP
 
