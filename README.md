@@ -86,12 +86,13 @@ This tool may be not working with your window DLL path(C:\Windows\System32)
 #### oep
 ---
 
-**oep** is option to find original entry point. If you turn off this option, you can emulate program after oep**(fast mode can't do it, it works on hook_block and hook_code)**
+**oep** is option to find original entry point. If you turn off this option, you can emulate program after oep
+**(fast mode can't do it, it works on hook_block and hook_code)**
 
 #### debugger
 ---
 
-If you want unpack another protector or different version of themida, you should add necessary hook_api functions(anti debugging, handle, syscall). you can analyze protected program hook_code mode or hook_block mode(more detail in https://github.com/unicorn-engine/unicorn) with **debugger ** option**(working only hook_code mode!)**
+If you want unpack another protector or different version of themida, you should add necessary hook_api functions(anti debugging, handle, syscall). you can analyze protected program hook_code mode or hook_block mode(more detail in https://github.com/unicorn-engine/unicorn) with **debugger option(working only hook_code mode!)**
 
 
 
