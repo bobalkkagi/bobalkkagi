@@ -25,7 +25,7 @@ pip install git+https://github.com/hackerhoon/bobalkkagi.git
 
 Need default Dll folder(win10_v1903) or you can give dll folder path
 
-win10_v1903 folder is in https://github.com/hackerhoon/bobalkkagi
+win10_v1903 folder is in https://github.com/bobalkkagi/bobalkkagi
 
 ### Use
 ```
