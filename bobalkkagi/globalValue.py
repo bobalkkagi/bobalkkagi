@@ -17,7 +17,7 @@ class GLOBAL_VAR:
     InverseHookFuncs={}
     ProtectedFile = None
     DirectoryPath = None
-    a_queue=[]
+    a_queue=[] #to be updated another queue(not ArrayQueue)  
     queue_size = 20
     text = []
     themida = []
