@@ -18,7 +18,7 @@ pip install bobalkkagi
 **or**
 
 ```
-pip install git+https://github.com/hackerhoon/bobalkkagi.git
+pip install git+https://github.com/bobalkkagi/bobalkkagi.git
 ```
 
 ### Notes
